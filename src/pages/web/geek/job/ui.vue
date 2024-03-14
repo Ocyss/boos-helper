@@ -20,12 +20,24 @@
     <el-tab-pane label="统计">
       <div>今日投递: 总投递:</div>
       <div>
-        <el-button
-          type="primary"
-          help="点击批量投递开始批量投简历，请先通过上方Boss的筛选功能筛选大致的范围，然后通过脚本的筛选进一步确认投递目标。"
-        >
-          开始投递
-        </el-button>
+        <el-button-group>
+          <el-button
+            type="primary"
+            help="点击批量投递开始批量投简历，请先通过上方Boss的筛选功能筛选大致的范围，然后通过脚本的筛选进一步确认投递目标。"
+            :loading="batchButLoad"
+            @click="startBatch"
+          >
+            开始投递
+          </el-button>
+          <el-button
+            v-if="batchButLoad && !batchButStop"
+            type="danger"
+            help="用于停止投递"
+            @click="stopBatch"
+          >
+            停止
+          </el-button>
+        </el-button-group>
       </div>
     </el-tab-pane>
     <el-tab-pane label="筛选" ref="searchRef"></el-tab-pane>
@@ -271,12 +283,14 @@ import {
   ElTooltip,
   ElSelect,
   ElOption,
+  ElButtonGroup,
 } from "element-plus";
-import { findEl, removeEl } from "@/utils/element";
+import { findAllEl, findEl, removeEl } from "@/utils/element";
 import { GM_addValueChangeListener, GM_getValue, GM_setValue } from "$";
 import { ScriptConfig } from "./config";
 import { computed } from "vue";
 import { useMouse, useMouseInElement } from "@vueuse/core";
+import { delay } from "@/utils";
 
 const { x, y } = useMouse({ type: "client" });
 
@@ -287,6 +301,8 @@ const helpContent = ref("鼠标移到对应元素查看提示");
 const helpElWidth = ref(400);
 const { isOutside } = useMouseInElement(tabsRef);
 const formDataKey = "web-geek-job-FormData";
+const batchButLoad = ref(false);
+const batchButStop = ref(false);
 const formData = reactive(
   GM_getValue(formDataKey, {
     company: {
@@ -366,6 +382,43 @@ function findHelp(dom: Element | null) {
     return dom;
   }
   return findHelp(dom.parentElement);
+}
+
+function startBatch() {
+  batchButLoad.value = true;
+  Promise.all([
+    findEl(".job-list-wrapper .search-job-result"),
+    findEl(".job-list-wrapper .options-pages .ui-icon-arrow-right"),
+  ])
+    .then(async ([el, next]) => {
+      if (next.parentElement) next = next.parentElement;
+      else throw new Error("未找到下一页按钮");
+      while (next.className !== "disabled" && !batchButStop.value) {
+        await findAllEl(".job-card-wrapper", { el }).then(jobListHandle);
+        if (batchButStop.value) {
+          return;
+        }
+        (next as HTMLLinkElement).click();
+        await delay(20000);
+      }
+    })
+    .finally(() => {
+      batchButLoad.value = false;
+      batchButStop.value = false;
+    });
+}
+
+function stopBatch() {
+  batchButStop.value = true;
+}
+
+async function jobListHandle(jobList: NodeListOf<Element>) {
+  for (const i in jobList) {
+    if (batchButStop.value) return;
+    const card = jobList[i];
+    console.log(card);
+    await delay(2000);
+  }
 }
 
 onMounted(() => {
