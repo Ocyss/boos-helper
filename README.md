@@ -22,4 +22,11 @@ Boos直聘助手,皆在减少投递简历的麻烦，和提高投递简历的效
 ## 鸣谢
 - https://github.com/yangfeng20/boss_batch_push
 - https://github.com/lisonge/vite-plugin-monkey
-- https://github.com/OpenBMB/MiniCP
+
+## 类似项目
+- https://github.com/Frrrrrrrrank/auto_job__find__chatgpt__rpa
+- https://github.com/noBaldAaa/find-job
+
+## 最后
+
+嗯...
