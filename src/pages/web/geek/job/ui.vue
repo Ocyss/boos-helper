@@ -17,31 +17,93 @@
     </template>
   </el-tooltip>
   <el-tabs ref="tabsRef" help="鼠标移到对应元素查看提示">
-    <el-tab-pane label="统计">
-      <div>今日投递: 总投递:</div>
-      <div>
-        <el-button-group>
+    <el-tab-pane label="统计" help="失败是成功她妈">
+      <el-row :gutter="20">
+        <el-col :span="6">
+          <el-statistic
+            help="愿你每一次投递都能得到回应"
+            :value="138"
+            title="今日投递："
+            suffix="/ 100"
+          ></el-statistic>
+        </el-col>
+        <el-col :span="6">
+          <el-statistic
+            help="愿你早日找到心满意足的工作"
+            :value="138"
+            title="过滤比例："
+            suffix="%"
+          ></el-statistic>
+        </el-col>
+        <el-col :span="6">
+          <el-statistic
+            help="愿你在面试中得到满意的结果"
+            :value="138"
+            title="沟通比例："
+            suffix="%"
+          ></el-statistic>
+        </el-col>
+        <el-col :span="6">
+          <el-statistic
+            help="愿你能早九晚五还双休带五险"
+            :value="138"
+            suffix="份"
+          >
+            <template #title>
+              <el-dropdown trigger="click">
+                <span class="el-dropdown-link">
+                  本周投递：
+                  <el-icon class="el-icon--right"><arrow-down /></el-icon>
+                </span>
+                <template #dropdown>
+                  <el-dropdown-menu>
+                    <el-dropdown-item>近三日投递</el-dropdown-item>
+                    <el-dropdown-item>本周投递</el-dropdown-item>
+                    <el-dropdown-item>本月投递</el-dropdown-item>
+                    <el-dropdown-item>历史投递</el-dropdown-item>
+                  </el-dropdown-menu>
+                </template>
+              </el-dropdown>
+            </template>
+          </el-statistic>
+        </el-col>
+      </el-row>
+      <div style="display: flex">
+        <el-button-group style="margin: 10px 30px 0 0">
           <el-button
             type="primary"
-            help="点击批量投递开始批量投简历，请先通过上方Boss的筛选功能筛选大致的范围，然后通过脚本的筛选进一步确认投递目标。"
+            help="点击开始就会开始投递"
             :loading="batchButLoad"
             @click="startBatch"
           >
-            开始投递
+            开始
+          </el-button>
+          <el-button
+            v-if="batchButLoad && !batchButStop"
+            type="warning"
+            help="暂停后应该能继续"
+            @click="stopBatch"
+          >
+            暂停
           </el-button>
           <el-button
             v-if="batchButLoad && !batchButStop"
             type="danger"
-            help="用于停止投递"
+            help="停止后应该不能继续"
             @click="stopBatch"
           >
             停止
           </el-button>
         </el-button-group>
+        <el-progress help="我会倒车的噢" style="flex: 1" :percentage="100" />
       </div>
     </el-tab-pane>
-    <el-tab-pane label="筛选" ref="searchRef"></el-tab-pane>
-    <el-tab-pane label="配置">
+    <el-tab-pane
+      label="筛选"
+      ref="searchRef"
+      help="可能真的需要?帮助?"
+    ></el-tab-pane>
+    <el-tab-pane label="配置" help="建议全文背诵">
       <el-form
         ref="formRef"
         inline
@@ -176,9 +238,7 @@
           />
         </el-form-item>
         <el-form-item
-          help="编辑自定义招呼语，当【发送自定义招呼语】打开时，投递后发送boss默认的招呼语后还会发送自定义招呼语；使用&lt;br&gt;
-      \\n 换行；例子：【你好\\n我...】；内置变量 $JOBNAME$ $COMPANYNAME$
-      $BOSSNAME$"
+          help="因为boss不支持将自定义的招呼语设置为默认招呼语。开启表示发送boss默认的招呼语后还会发送自定义招呼语, 使用&lt;br&gt;\\n 换行；例子：【你好\\n我...】"
         >
           <template #label>
             <el-checkbox label="自定义招呼语" size="small" />
@@ -189,53 +249,74 @@
             type="textarea"
           />
         </el-form-item>
+        <div>
+          <el-checkbox
+            help="打开将替换招呼语中的部分单词为对应信息；JOBNAME:岗位名 COMPANYNAME:公司名
+      BOSSNAME:招聘人"
+            label="招呼语变量"
+            border
+          />
+          <el-checkbox
+            help="打开后会自动过滤掉最近未活跃的Boss发布的工作。以免浪费每天的100次机会。"
+            label="活跃度过滤"
+            border
+          />
+          <el-checkbox
+            help="可以在网站管理中打开通知权限,当停止时会自动发送桌面端通知提醒。"
+            label="发送通知"
+            border
+          />
+        </div>
       </el-form>
-      <el-button
-        type="primary"
-        help="保持下方脚本筛选项，用于后续直接使用当前配置。"
-        @click="() => GM_setValue(formDataKey, toRaw(formData))"
-      >
-        保存配置
-      </el-button>
-      <el-button
-        type="primary"
-        help="因为boss不支持将自定义的招呼语设置为默认招呼语。开启表示发送boss默认的招呼语后还会发送自定义招呼语"
-      >
-        自动打招呼
-      </el-button>
-      <el-button
-        type="primary"
-        help="打开后会自动过滤掉最近未活跃的Boss发布的工作。以免浪费每天的100次机会。"
-      >
-        活跃度过滤
-      </el-button>
-      "6.可以在网站管理中打开通知权限,当停止时会自动发送桌面端通知提醒。"
+      <div style="margin-top: 15px">
+        <el-button
+          type="primary"
+          help="保持下方脚本筛选项，用于后续直接使用当前配置。"
+          @click="() => GM_setValue(formDataKey, toRaw(formData))"
+        >
+          保存配置
+        </el-button>
+        <el-button type="primary" help="">重载配置</el-button>
+        <el-button type="primary" help="">导出配置</el-button>
+        <el-button type="primary" help="">导入配置</el-button>
+        <el-button type="primary" help="">删除配置</el-button>
+      </div>
     </el-tab-pane>
-    <el-tab-pane label="AI">333</el-tab-pane>
-    <el-tab-pane label="UI">333</el-tab-pane>
-    <el-tab-pane label="日志">
+    <el-tab-pane label="AI" help="我可是为了你,重写了整个项目啊!">
+      哼,你又在画大饼啦??
+    </el-tab-pane>
+    <el-tab-pane label="日志" help="反正你也不看">
       <iframe
         src="https://www.zhipin.com/web/geek/chat"
         frameborder="0"
         style="height: 1px; width: 1px; resize: both; overflow: auto"
       ></iframe>
+      下次在写哇
     </el-tab-pane>
-    <el-tab-pane label="关于" class="hp-about-box">
-      <div class="hp-about">
-        <div>
+    <el-tab-pane
+      label="关于"
+      class="hp-about-box"
+      help="项目是写不完美的,但总要去追求完美"
+    >
+      <div class="hp-about" help="谢谢你的关心">
+        <div help="梦想就是全职开源">
           作者:&#12288;
           <el-link href="https://github.com/Ocyss" target="_blank">
             Ocyss_04
           </el-link>
         </div>
-        <div>
+        <div help="更应该感谢这些人">
           鸣谢:&#12288;
           <el-link href="https://github.com/yangfeng20" target="_blank">
             yangfeng20
           </el-link>
         </div>
       </div>
-      <div class="hp-about" style="margin-left: 20px">
+      <div
+        class="hp-about"
+        help="如果对你有帮助一定要Star呀!"
+        style="margin-left: 20px"
+      >
         <div>
           <el-link
             href="https://github.com/Ocyss"
@@ -255,6 +336,13 @@
           </el-link>
         </div>
       </div>
+      <el-image
+        help="可能并没什么用,只是不让页面空荡荡"
+        style="width: 200px; height: 200px"
+        src="https://img2.imgtp.com/2024/03/16/Jipx1nKP.png"
+        fit="cover"
+        loading="lazy"
+      />
     </el-tab-pane>
     <el-tab-pane>
       <template #label>
@@ -284,6 +372,14 @@ import {
   ElSelect,
   ElOption,
   ElButtonGroup,
+  ElImage,
+  ElRow,
+  ElCol,
+  ElStatistic,
+  ElDropdown,
+  ElDropdownMenu,
+  ElDropdownItem,
+  ElProgress,
 } from "element-plus";
 import { findAllEl, findEl, removeEl } from "@/utils/element";
 import { GM_addValueChangeListener, GM_getValue, GM_setValue } from "$";
@@ -428,9 +524,11 @@ onMounted(() => {
   ]).then(([searchEl, conditionEl]) => {
     searchRef.value.$el.appendChild(searchEl);
     searchRef.value.$el.appendChild(conditionEl);
+    // 搜索栏去APP
     removeEl(".job-search-scan", { el: searchEl });
   });
   findEl(".job-list-wrapper").then((jobListEl) => {
+    // 新职位发布时通知我
     removeEl(".subscribe-weixin-wrapper", { el: jobListEl });
   });
 
@@ -438,13 +536,8 @@ onMounted(() => {
   removeEl(".job-side-wrapper");
   // 侧边悬浮框
   removeEl(".side-bar-box");
-  // 新职位发布时通知我
-  removeEl(".subscribe-weixin-wrapper", { retry: 20, time: 500 });
   // 搜索栏登录框
   removeEl(".go-login-btn");
-  // 搜索栏去APP
-  removeEl(".job-search-scan", { retry: 20, time: 500 });
-
   GM_addValueChangeListener(ScriptConfig.PUSH_COUNT, () => {});
 });
 </script>

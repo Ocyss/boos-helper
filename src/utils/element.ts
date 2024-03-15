@@ -33,7 +33,7 @@ export function findEl<E extends Element = Element>(
       }
       if (retry === 0) {
         clearInterval(t);
-        reject(new Error("Element not found"));
+        reject(new Error(`Element<${selectors}> not found`));
       }
       retry--;
     }, time);
@@ -53,7 +53,7 @@ export function findAllEl<E extends Element = Element>(
       }
       if (retry === 0) {
         clearInterval(t);
-        reject(new Error("Element not found"));
+        reject(new Error(`Element<${selectors}> not found`));
       }
       retry--;
     }, time);
