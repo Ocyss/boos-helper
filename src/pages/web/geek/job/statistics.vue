@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { ref } from "vue";
+import { ref, toRaw } from "vue";
 import {
   ElButton,
   ElButtonGroup,
@@ -13,9 +13,9 @@ import {
   ElIcon,
 } from "element-plus";
 import { findAllEl, findEl } from "@/utils/element";
-
+import { useFormData } from "./hooks/form";
 import { delay } from "@/utils";
-
+const { formData } = useFormData();
 const batchButLoad = ref(false);
 const batchButStop = ref(false);
 const statisticCycle = ref(1);
@@ -54,11 +54,108 @@ function stopBatch() {
   batchButStop.value = true;
 }
 
+type jobFilterError = {
+  msg: string;
+  mods?: string;
+};
 async function jobListHandle(jobList: NodeListOf<Element>) {
   for (const i in jobList) {
     if (batchButStop.value) return;
-    const card = jobList[i];
-    console.log(card);
+    const fn = <E extends Element = Element>(
+      selectors: string,
+      action: (
+        element: E,
+        resolve: () => void,
+        reject: (reason: jobFilterError) => void
+      ) => void
+    ): Promise<void> =>
+      new Promise(async (resolve, reject) => {
+        try {
+          const element = await findEl<E>(selectors, { el: jobList[i] });
+          action(element, resolve, reject);
+        } catch (error: any) {
+          reject({ msg: error.message || error, mods: "findEl" });
+        }
+      });
+
+    const p: [string, Promise<any>][] = [];
+    // 岗位名筛选
+    if (formData.jobTitle.enable) {
+      p.push([
+        "岗位名筛选",
+        fn(".job-title .job-name", (el, resolve, reject) => {
+          const text = el.textContent;
+          if (!text) return { msg: "岗位名为空" };
+          for (const x of formData.jobTitle.value) {
+            if (text.includes(x)) {
+              if (formData.jobTitle.include) {
+                return resolve();
+              }
+              return reject({
+                msg: `岗位名含有排除关键词 [${x}]`,
+                mods: "排除模式",
+              });
+            }
+          }
+          if (formData.jobTitle.include) {
+            return reject({
+              msg: "岗位名不包含关键词",
+              mods: "包含模式",
+            });
+          }
+          return resolve();
+        }),
+      ]);
+    }
+    // 公司名筛选
+    if (formData.company.enable) {
+      p.push([
+        "公司名筛选",
+        fn(".job-card-right .company-name a", (el, resolve, reject) => {
+          const text = el.textContent;
+          if (!text) return { msg: "岗位名为空" };
+          for (const x of formData.company.value) {
+            if (text.includes(x)) {
+              if (formData.company.include) {
+                return resolve();
+              }
+              return reject({
+                msg: `岗位名含有排除关键词 [${x}]`,
+                mods: "排除模式",
+              });
+            }
+          }
+          if (formData.company.include) {
+            return reject({
+              msg: "岗位名不包含关键词",
+              mods: "包含模式",
+            });
+          }
+          return resolve();
+        }),
+      ]);
+    }
+    // 薪资筛选
+    if (formData.salaryRange.enable) {
+      p.push([
+        "薪资筛选",
+        fn(".job-info .salary", (el, resolve, reject) => resolve()),
+      ]);
+    }
+    // 公司规模筛选
+    if (formData.companySizeRange.enable) {
+      p.push([
+        "公司规模筛选",
+        fn(
+          ".job-card-right .company-tag-list li:last-child",
+          (el, resolve, reject) => resolve()
+        ),
+      ]);
+    }
+    ``;
+    // 工作内容筛选
+    if (formData.jobContent.enable) {
+    }
     await delay(2000);
   }
 }

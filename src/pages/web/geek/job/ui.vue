@@ -78,7 +78,7 @@ onMounted(() => {
   });
   findEl(".job-list-wrapper").then((jobListEl) => {
     // 新职位发布时通知我
-    removeEl(".subscribe-weixin-wrapper", { el: jobListEl });
+    removeEl(".subscribe-weixin-wrapper", { el: jobListEl, retry: 20 });
   });
 
   // 侧栏
