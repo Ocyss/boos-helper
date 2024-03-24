@@ -2,31 +2,17 @@ import { delay } from "@/utils";
 import { findEl, getElText } from "@/utils/element";
 import axios from "axios";
 import { useFormData } from "./form";
+import {
+  PublishError,
+  JobTitleError,
+  CompanyNameError,
+  SalaryError,
+  CompanySizeError,
+  JobDescriptionError,
+  UnknownError,
+  errMap,
+} from "./types";
 const { formData, deliverLock, deliverStop } = useFormData();
-
-const errMap = new Map<string, boolean>();
-
-function createCustomError(name: string): any {
-  errMap.set(name, true);
-  return class CustomError extends Error {
-    constructor(
-      message: string,
-      cause?: any
-      // options?: ErrorOptions
-    ) {
-      super(message, { cause });
-      this.name = name;
-      Object.setPrototypeOf(this, CustomError.prototype);
-    }
-  };
-}
-const JobTitleError = createCustomError("岗位名筛选");
-const CompanyNameError = createCustomError("公司名筛选");
-const SalaryError = createCustomError("薪资筛选");
-const CompanySizeError = createCustomError("公司规模筛选");
-const JobDescriptionError = createCustomError("工作内容筛选");
-const UnknownError = createCustomError("未知错误");
-const PublishError = createCustomError("投递出错");
 
 type handleArgs = {
   el: Element;
@@ -79,7 +65,7 @@ function getCookieValue(key: string) {
 }
 async function sendPublishReq(jobTag: Element, errorMsg?: string, retries = 3) {
   if (retries === 0) {
-    throw new PublishError(errorMsg);
+    throw new PublishError(errorMsg || "重试多次失败");
   }
 
   let src = jobTag.querySelector<HTMLLinkElement>(".job-card-left")?.href;
@@ -100,12 +86,11 @@ async function sendPublishReq(jobTag: Element, errorMsg?: string, retries = 3) {
       res.data?.zpData?.bizData?.chatRemindDialog?.content
     ) {
       throw new PublishError(
-        "投递错误",
         res.data?.zpData?.bizData?.chatRemindDialog?.content
       );
     }
     if (res.data.code !== 0) {
-      throw new PublishError("投递状态错误", res.data.message);
+      throw new PublishError("状态错误:" + res.data.message);
     }
     return res.data;
   } catch (e: any) {
@@ -178,14 +163,14 @@ export const useDeliver = () => {
               if (formData.jobTitle.include) {
                 return;
               }
-              throw new JobTitleError(`含有排除关键词`, x);
+              throw new JobTitleError(`含有排除关键词 [${x}]`);
             }
           }
           if (formData.jobTitle.include) {
             throw new JobTitleError("不包含关键词");
           }
         } catch (e: any) {
-          throw new JobTitleError(e.message, e.cause);
+          throw new JobTitleError(e.message);
         }
       });
     }
@@ -201,14 +186,14 @@ export const useDeliver = () => {
               if (formData.jobTitle.include) {
                 return;
               }
-              throw new CompanyNameError(`含有排除关键词`, x);
+              throw new CompanyNameError(`含有排除关键词 [${x}]`);
             }
           }
           if (formData.jobTitle.include) {
             throw new CompanyNameError("不包含关键词");
           }
         } catch (e: any) {
-          throw new CompanyNameError(e.message, e.cause);
+          throw new CompanyNameError(e.message);
         }
       });
     }
@@ -218,9 +203,9 @@ export const useDeliver = () => {
         try {
           const text = getElText(".job-info .salary", el);
           const [v, e] = rangeMatch(text, formData.salaryRange.value);
-          if (!v) throw new SalaryError("不匹配的范围", e);
+          if (!v) throw new SalaryError(`不匹配的范围 [${e}]`);
         } catch (e: any) {
-          throw new SalaryError(e.message, e.cause);
+          throw new SalaryError(e.message);
         }
       });
     }
@@ -233,9 +218,9 @@ export const useDeliver = () => {
             el
           );
           const [v, e] = rangeMatch(text, formData.companySizeRange.value);
-          if (!v) throw new CompanySizeError("不匹配的规模", e);
+          if (!v) throw new CompanySizeError(`不匹配的规模 [${e}]`);
         } catch (e: any) {
-          throw new CompanySizeError(e.message, e.cause);
+          throw new CompanySizeError(e.message);
         }
       });
     }
@@ -255,14 +240,14 @@ export const useDeliver = () => {
               if (formData.jobContent.include) {
                 return;
               }
-              throw new JobDescriptionError("含有排除关键词", x);
+              throw new JobDescriptionError(`含有排除关键词 [${x}]`);
             }
           }
           if (formData.jobContent.include) {
             throw new JobDescriptionError("不包含关键词");
           }
         } catch (e: any) {
-          throw new JobDescriptionError(e.message, e.cause);
+          throw new JobDescriptionError(e.message);
         }
       });
     }
@@ -287,14 +272,14 @@ export const useDeliver = () => {
             args.card = res.data.zpData.jobCard;
             await Promise.all(handlesRes.map((handle) => handle(args)));
           } else {
-            throw UnknownError("请求响应错误", res.data.message);
+            throw new UnknownError("请求响应错误:" + res.data.message);
           }
         }
       } catch (e: any) {
         if (errMap.has(e.name)) {
           throw e;
         }
-        throw new UnknownError("预期之外的错误", e);
+        throw new UnknownError("预期外:" + e.message);
       }
     };
   }
