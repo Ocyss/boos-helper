@@ -59,3 +59,10 @@ export function findAllEl<E extends Element = Element>(
     }, time);
   });
 }
+
+export function getElText<E extends Element = Element>(
+  selectors = "span",
+  el: E
+) {
+  return el.querySelector<E>(selectors)?.textContent || "";
+}

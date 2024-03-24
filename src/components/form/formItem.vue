@@ -3,6 +3,7 @@ import { ElLink, ElFormItem, ElCheckbox } from "element-plus";
 const props = defineProps<{
   label: string;
   help?: string;
+  disabled?: boolean;
 }>();
 
 const include = defineModel<boolean | undefined>("include", {
@@ -20,6 +21,7 @@ const enable = defineModel<boolean>("enable", { required: true });
         @click.stop="include = !include"
         :type="include ? 'primary' : 'warning'"
         size="small"
+        :disabled
       >
         {{ include ? "包含" : "排除" }}
       </el-link>

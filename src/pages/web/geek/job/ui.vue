@@ -245,4 +245,8 @@ onMounted(() => {
 .system-search-condition {
   width: auto !important;
 }
+
+.el-tabs__content {
+  overflow: unset;
+}
 </style>

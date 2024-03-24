@@ -1,6 +1,6 @@
-import { reactive, toRaw } from "vue";
+import { compile, reactive, toRaw, computed, ref } from "vue";
 
-import { GM_getValue, GM_setValue } from "$";
+import { GM_getValue, GM_listValues, GM_setValue } from "$";
 
 import { watchThrottled } from "@vueuse/core";
 
@@ -8,6 +8,7 @@ import deepmerge from "@/utils/deepmerge";
 import { FormData } from "@/types/formData";
 
 const formDataKey = "web-geek-job-FormData";
+const deliverLockKey = "web-geek-job-DeliverLock";
 
 const defaultFormData: FormData = {
   company: {
@@ -73,6 +74,9 @@ const formData: FormData = reactive(
   deepmerge<FormData>(defaultFormData, GM_getValue(formDataKey, {}))
 );
 
+const deliverLock = ref(false);
+const deliverStop = ref(false);
+
 watchThrottled(
   formData,
   (v) => {
@@ -106,6 +110,7 @@ export const useFormData = () => {
     console.log("formData已清空");
   }
   return {
+    deliverLock,
     confSaving,
     confReload,
     confExport,
@@ -114,5 +119,14 @@ export const useFormData = () => {
     formDataKey,
     defaultFormData,
     formData,
+    deliverStop,
+  };
+};
+
+export const useFormStore = () => {
+  return {
+    deliverLock,
+    formData,
+    deliverStop,
   };
 };

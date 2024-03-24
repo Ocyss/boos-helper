@@ -36,4 +36,12 @@ export default defineConfig({
       "@": pathSrc,
     },
   },
+  // server: {
+  //   host: "logapi.zhipin.com",
+  //   port: 80,
+  //   https: {
+  //     key: path.resolve(__dirname, "logapi.zhipin.com-key.pem"),
+  //     cert: path.resolve(__dirname, "logapi.zhipin.com.pem"),
+  //   },
+  // },
 });

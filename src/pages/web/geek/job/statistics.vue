@@ -14,10 +14,11 @@ import {
 } from "element-plus";
 import { findAllEl, findEl } from "@/utils/element";
 import { useFormData } from "./hooks/form";
+import { useDeliver } from "./hooks/deliver";
 import { delay } from "@/utils";
-const { formData } = useFormData();
-const batchButLoad = ref(false);
-const batchButStop = ref(false);
+import axios from "axios";
+const { formData, deliverLock, deliverStop } = useFormData();
+const { jobListHandle } = useDeliver();
 const statisticCycle = ref(1);
 const statisticCycleData = [
   { label: "近三日投递", help: "愿你每一次投递都能得到回应" },
@@ -27,17 +28,18 @@ const statisticCycleData = [
 ];
 
 function startBatch() {
-  batchButLoad.value = true;
+  deliverLock.value = true;
   Promise.all([
     findEl(".job-list-wrapper .search-job-result"),
     findEl(".job-list-wrapper .options-pages .ui-icon-arrow-right"),
   ])
     .then(async ([el, next]) => {
+      console.log("start batch", el, next);
       if (next.parentElement) next = next.parentElement;
       else throw new Error("未找到下一页按钮");
-      while (next.className !== "disabled" && !batchButStop.value) {
+      while (next.className !== "disabled" && !deliverStop.value) {
         await findAllEl(".job-card-wrapper", { el }).then(jobListHandle);
-        if (batchButStop.value) {
+        if (deliverStop.value) {
           return;
         }
         (next as HTMLLinkElement).click();
@@ -45,119 +47,13 @@ function startBatch() {
       }
     })
     .finally(() => {
-      batchButLoad.value = false;
-      batchButStop.value = false;
+      deliverLock.value = false;
+      deliverStop.value = false;
     });
 }
 
 function stopBatch() {
-  batchButStop.value = true;
-}
-
-type jobFilterError = {
-  msg: string;
-  mods?: string;
-};
-async function jobListHandle(jobList: NodeListOf<Element>) {
-  for (const i in jobList) {
-    if (batchButStop.value) return;
-    const fn = <E extends Element = Element>(
-      selectors: string,
-      action: (
-        element: E,
-        resolve: () => void,
-        reject: (reason: jobFilterError) => void
-      ) => void
-    ): Promise<void> =>
-      new Promise(async (resolve, reject) => {
-        try {
-          const element = await findEl<E>(selectors, { el: jobList[i] });
-          action(element, resolve, reject);
-        } catch (error: any) {
-          reject({ msg: error.message || error, mods: "findEl" });
-        }
-      });
-
-    const p: [string, Promise<any>][] = [];
-    // 岗位名筛选
-    if (formData.jobTitle.enable) {
-      p.push([
-        "岗位名筛选",
-        fn(".job-title .job-name", (el, resolve, reject) => {
-          const text = el.textContent;
-          if (!text) return { msg: "岗位名为空" };
-          for (const x of formData.jobTitle.value) {
-            if (text.includes(x)) {
-              if (formData.jobTitle.include) {
-                return resolve();
-              }
-              return reject({
-                msg: `岗位名含有排除关键词 [${x}]`,
-                mods: "排除模式",
-              });
-            }
-          }
-          if (formData.jobTitle.include) {
-            return reject({
-              msg: "岗位名不包含关键词",
-              mods: "包含模式",
-            });
-          }
-          return resolve();
-        }),
-      ]);
-    }
-    // 公司名筛选
-    if (formData.company.enable) {
-      p.push([
-        "公司名筛选",
-        fn(".job-card-right .company-name a", (el, resolve, reject) => {
-          const text = el.textContent;
-          if (!text) return { msg: "岗位名为空" };
-          for (const x of formData.company.value) {
-            if (text.includes(x)) {
-              if (formData.company.include) {
-                return resolve();
-              }
-              return reject({
-                msg: `岗位名含有排除关键词 [${x}]`,
-                mods: "排除模式",
-              });
-            }
-          }
-          if (formData.company.include) {
-            return reject({
-              msg: "岗位名不包含关键词",
-              mods: "包含模式",
-            });
-          }
-          return resolve();
-        }),
-      ]);
-    }
-    // 薪资筛选
-    if (formData.salaryRange.enable) {
-      p.push([
-        "薪资筛选",
-        fn(".job-info .salary", (el, resolve, reject) => resolve()),
-      ]);
-    }
-    // 公司规模筛选
-    if (formData.companySizeRange.enable) {
-      p.push([
-        "公司规模筛选",
-        fn(
-          ".job-card-right .company-tag-list li:last-child",
-          (el, resolve, reject) => resolve()
-        ),
-      ]);
-    }
-    ``;
-    // 工作内容筛选
-    if (formData.jobContent.enable) {
-    }
-    await delay(2000);
-  }
+  deliverStop.value = true;
 }
 </script>
 
@@ -233,13 +129,13 @@ async function jobListHandle(jobList: NodeListOf<Element>) {
       <el-button
         type="primary"
         help="点击开始就会开始投递"
-        :loading="batchButLoad"
+        :loading="deliverLock"
         @click="startBatch"
       >
         开始
       </el-button>
       <el-button
-        v-if="batchButLoad && !batchButStop"
+        v-if="deliverLock && !deliverStop"
         type="warning"
         help="暂停后应该能继续"
         @click="stopBatch"
@@ -247,7 +143,7 @@ async function jobListHandle(jobList: NodeListOf<Element>) {
         暂停
       </el-button>
       <el-button
-        v-if="batchButLoad && !batchButStop"
+        v-if="deliverLock && !deliverStop"
         type="danger"
         help="停止后应该不能继续"
         @click="stopBatch"
