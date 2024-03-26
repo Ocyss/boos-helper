@@ -1,7 +1,7 @@
 import { delay } from "@/utils";
 import { findEl, getElText } from "@/utils/element";
 import axios from "axios";
-import { useFormData } from "./form";
+import { useFormData } from "./useForm";
 import {
   PublishError,
   JobTitleError,
@@ -11,7 +11,10 @@ import {
   JobDescriptionError,
   UnknownError,
   errMap,
+  RepeatError,
+  ActivityError,
 } from "./types";
+import { logData, useLog } from "./useLog";
 const { formData, deliverLock, deliverStop } = useFormData();
 
 type handleArgs = {
@@ -102,6 +105,7 @@ async function sendPublishReq(jobTag: Element, errorMsg?: string, retries = 3) {
 }
 
 export const useDeliver = () => {
+  const log = useLog();
   function rangeMatch(
     rangeStr: string,
     input?: string,
@@ -146,28 +150,41 @@ export const useDeliver = () => {
     return [false, err];
   }
 
-  function createHandle(): (args: handleArgs) => Promise<void> {
+  function createHandle(): (args: handleArgs, ctx: logData) => Promise<void> {
     // 无需调用接口
-    const handles: Array<(args: handleArgs) => Promise<void>> = [];
+    const handles: Array<(args: handleArgs, ctx: logData) => Promise<void>> =
+      [];
     // 需要调用接口
     const handlesRes: Array<(args: handleArgs) => Promise<void>> = [];
 
+    // 已沟通过滤
+    handles.push(async ({ el }) => {
+      try {
+        const text = getElText(".start-chat-btn", el);
+        if (!text) throw new Error("沟通按钮为空");
+        if (!text.includes("立即沟通"))
+          throw new RepeatError(`已经沟通过,按钮状态为 [${text}]`);
+      } catch (e: any) {
+        throw new RepeatError(e.message);
+      }
+    });
     // 岗位名筛选
     if (formData.jobTitle.enable) {
-      handles.push(async ({ el, title }) => {
+      handles.push(async ({ el, title }, ctx) => {
         try {
           const text = title || getElText(".job-title .job-name", el);
           if (!text) throw new Error("岗位名为空");
+          ctx.jobName = text;
           for (const x of formData.jobTitle.value) {
             if (text.includes(x)) {
               if (formData.jobTitle.include) {
                 return;
               }
-              throw new JobTitleError(`含有排除关键词 [${x}]`);
+              throw new JobTitleError(`岗位名含有排除关键词 [${x}]`);
             }
           }
           if (formData.jobTitle.include) {
-            throw new JobTitleError("不包含关键词");
+            throw new JobTitleError("岗位名不包含关键词");
           }
         } catch (e: any) {
           throw new JobTitleError(e.message);
@@ -176,21 +193,22 @@ export const useDeliver = () => {
     }
     // 公司名筛选
     if (formData.company.enable) {
-      handles.push(async ({ el, company }) => {
+      handles.push(async ({ el, company }, ctx) => {
         try {
           const text =
             company || getElText(".job-card-right .company-name a", el);
           if (!text) throw new Error("公司名为空");
+          ctx.companyName = company;
           for (const x of formData.jobTitle.value) {
             if (text.includes(x)) {
               if (formData.jobTitle.include) {
                 return;
               }
-              throw new CompanyNameError(`含有排除关键词 [${x}]`);
+              throw new CompanyNameError(`公司名含有排除关键词 [${x}]`);
             }
           }
           if (formData.jobTitle.include) {
-            throw new CompanyNameError("不包含关键词");
+            throw new CompanyNameError("公司名不包含关键词");
           }
         } catch (e: any) {
           throw new CompanyNameError(e.message);
@@ -199,11 +217,15 @@ export const useDeliver = () => {
     }
     // 薪资筛选
     if (formData.salaryRange.enable) {
-      handles.push(async ({ el }) => {
+      handles.push(async ({ el }, ctx) => {
         try {
           const text = getElText(".job-info .salary", el);
+          ctx.salary = text;
           const [v, e] = rangeMatch(text, formData.salaryRange.value);
-          if (!v) throw new SalaryError(`不匹配的范围 [${e}]`);
+          if (!v)
+            throw new SalaryError(
+              `不匹配的薪资范围 [${e}],预期: ${formData.salaryRange.value}`
+            );
         } catch (e: any) {
           throw new SalaryError(e.message);
         }
@@ -211,14 +233,18 @@ export const useDeliver = () => {
     }
     // 公司规模筛选
     if (formData.companySizeRange.enable) {
-      handles.push(async ({ el }) => {
+      handles.push(async ({ el }, ctx) => {
         try {
           const text = getElText(
             ".job-card-right .company-tag-list", // li:last-child
             el
           );
+          ctx.companySize = text;
           const [v, e] = rangeMatch(text, formData.companySizeRange.value);
-          if (!v) throw new CompanySizeError(`不匹配的规模 [${e}]`);
+          if (!v)
+            throw new CompanySizeError(
+              `不匹配的公司规模 [${e}], 预期: ${formData.companySizeRange.value}`
+            );
         } catch (e: any) {
           throw new CompanySizeError(e.message);
         }
@@ -226,7 +252,7 @@ export const useDeliver = () => {
     }
     // 工作内容筛选
     if (formData.jobContent.enable) {
-      handlesRes.push(async ({ el, card }) => {
+      handlesRes.push(async ({ card }) => {
         try {
           const content = card?.postDescription;
           for (const x of formData.jobContent.value) {
@@ -240,20 +266,36 @@ export const useDeliver = () => {
               if (formData.jobContent.include) {
                 return;
               }
-              throw new JobDescriptionError(`含有排除关键词 [${x}]`);
+              throw new JobDescriptionError(`工作内容含有排除关键词 [${x}]`);
             }
           }
           if (formData.jobContent.include) {
-            throw new JobDescriptionError("不包含关键词");
+            throw new JobDescriptionError("工作内容中不包含关键词");
           }
         } catch (e: any) {
           throw new JobDescriptionError(e.message);
         }
       });
     }
-    return async (args: handleArgs) => {
+    // 活跃度过滤
+    if (formData.activityFilter) {
+      handlesRes.push(async ({ card }) => {
+        try {
+          const activeText = card?.activeTimeDesc;
+          if (
+            !activeText ||
+            activeText.includes("月") ||
+            activeText.includes("年")
+          )
+            throw new ActivityError(`不活跃,当前活跃度 [${activeText}]`);
+        } catch (e: any) {
+          throw new ActivityError(e.message);
+        }
+      });
+    }
+    return async (args: handleArgs, ctx) => {
       try {
-        await Promise.all(handles.map((handle) => handle(args)));
+        await Promise.all(handles.map((handle) => handle(args, ctx)));
         if (handlesRes.length > 0) {
           const params = args.el
             .querySelector<HTMLLinkElement>(".job-card-left")
@@ -270,6 +312,16 @@ export const useDeliver = () => {
           });
           if (res.data.code == 0) {
             args.card = res.data.zpData.jobCard;
+            ctx = {
+              ...ctx,
+              jobName: args.card.jobName,
+              companyName: args.card.brandName,
+              salary: args.card.salaryDesc,
+              experience: args.card.experienceName,
+              degree: args.card.degreeName,
+              jobLabels: args.card.jobLabels,
+              address: args.card.address,
+            };
             await Promise.all(handlesRes.map((handle) => handle(args)));
           } else {
             throw new UnknownError("请求响应错误:" + res.data.message);
@@ -285,23 +337,26 @@ export const useDeliver = () => {
   }
 
   async function jobListHandle(jobList: NodeListOf<Element>) {
+    log.info("获取岗位", `本次获取到 ${jobList.length} 个`);
     const h = createHandle();
     for (const i in jobList) {
-      if (deliverStop.value) return;
+      if (deliverStop.value) {
+        log.info("暂停投递", `剩余 ${jobList.length - Number(i)} 个未处理`);
+        return;
+      }
       try {
         const title = getElText(".job-title .job-name", jobList[i]);
         const company = getElText(
           ".job-card-right .company-name a",
           jobList[i]
         );
-
-        console.log(title, "开始处理");
+        const ctx: logData = {};
         try {
-          await h({ el: jobList[i], title, company });
-          console.log(title, "处理通过,开始投递");
+          await h({ el: jobList[i], title, company }, ctx);
           sendPublishReq(jobList[i]);
+          log.add(title, null, ctx);
         } catch (e: any) {
-          console.log(title, "处理失败", e.name, e.message, e.cause);
+          log.add(title, e, ctx);
         }
       } finally {
         await delay(2000);

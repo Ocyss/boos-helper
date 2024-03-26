@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { ref, h } from "vue";
+import { ref, h, watchEffect } from "vue";
 import {
   ElButton,
   ElIcon,
@@ -8,38 +8,16 @@ import {
   TableV2FixedDir,
   ElTableV2,
   ElAutoResizer,
+  TableV2Instance,
 } from "element-plus";
+import { useLog } from "./hooks/useLog";
+import { onRowRenderedParams } from "element-plus/es/components/table-v2/src/grid";
+const tableRef = ref<TableV2Instance>();
+const { data, columns, Row } = useLog();
 
-import type { Column } from "element-plus";
-
-const columns: Column<any>[] = [
-  {
-    key: "title",
-    title: "岗位名",
-
-    width: 150,
-  },
-  {
-    key: "state",
-    title: "状态",
-    width: 150,
-    align: "center",
-    cellRenderer: ({ cellData: name }) => h(ElTag, {}, name),
-  },
-  {
-    key: "message",
-    title: "信息",
-    cellRenderer: () =>
-      h([
-        h(ElButton, { size: "small" }, "Edit"),
-        h(ElButton, { size: "small", type: "danger" }, "Del"),
-      ]),
-    width: 150,
-    align: "center",
-  },
-];
-
-const data = ref([]);
+watchEffect(() => {
+  tableRef.value?.scrollToRow(data.value.length - 1);
+});
 </script>
 
 <template>
@@ -51,15 +29,24 @@ const data = ref([]);
   <el-auto-resizer>
     <template #default="{ width }">
       <el-table-v2
+        ref="tableRef"
         :columns="columns"
         :data="data"
-        :estimated-row-height="50"
-        :expand-column-key="columns[0].key"
-        :height="400"
+        :height="360"
         :width
-      />
+      ></el-table-v2>
     </template>
   </el-auto-resizer>
 </template>
 
-<style lang="scss" scoped></style>
+<style lang="scss">
+.el-table-v2__row-depth-0 {
+  height: 50px;
+}
+
+.el-table-v2__cell-text {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+</style>

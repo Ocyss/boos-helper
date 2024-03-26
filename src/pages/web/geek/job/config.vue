@@ -10,7 +10,7 @@ import formItem from "@/components/form/formItem.vue";
 import formSelect from "@/components/form/formSelect.vue";
 import deepmerge from "@/utils/deepmerge";
 import { FormData } from "@/types/formData";
-import { useFormData } from "./hooks/form";
+import { useFormData } from "./hooks/useForm";
 const {
   formData,
   deliverLock,
@@ -135,3 +135,4 @@ const {
 </template>
 
 <style lang="scss" scoped></style>
+./hooks/useForm

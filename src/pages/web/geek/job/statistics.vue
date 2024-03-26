@@ -13,10 +13,11 @@ import {
   ElIcon,
 } from "element-plus";
 import { findAllEl, findEl } from "@/utils/element";
-import { useFormData } from "./hooks/form";
-import { useDeliver } from "./hooks/deliver";
+import { useFormData } from "./hooks/useForm";
+import { useDeliver } from "./hooks/useDeliver";
 import { delay } from "@/utils";
-import axios from "axios";
+import { useLog } from "./hooks/useLog";
+const log = useLog();
 const { formData, deliverLock, deliverStop } = useFormData();
 const { jobListHandle } = useDeliver();
 const statisticCycle = ref(1);
@@ -28,6 +29,7 @@ const statisticCycleData = [
 ];
 
 function startBatch() {
+  log.reset();
   deliverLock.value = true;
   Promise.all([
     findEl(".job-list-wrapper .search-job-result"),
@@ -47,6 +49,8 @@ function startBatch() {
       }
     })
     .finally(() => {
+      console.log(log.data);
+
       deliverLock.value = false;
       deliverStop.value = false;
     });
@@ -156,3 +160,4 @@ function stopBatch() {
 </template>
 
 <style lang="scss" scoped></style>
+./hooks/useForm
