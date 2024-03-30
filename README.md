@@ -8,22 +8,35 @@
 
 Boos直聘助手,皆在减少投递简历的麻烦，和提高投递简历的效率
 
+> 本项目处于积极维护状态
+
 ## 未来计划
 
 - [x] 优化UI去除广告
 - [x] 批量投递简历
-- [ ] 自适应UI适配手机
 - 高级筛选
   - [x] 薪资,公司名,工作名,人数,内容简单筛选
   - [ ] 通勤时间
   - [ ] 公司风险评控
-  - [ ] GPT评分筛选
+  - [ ] GPT筛选
 - 自动打招呼
   - [x] 模板语言
   - [ ] 支持GPT调用
-- 多账号管理
+- GPT赋能
+  - [ ] 自动回复聊天
+  - [ ] 多模型管理
+- 额外功能(有时间会写)
+  - [ ] 暗黑模式
+  - [ ] 自适应UI适配手机
+  - [ ] 黑名单
+  - [ ] 多账号管理
+  - [ ] 聊天屏蔽已读消息
+  - [ ] boos消息弹窗
+
 
 ## 参与贡献
+
+> 本项目写的一托,包括文件名,变量名,不完整的注释,解释不到位的help...,如果有更好的命名,功能解释,文件结构优化方案,请直接提交pr,让你的名字出现到贡献者名单中。
 
 1. Fork 本仓库并克隆到本地。
 2. 在新分支上进行您的更改：`git checkout -b 您的分支名称`
@@ -48,6 +61,8 @@ Boos直聘助手,皆在减少投递简历的麻烦，和提高投递简历的效
 - <https://github.com/yangfeng20/boss_batch_push>
 - <https://github.com/lisonge/vite-plugin-monkey>
 
+- <https://www.runoob.com/manual/mqtt/protocol/MQTT-3.1.1-CN.pdf>
+  
 ## 类似项目
 
 - <https://github.com/Frrrrrrrrank/auto_job__find__chatgpt__rpa>

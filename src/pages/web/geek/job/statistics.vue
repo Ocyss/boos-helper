@@ -48,6 +48,9 @@ function startBatch() {
         await delay(20000);
       }
     })
+    .catch((e) => {
+      console.log("获取失败", e);
+    })
     .finally(() => {
       console.log(log.data);
 
@@ -160,4 +163,3 @@ function stopBatch() {
 </template>
 
 <style lang="scss" scoped></style>
-./hooks/useForm

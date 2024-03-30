@@ -1,0 +1,85 @@
+{
+  "nested": {
+    "TechwolfUser": {
+      "fields": {
+        "uid": {
+          "type": "string",
+          "id": 1
+        },
+        "name": {
+          "type": "string",
+          "id": 2
+        },
+        "source": {
+          "type": "int32",
+          "id": 7
+        }
+      }
+    },
+    "TechwolfMessageBody": {
+      "fields": {
+        "type": {
+          "type": "int32",
+          "id": 1
+        },
+        "templateId": {
+          "type": "int32",
+          "id": 2
+        },
+        "headTitle": {
+          "type": "string",
+          "id": 11
+        },
+        "text": {
+          "type": "string",
+          "id": 3
+        }
+      }
+    },
+    "TechwolfMessage": {
+      "fields": {
+        "from": {
+          "type": "TechwolfUser",
+          "id": 1
+        },
+        "to": {
+          "type": "TechwolfUser",
+          "id": 2
+        },
+        "type": {
+          "type": "int32",
+          "id": 3
+        },
+        "mid": {
+          "type": "string",
+          "id": 4
+        },
+        "time": {
+          "type": "string",
+          "id": 5
+        },
+        "body": {
+          "type": "TechwolfMessageBody",
+          "id": 6
+        },
+        "cmid": {
+          "type": "string",
+          "id": 11
+        }
+      }
+    },
+    "TechwolfChatProtocol": {
+      "fields": {
+        "type": {
+          "type": "int32",
+          "id": 1
+        },
+        "messages": {
+          "rule": "repeated",
+          "type": "TechwolfMessage",
+          "id": 3
+        }
+      }
+    }
+  }
+}

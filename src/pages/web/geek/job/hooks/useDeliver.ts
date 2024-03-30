@@ -13,9 +13,11 @@ import {
   errMap,
   RepeatError,
   ActivityError,
+  GreetError,
 } from "./types";
 import { logData, useLog } from "./useLog";
 const { formData, deliverLock, deliverStop } = useFormData();
+import { Message } from "@/pages/web/geek/chat/protobuf";
 
 type handleArgs = {
   el: Element;
@@ -23,38 +25,6 @@ type handleArgs = {
   company?: string;
   card?: JobCard;
 };
-
-function queryString(
-  baseURL: string,
-  queryParams: {
-    securityId: string | null;
-    jobId: string;
-    lid: string | null;
-  }
-) {
-  const queryString = Object.entries(queryParams)
-    .map(
-      ([key, value]) =>
-        `${encodeURIComponent(key)}=${encodeURIComponent(value ?? 0)}`
-    )
-    .join("&");
-
-  return `${baseURL}?${queryString}`;
-}
-
-function parseURL(url: string) {
-  const urlObj = new URL(url);
-  const pathSegments = urlObj.pathname.split("/");
-  const jobId = pathSegments[2].replace(".html", "");
-  const lid = urlObj.searchParams.get("lid");
-  const securityId = urlObj.searchParams.get("securityId");
-
-  return {
-    securityId,
-    jobId,
-    lid,
-  };
-}
 
 function getCookieValue(key: string) {
   const cookies = document.cookie.split(";");
@@ -66,22 +36,50 @@ function getCookieValue(key: string) {
   }
   return null;
 }
-async function sendPublishReq(jobTag: Element, errorMsg?: string, retries = 3) {
+async function sendPublishReq(
+  jobTag: Element,
+  card?: JobCard,
+  errorMsg?: string,
+  retries = 3
+) {
   if (retries === 0) {
     throw new PublishError(errorMsg || "重试多次失败");
   }
+  const url = "https://www.zhipin.com/wapi/zpgeek/friend/add.json";
+  let params: {
+    securityId: string | null;
+    jobId: string | null;
+    lid: string | null;
+  };
+  if (!card) {
+    let src = jobTag.querySelector<HTMLLinkElement>(".job-card-left")?.href;
+    if (!src) {
+      return sendPublishReq(jobTag, card, "未找到元素", retries - 1);
+    }
+    const urlObj = new URL(src);
+    const pathSegments = urlObj.pathname.split("/");
+    const jobId = pathSegments[2].replace(".html", "");
+    const lid = urlObj.searchParams.get("lid");
+    const securityId = urlObj.searchParams.get("securityId");
 
-  let src = jobTag.querySelector<HTMLLinkElement>(".job-card-left")?.href;
-  if (!src) {
-    return sendPublishReq(jobTag, "未找到元素", retries - 1);
+    params = {
+      securityId,
+      jobId,
+      lid,
+    };
+  } else {
+    params = {
+      securityId: card.securityId,
+      jobId: card.encryptJobId,
+      lid: card.lid,
+    };
   }
-  let paramObj = parseURL(src);
-  let url = queryString(
-    "https://www.zhipin.com/wapi/zpgeek/friend/add.json",
-    paramObj
-  );
+
   try {
-    const res = await axios.post(url, null, {
+    const res = await axios({
+      url,
+      params,
+      method: "POST",
       headers: { Zp_token: getCookieValue("geek_zp_token") },
     });
     if (
@@ -100,7 +98,44 @@ async function sendPublishReq(jobTag: Element, errorMsg?: string, retries = 3) {
     if (e instanceof PublishError) {
       throw e;
     }
-    return sendPublishReq(jobTag, e.message, retries - 1);
+    return sendPublishReq(jobTag, card, e.message, retries - 1);
+  }
+}
+async function getBossData(
+  card: JobCard,
+  errorMsg?: string,
+  retries = 3
+): Promise<BoosData> {
+  if (retries === 0) {
+    throw new GreetError(errorMsg || "重试多次失败");
+  }
+  const url = "https://www.zhipin.com/wapi/zpchat/geek/getBossData";
+  try {
+    const data = new FormData();
+    data.append("bossId", card.encryptUserId);
+    data.append("securityId", card.securityId);
+    data.append("bossSrc", "0");
+    const res = await axios<{
+      code: number;
+      message: string;
+      zpData: BoosData;
+    }>({
+      url,
+      data: data,
+      method: "POST",
+      headers: { Zp_token: getCookieValue("geek_zp_token") },
+    });
+    if (res.data.code !== 0 && res.data.message !== "非好友关系") {
+      throw new GreetError("状态错误:" + res.data.message);
+    }
+    if (res.data.code !== 0)
+      return getBossData(card, "非好友关系", retries - 1);
+    return res.data.zpData;
+  } catch (e: any) {
+    if (e instanceof GreetError) {
+      throw e;
+    }
+    return getBossData(card, e.message, retries - 1);
   }
 }
 
@@ -150,12 +185,19 @@ export const useDeliver = () => {
     return [false, err];
   }
 
-  function createHandle(): (args: handleArgs, ctx: logData) => Promise<void> {
+  function createHandle(): {
+    before: (args: handleArgs, ctx: logData) => Promise<void>;
+    after: (args: handleArgs, ctx: logData) => Promise<void>;
+  } {
     // 无需调用接口
     const handles: Array<(args: handleArgs, ctx: logData) => Promise<void>> =
       [];
     // 需要调用接口
-    const handlesRes: Array<(args: handleArgs) => Promise<void>> = [];
+    const handlesRes: Array<(args: handleArgs, ctx: logData) => Promise<void>> =
+      [];
+    const handlesAfter: Array<
+      (args: handleArgs, ctx: logData) => Promise<void>
+    > = [];
 
     // 已沟通过滤
     handles.push(async ({ el }) => {
@@ -293,46 +335,101 @@ export const useDeliver = () => {
         }
       });
     }
-    return async (args: handleArgs, ctx) => {
-      try {
-        await Promise.all(handles.map((handle) => handle(args, ctx)));
-        if (handlesRes.length > 0) {
-          const params = args.el
-            .querySelector<HTMLLinkElement>(".job-card-left")
-            ?.href.split("?")[1];
+    // 自定义招呼语
+    if (formData.customGreeting.enable) {
+      handlesAfter.push(async (args: handleArgs, ctx) => {
+        const boosData = await getBossData(args.card!);
+        let msg = formData.customGreeting.value;
+        if (formData.greetingVariable.value && args.card) {
+          msg = msg.replaceAll("JOBNAME", args.card.jobName);
+          msg = msg.replaceAll("COMPANYNAME", args.card.brandName);
+          msg = msg.replaceAll("BOSSNAME", args.card.bossName);
+        }
+        const buf = new Message({
+          form_uid: window._PAGE.uid.toString(),
+          to_uid: boosData.data.bossId.toString(),
+          to_name: boosData.data.encryptBossId, // encryptUserId
+          content: msg,
+        });
+        ctx.message = msg;
+        console.log("send", buf.hex, buf.toArrayBuffer());
 
-          const res = await axios.get<{
-            code: number;
-            message: string;
-            zpData: {
-              jobCard: JobCard;
-            };
-          }>("https://www.zhipin.com/wapi/zpgeek/job/card.json?" + params, {
-            timeout: 5000,
-          });
-          if (res.data.code == 0) {
-            args.card = res.data.zpData.jobCard;
-            ctx = {
-              ...ctx,
-              jobName: args.card.jobName,
-              companyName: args.card.brandName,
-              salary: args.card.salaryDesc,
-              experience: args.card.experienceName,
-              degree: args.card.degreeName,
-              jobLabels: args.card.jobLabels,
-              address: args.card.address,
-            };
-            await Promise.all(handlesRes.map((handle) => handle(args)));
-          } else {
-            throw new UnknownError("请求响应错误:" + res.data.message);
+        window.ChatWebsocket.send(buf); // 不用手动构造mqtt真爽
+      });
+    }
+    return {
+      before: async (args, ctx) => {
+        try {
+          await Promise.all(handles.map((handle) => handle(args, ctx)));
+          if (handlesRes.length > 0) {
+            const params = args.el
+              .querySelector<HTMLLinkElement>(".job-card-left")
+              ?.href.split("?")[1];
+
+            const res = await axios.get<{
+              code: number;
+              message: string;
+              zpData: {
+                jobCard: JobCard;
+              };
+            }>("https://www.zhipin.com/wapi/zpgeek/job/card.json?" + params, {
+              timeout: 5000,
+            });
+            if (res.data.code == 0) {
+              args.card = res.data.zpData.jobCard;
+              ctx = {
+                ...ctx,
+                jobName: args.card.jobName,
+                companyName: args.card.brandName,
+                salary: args.card.salaryDesc,
+                experience: args.card.experienceName,
+                degree: args.card.degreeName,
+                jobLabels: args.card.jobLabels,
+                address: args.card.address,
+                card: args.card,
+              };
+              await Promise.all(handlesRes.map((handle) => handle(args, ctx)));
+            } else {
+              throw new UnknownError("请求响应错误:" + res.data.message);
+            }
           }
+        } catch (e: any) {
+          if (errMap.has(e.name)) {
+            throw e;
+          }
+          throw new UnknownError("预期外:" + e.message);
         }
-      } catch (e: any) {
-        if (errMap.has(e.name)) {
-          throw e;
+      },
+      after: async (args, ctx) => {
+        if (handlesAfter.length === 0) return;
+        try {
+          if (!args.card) {
+            const params = args.el
+              .querySelector<HTMLLinkElement>(".job-card-left")
+              ?.href.split("?")[1];
+            const res = await axios.get<{
+              code: number;
+              message: string;
+              zpData: {
+                jobCard: JobCard;
+              };
+            }>("https://www.zhipin.com/wapi/zpgeek/job/card.json?" + params, {
+              timeout: 5000,
+            });
+            if (res.data.code == 0) {
+              args.card = res.data.zpData.jobCard;
+            } else {
+              throw new UnknownError("请求响应错误:" + res.data.message);
+            }
+          }
+          await Promise.all(handlesAfter.map((handle) => handle(args, ctx)));
+        } catch (e: any) {
+          if (errMap.has(e.name)) {
+            throw e;
+          }
+          throw new UnknownError("预期外:" + e.message);
         }
-        throw new UnknownError("预期外:" + e.message);
-      }
+      },
     };
   }
 
@@ -352,9 +449,13 @@ export const useDeliver = () => {
         );
         const ctx: logData = {};
         try {
-          await h({ el: jobList[i], title, company }, ctx);
-          sendPublishReq(jobList[i]);
-          log.add(title, null, ctx);
+          await h.before({ el: jobList[i], title, company }, ctx);
+          await sendPublishReq(jobList[i], ctx.card);
+          await h.after(
+            { el: jobList[i], title, company, card: ctx.card },
+            ctx
+          );
+          log.add(title, null, ctx, ctx.message);
         } catch (e: any) {
           log.add(title, e, ctx);
         }

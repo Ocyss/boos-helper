@@ -37,3 +37,5 @@ export const UnknownError = createCustomError("未知错误", "danger");
 export type UnknownError = InstanceType<typeof UnknownError>;
 export const PublishError = createCustomError("投递出错", "danger");
 export type PublishError = InstanceType<typeof PublishError>;
+export const GreetError = createCustomError("打招呼出错", "danger");
+export type GreetError = InstanceType<typeof GreetError>;

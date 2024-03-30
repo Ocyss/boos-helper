@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { onMounted, ref } from "vue";
+import { onMounted, ref, watch, watchEffect } from "vue";
 import { ElTabPane, ElTabs, ElCheckbox, ElTooltip } from "element-plus";
 import { findEl, removeEl } from "@/utils/element";
 
@@ -16,6 +16,7 @@ const { x, y } = useMouse({ type: "client" });
 const helpVisible = ref(false);
 const searchRef = ref();
 const tabsRef = ref();
+const chatIframe = ref<HTMLIFrameElement | null>();
 const helpContent = ref("鼠标移到对应元素查看提示");
 const helpElWidth = ref(400);
 const { isOutside } = useMouseInElement(tabsRef);

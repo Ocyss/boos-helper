@@ -23,6 +23,7 @@ export default defineConfig({
         homepage: "https://github.com/Ocyss/boos-helper",
         match: ["https://*.zhipin.com/*"],
         author: "Ocyss",
+        // "run-at": "document-start",
       },
       build: {
         externalGlobals: {
@@ -35,6 +36,9 @@ export default defineConfig({
     alias: {
       "@": pathSrc,
     },
+  },
+  build: {
+    minify: false,
   },
   // server: {
   //   host: "logapi.zhipin.com",

@@ -31,6 +31,9 @@ export type logData = {
   companyLabel?: string[]; //公司标签
   companySize?: string; //公司规模
   address?: string; //地址
+  card?: JobCard;
+  boosData?: BoosData;
+  message?: string;
 };
 type logState = "info" | "success" | "warning" | "danger";
 
@@ -120,9 +123,10 @@ const data = ref<log[]>([
 ]);
 
 export const useLog = () => {
-  const add = (title: string, err: logErr, logdata?: logData) => {
+  const add = (title: string, err: logErr, logdata?: logData, msg?: string) => {
     const state = !err ? "success" : err.state;
-    const message = err ? err.message : undefined;
+    const message = msg ?? (err ? err.message : undefined);
+
     data.value.push({
       title,
       state,
