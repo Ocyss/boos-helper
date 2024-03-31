@@ -4,7 +4,8 @@ on:
     tags:
       - 'v*.*.*'
   workflow_dispatch:
-  
+
+
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -30,10 +31,13 @@ jobs:
   release:
       needs: build
       runs-on: ubuntu-latest
+      permissions:
+        contents: write
+        discussions: write
       steps:
       - name: Release
         uses: softprops/action-gh-release@v2
         if: startsWith(github.ref, 'refs/tags/')
         with:
           files: |
-            .dist/*
+            ./dist/*
