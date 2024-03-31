@@ -51,4 +51,4 @@ jobs:
         if: startsWith(github.ref, 'refs/tags/')
         with:
           fail_on_unmatched_files: true
-          files: dist/boos-helper.user.js
+          files: dist/**
