@@ -2,7 +2,7 @@ name: Main
 on:
   push:
     tags:
-      - 'v*.*.*'
+      - '*'
   workflow_dispatch:
 
 
