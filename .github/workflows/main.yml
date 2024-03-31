@@ -27,7 +27,12 @@ jobs:
         run: pnpm install
       - name: Build 
         run: pnpm run build
-      
+      - name: Upload Artifacts
+        uses: actions/upload-artifact@v4
+        with: 
+          path: dist/*
+
+
   release:
       needs: build
       runs-on: ubuntu-latest
@@ -35,11 +40,15 @@ jobs:
         contents: write
         discussions: write
       steps:
+      - name: Download Artifacts
+        uses: actions/download-artifact@v4
+        with:
+          path: dist
       - name: ls dist
-        run: ls -la ./dist/*
+        run: ls -la dist/*
       - name: Release
         uses: softprops/action-gh-release@v2
         if: startsWith(github.ref, 'refs/tags/')
         with:
           files: |
-            ./dist/*
+            dist/*
