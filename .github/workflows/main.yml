@@ -47,7 +47,7 @@ jobs:
       - name: ls dist
         run: ls -la dist/*
       - name: Release
-        uses: softprops/action-gh-release@v2
+        uses: softprops/action-gh-release@v2.0.4
         if: startsWith(github.ref, 'refs/tags/')
         with:
           fail_on_unmatched_files: true
