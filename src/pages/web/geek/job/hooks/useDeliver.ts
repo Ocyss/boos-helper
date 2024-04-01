@@ -16,7 +16,7 @@ import {
   GreetError,
 } from "./types";
 import { logData, useLog } from "./useLog";
-const { formData, deliverLock, deliverStop } = useFormData();
+const { formData, todayData, deliverStop } = useFormData();
 import { Message } from "@/pages/web/geek/chat/protobuf";
 
 type handleArgs = {
@@ -207,6 +207,7 @@ export const useDeliver = () => {
         if (!text.includes("立即沟通"))
           throw new RepeatError(`已经沟通过,按钮状态为 [${text}]`);
       } catch (e: any) {
+        todayData.repeat++;
         throw new RepeatError(e.message);
       }
     });
@@ -229,6 +230,7 @@ export const useDeliver = () => {
             throw new JobTitleError("岗位名不包含关键词");
           }
         } catch (e: any) {
+          todayData.jobTitle++;
           throw new JobTitleError(e.message);
         }
       });
@@ -253,6 +255,7 @@ export const useDeliver = () => {
             throw new CompanyNameError("公司名不包含关键词");
           }
         } catch (e: any) {
+          todayData.company++;
           throw new CompanyNameError(e.message);
         }
       });
@@ -269,6 +272,7 @@ export const useDeliver = () => {
               `不匹配的薪资范围 [${e}],预期: ${formData.salaryRange.value}`
             );
         } catch (e: any) {
+          todayData.salaryRange++;
           throw new SalaryError(e.message);
         }
       });
@@ -288,6 +292,7 @@ export const useDeliver = () => {
               `不匹配的公司规模 [${e}], 预期: ${formData.companySizeRange.value}`
             );
         } catch (e: any) {
+          todayData.companySizeRange++;
           throw new CompanySizeError(e.message);
         }
       });
@@ -315,6 +320,7 @@ export const useDeliver = () => {
             throw new JobDescriptionError("工作内容中不包含关键词");
           }
         } catch (e: any) {
+          todayData.jobContent++;
           throw new JobDescriptionError(e.message);
         }
       });
@@ -331,6 +337,7 @@ export const useDeliver = () => {
           )
             throw new ActivityError(`不活跃,当前活跃度 [${activeText}]`);
         } catch (e: any) {
+          todayData.activityFilter++;
           throw new ActivityError(e.message);
         }
       });
@@ -456,10 +463,12 @@ export const useDeliver = () => {
             ctx
           );
           log.add(title, null, ctx, ctx.message);
+          todayData.success++;
         } catch (e: any) {
           log.add(title, e, ctx);
         }
       } finally {
+        todayData.total++;
         await delay(2000);
       }
     }

@@ -50,7 +50,7 @@ jobs:
           echo "VITE_RELEASE_MODE=alpha" >> $GITHUB_ENV
 
       - name: Watch Environment
-        run: echo "version=$VITE_VERSION,mode=$VITE_MODE"
+        run: echo "version=$VITE_VERSION,mode=$VITE_RELEASE_MODE"
 
       - name: Build
         run: pnpm run build

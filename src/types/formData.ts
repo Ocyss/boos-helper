@@ -1,3 +1,16 @@
+export interface Statistics {
+  date: string;
+  success: number;
+  total: number;
+  company: number;
+  jobTitle: number;
+  jobContent: number;
+  salaryRange: number;
+  companySizeRange: number;
+  activityFilter: number;
+  repeat: number;
+}
+
 export interface FormData {
   company: FormDataSelect;
   jobTitle: FormDataSelect;
