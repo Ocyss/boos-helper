@@ -34,11 +34,6 @@ jobs:
         id: current_time
         run: echo "current_time=$(date +%Y-%m-%d)" >> "$GITHUB_OUTPUT"
 
-      - name: Set time output
-        run: echo "Current time is ${{ steps.current_time.outputs.current_time }}"
-        env:
-          CURRENT_TIME: ${{ steps.current_time.outputs.current_time }}
-
       - name: Set Release Environment
         if: startsWith(github.ref, 'refs/tags/')
         run: |
@@ -48,7 +43,7 @@ jobs:
       - name: Set Prerelease Environment
         if: ${{ ! startsWith(github.ref, 'refs/tags/') }}
         run: |
-          echo "VITE_VERSION=$CURRENT_TIME.alpha" >> $GITHUB_ENV
+          echo "VITE_VERSION=${{ steps.current_time.outputs.current_time }}.alpha" >> $GITHUB_ENV
           echo "VITE_RELEASE_MODE=alpha" >> $GITHUB_ENV
 
       - name: Watch Environment
