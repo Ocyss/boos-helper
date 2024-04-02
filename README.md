@@ -6,13 +6,18 @@
 
 ## 项目介绍
 
-Boos直聘助手, 皆在减少投递简历的麻烦, 和提高投递简历的效率
+Boos直聘助手, 皆在减少投递简历的麻烦, 和提高投递简历的效率,技术栈使用VIte + Vue3 + element-plus, 代码由 Vite 打包无加密混淆最小化,开源在 Github 欢迎前来Pr
 
 > 本项目处于积极维护状态
 >
 > 测试阶段,目前可以正常筛选,自动打招呼并且进行投递,统计,GPT等功能制作中
 
-### 版本说明
+## 项目预览
+
+[![统计界面](https://s21.ax1x.com/2024/04/02/pFHa3ZD.png)](https://imgse.com/i/pFHa3ZD)
+[![配置界面](https://s21.ax1x.com/2024/04/02/pFHa8de.png)](https://imgse.com/i/pFHa8de)
+[![日志界面](https://s21.ax1x.com/2024/04/02/pFHalqO.png)](https://imgse.com/i/pFHalqO)
+## 版本说明
 
 [x.x.x] 为正式版本,同步github的release版本,不保证稳定性只是功能相对完善
 
@@ -42,6 +47,12 @@ Boos直聘助手, 皆在减少投递简历的麻烦, 和提高投递简历的效
   - [ ] 多账号管理
   - [ ] 聊天屏蔽已读消息
   - [ ] boos消息弹窗
+
+## 相关链接
+
+Github开源地址: <https://github.com/ocyss/boos-helper>
+
+greasyfork地址: <https://greasyfork.org/zh-CN/scripts/491340>
 
 ## 参与贡献
 
