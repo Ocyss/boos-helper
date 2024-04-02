@@ -13,6 +13,8 @@ jobs:
     strategy:
       matrix:
         node-version: [21]
+    outputs:
+      current_time: ${{ steps.current_time.outputs.current_time }}
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -30,7 +32,7 @@ jobs:
 
       - name: Get current time
         id: current_time
-        run: echo "::set-output name=current_time::$(date +%Y-%m-%d)"
+        run: echo "current_time=$(date +%Y-%m-%d)" >> "$GITHUB_OUTPUT"
 
       - name: Set time output
         run: echo "Current time is ${{ steps.current_time.outputs.current_time }}"
@@ -85,8 +87,8 @@ jobs:
         uses: softprops/action-gh-release@v2.0.4
         if: ${{ ! startsWith(github.ref, 'refs/tags/') }}
         with:
-          name: $VITE_VERSION
-          tag_name: $VITE_VERSION
+          name: ${{needs.build.outputs.current_time}}
+          tag_name: ${{needs.build.outputs.current_time}}
           fail_on_unmatched_files: true
           prerelease: true
           files: dist/**
