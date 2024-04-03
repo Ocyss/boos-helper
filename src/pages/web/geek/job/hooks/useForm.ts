@@ -8,11 +8,11 @@ import deepmerge from "@/utils/deepmerge";
 import { FormData, Statistics } from "@/types/formData";
 import { getCurDay } from "@/utils";
 
-const formDataKey = "web-geek-job-FormData";
-const todayKey = "web-geek-job-Today";
-const statisticsKey = "web-geek-job-Statistics";
+export const formDataKey = "web-geek-job-FormData";
+export const todayKey = "web-geek-job-Today";
+export const statisticsKey = "web-geek-job-Statistics";
 
-const defaultFormData: FormData = {
+export const defaultFormData: FormData = {
   company: {
     label: "公司名",
     help: "投递工作的公司名一定包含或不包含在当前集合中，模糊匹配，可用于只投或不投某个公司/子公司。",

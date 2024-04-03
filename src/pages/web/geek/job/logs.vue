@@ -15,18 +15,13 @@ import { onRowRenderedParams } from "element-plus/es/components/table-v2/src/gri
 const tableRef = ref<TableV2Instance>();
 const { data, columns, Row } = useLog();
 
-watchEffect(() => {
-  tableRef.value?.scrollToRow(data.value.length - 1);
-});
+// watchEffect(() => {
+//   tableRef.value?.scrollToRow(data.value.length - 1);
+// });
 </script>
 
 <template>
-  <!-- <iframe
-    src="https://www.zhipin.com/web/geek/chat"
-    frameborder="0"
-    style="height: 1px; width: 1px; resize: both; overflow: auto"
-  ></iframe> -->
-  <el-auto-resizer>
+  <el-auto-resizer :disableHeight="true">
     <template #default="{ width }">
       <el-table-v2
         ref="tableRef"

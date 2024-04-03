@@ -109,7 +109,7 @@ function stopBatch() {
     <el-col :span="5">
       <el-statistic
         help="统计当天岗位过滤的比例,被过滤/总数"
-        :value="(todayData.total - todayData.success) / todayData.total"
+        :value="((todayData.total - todayData.success) / todayData.total) * 100"
         title="过滤比例："
         suffix="%"
       ></el-statistic>
@@ -117,7 +117,7 @@ function stopBatch() {
     <el-col :span="5">
       <el-statistic
         help="统计当天岗位中已沟通的比例,已沟通/总数"
-        :value="todayData.repeat / todayData.total"
+        :value="(todayData.repeat / todayData.total) * 100"
         title="沟通比例："
         suffix="%"
       ></el-statistic>
@@ -125,7 +125,7 @@ function stopBatch() {
     <el-col :span="5">
       <el-statistic
         help="统计当天岗位中的活跃情况,不活跃/总数"
-        :value="todayData.activityFilter / todayData.total"
+        :value="(todayData.activityFilter / todayData.total) * 100"
         title="活跃比例："
         suffix="%"
       ></el-statistic>

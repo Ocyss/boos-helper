@@ -94,22 +94,32 @@ declare global {
       send(e: { toArrayBuffer(): ArrayBuffer }): void;
     };
     _PAGE: {
-      checkMobileUrl: string;
-      regMobileUrl: string;
-      loginMobileUrl: string;
-      loginAccountUrl: string;
-      getRandomKeyUrl: string;
-      verifyImgUrl: string;
-      getPositionUrl: string;
-      citySiteName: string;
-      citySiteCode: string;
-      skillsUrl: string;
-      uid: number;
-      name: string;
-      face: string;
-      token: string;
-      clientIP: string;
+      isGeekChat: boolean;
       zp_token: string;
+      userId: number;
+      identity: number;
+      encryptUserId: string;
+      name: string;
+      showName: string;
+      tinyAvatar: string;
+      largeAvatar: string;
+      token: string;
+      isHunter: boolean;
+      clientIP: string;
+      email: any;
+      phone: any;
+      brandName: any;
+      doubleIdentity: boolean;
+      recruit: boolean;
+      agentRecruit: boolean;
+      industryCostTag: number;
+      gender: number;
+      trueMan: boolean;
+      studentFlag: boolean;
+      completeDayStatus: boolean;
+      complete: boolean;
+      multiExpect: boolean;
+      uid: number;
     };
   }
 }

@@ -250,4 +250,15 @@ onMounted(() => {
 .el-tabs__content {
   overflow: unset;
 }
+.page-job-wrapper {
+  padding-top: 0 !important;
+  .job-search-wrapper.fix-top {
+    position: unset;
+    width: unset;
+    top: unset;
+    z-index: unset;
+    margin-top: unset;
+    box-shadow: unset;
+  }
+}
 </style>

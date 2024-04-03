@@ -11,13 +11,13 @@ Boos直聘助手, 皆在减少投递简历的麻烦, 和提高投递简历的效
 >
 > 测试阶段,目前可以正常筛选,自动打招呼并且进行投递,统计,GPT等功能制作中
 
-## 项目预览
+### 项目预览
 
 [![统计界面](https://s21.ax1x.com/2024/04/02/pFHa3ZD.png)](https://imgse.com/i/pFHa3ZD)
 [![配置界面](https://s21.ax1x.com/2024/04/02/pFHa8de.png)](https://imgse.com/i/pFHa8de)
 [![日志界面](https://s21.ax1x.com/2024/04/02/pFHalqO.png)](https://imgse.com/i/pFHalqO)
 
-## 未来计划
+### 未来计划
 
 - [x] 优化UI去除广告
 - [x] 批量投递简历
@@ -40,13 +40,13 @@ Boos直聘助手, 皆在减少投递简历的麻烦, 和提高投递简历的效
   - [ ] 聊天屏蔽已读消息
   - [ ] boos消息弹窗
 
-# 免责声明
+## 免责声明
 
 本项目仅供学习交流，禁止用于商业用途
 
 使用该脚本有一定风险(如黑号,封号,权重降低等)，本项目不承担任何责任
 
-# 相关链接
+## 相关链接
 
 Github开源地址: <https://github.com/ocyss/boos-helper>
 
@@ -58,3 +58,13 @@ greasyfork地址: <https://greasyfork.org/zh-CN/scripts/491340>
 - <https://github.com/lisonge/vite-plugin-monkey>
 
 - <https://www.runoob.com/manual/mqtt/protocol/MQTT-3.1.1-CN.pdf>
+
+## Star 趋势
+
+<a href="https://star-history.com/#ocyss/boos-helper&Date">
+ <picture>
+   <source media="(prefers-color-scheme: dark)" srcset="https://api.star-history.com/svg?repos=ocyss/boos-helper&type=Date&theme=dark" />
+   <source media="(prefers-color-scheme: light)" srcset="https://api.star-history.com/svg?repos=ocyss/boos-helper&type=Date" />
+   <img alt="Star History Chart" src="https://api.star-history.com/svg?repos=ocyss/boos-helper&type=Date" />
+ </picture>
+</a>
