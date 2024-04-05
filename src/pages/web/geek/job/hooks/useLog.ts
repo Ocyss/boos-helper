@@ -34,6 +34,7 @@ export type logData = {
   card?: JobCard;
   boosData?: BoosData;
   message?: string;
+  aiFiltering?: string; //Ai筛选
 };
 type logState = "info" | "success" | "warning" | "danger";
 

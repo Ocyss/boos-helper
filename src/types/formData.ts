@@ -22,31 +22,31 @@ export interface FormData {
   activityFilter: FormDataCheckbox;
   notification: FormDataCheckbox;
   aiGreeting: FormDataAi;
-  // aiFiltering: FormDataAi;
-  // aiReply: FormDataAi;
+  aiFiltering: FormDataAi;
+  aiReply: FormDataAi;
 }
 
+export type FormInfoData = {
+  [key in keyof FormData]: {
+    label: string;
+    help?: string;
+  };
+};
+
 export interface FormDataSelect {
-  label: string;
-  help?: string;
   include: boolean;
   value: string[];
   options: string[];
   enable: boolean;
 }
 export interface FormDataInput {
-  label: string;
-  help?: string;
   value: string;
   enable: boolean;
 }
 export interface FormDataCheckbox {
-  label: string;
-  help?: string;
   value: boolean;
 }
 export interface FormDataAi {
-  label: string;
   model?: string;
   word: string;
   enable: boolean;

@@ -14,6 +14,7 @@ import {
   RepeatError,
   ActivityError,
   GreetError,
+  AIFilteringError,
 } from "./types";
 import { logData, useLog } from "./useLog";
 const { formData, todayData, deliverStop } = useFormData();
@@ -302,7 +303,7 @@ export const useDeliver = () => {
       });
     }
     // 工作内容筛选
-    if (formData.jobContent.enable) {
+    if (formData.jobContent.enable || formData.aiFiltering.enable) {
       handlesRes.push(async ({ card }) => {
         try {
           const content = card?.postDescription;
@@ -329,8 +330,57 @@ export const useDeliver = () => {
         }
       });
     }
-    // 活跃度过滤
+    // AI过滤
+    if (formData.aiFiltering.enable) {
+      const template =
+        miTem.compile(`我现在需要求职，让你根据我的需要对岗位进行评分，方便我筛选岗位。
+我的要求是:
+${formData.aiFiltering.word}
+>>>下面是岗位相关信息:
+岗位名:{{ card.jobName }}
+岗位描述:{{ card.postDescription }}
+薪酬:{{ card.salaryDesc }}
+经验要求:{{ card.experienceName }},学历要求:{{ card.degreeName }}
+相关标签:{{ card.jobLabels }}
+>>>>>>>>>>我需要你输出Json格式的字符串，符合以下的定义
+interface aiFiltering {
+  rating: number; // 分数，0-100分，低于60的我会筛选掉
+  negative: string[] | string; // 扣分项，可以是一句话为什么扣分，也可以是数组代表多个扣分项
+  positive: string[] | string; // 加分项，可以是一句话为什么加分，也可以是数组代表多个加分项
+}`);
+
+      const model = modelData.value.find(
+        (v) => v.key === formData.aiGreeting.model
+      );
+      handlesRes.push(async ({ card }, ctx) => {
+        try {
+          const msg = template({ card: card });
+          if (!model) {
+            ElMessage.warning("没有找到AI筛选的模型");
+            return;
+          }
+          const gptMsg = await requestGpt(model, msg);
+          if (!gptMsg) {
+            return;
+          }
+          const data: {
+            rating: number;
+            negative: string[] | string;
+            positive: string[] | string;
+          } = JSON.parse(gptMsg);
+          const mg = `分数${data.rating}\n消极：${data.negative}\n积极：${data.positive}`;
+          ctx.aiFiltering = mg;
+          if (data.rating < 60) {
+            throw new AIFilteringError(mg);
+          }
+        } catch (e: any) {
+          todayData.jobContent++;
+          throw new AIFilteringError(e.message);
+        }
+      });
+    }
     if (formData.activityFilter) {
+      // 活跃度过滤
       handlesRes.push(async ({ card }) => {
         try {
           const activeText = card?.activeTimeDesc;

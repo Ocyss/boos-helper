@@ -9,19 +9,23 @@ import {
   ElLink,
 } from "element-plus";
 import { useModel } from "../hooks/useModel";
-import { useFormData } from "../hooks/useForm";
-import { ref } from "vue";
+import { useFormData, formInfoData } from "../hooks/useForm";
+import { onMounted, ref } from "vue";
+import { FormDataAi, FormData } from "@/types/formData";
 const { formData, confSaving, defaultFormData } = useFormData();
 const { modelData } = useModel();
+const props = defineProps<{
+  data: "aiGreeting" | "aiFiltering" | "aiReply";
+}>();
 const show = defineModel<boolean>({ required: true });
-const val = ref(formData.aiGreeting.word);
-const model = ref(formData.aiGreeting.model);
+const val = ref(formData[props.data].word);
+const model = ref(formData[props.data].model);
 </script>
 
 <template>
   <el-dialog
     v-model="show"
-    title="Ai招呼语配置"
+    :title="formInfoData[data].label"
     width="70%"
     align-center
     destroy-on-close
@@ -51,14 +55,14 @@ const model = ref(formData.aiGreeting.model);
       style="width: 100%"
       :autosize="{ minRows: 10, maxRows: 18 }"
       type="textarea"
-      placeholder="Please input"
+      placeholder="如果无内容或错误内容请直接恢复默认，示例会随脚本更新"
     />
     <template #footer>
       <div>
         <el-button @click="show = false">取消</el-button>
         <el-popconfirm
           title="恢复默认但不保存～"
-          @confirm="val = defaultFormData.aiGreeting.word"
+          @confirm="val = defaultFormData[data].word"
         >
           <template #reference>
             <el-button type="info">默认</el-button>
@@ -68,8 +72,8 @@ const model = ref(formData.aiGreeting.model);
           type="primary"
           @click="
             () => {
-              formData.aiGreeting.model = model;
-              formData.aiGreeting.word = val;
+              formData[data].model = model;
+              formData[data].word = val;
               confSaving();
               show = false;
             }

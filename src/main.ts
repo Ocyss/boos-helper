@@ -91,24 +91,24 @@ async function start(e?: any) {
 logger.debug("开始运行");
 start();
 
-const _wr = function (type: keyof History) {
-  var orig = history[type];
-  return function () {
-    // @ts-ignore
-    var rv = orig.apply(this, arguments);
-    var e = new Event(type);
-    // @ts-ignore
-    e.arguments = arguments;
-    window.dispatchEvent(e);
-    return rv;
-  };
-};
-history.pushState = _wr("pushState");
-history.replaceState = _wr("replaceState");
-window.addEventListener("popstate", start);
-window.addEventListener("hashchange", start);
-window.addEventListener("replaceState", start);
-window.addEventListener("pushState", start);
+// const _wr = function (type: keyof History) {
+//   var orig = history[type];
+//   return function () {
+//     // @ts-ignore
+//     var rv = orig.apply(this, arguments);
+//     var e = new Event(type);
+//     // @ts-ignore
+//     e.arguments = arguments;
+//     window.dispatchEvent(e);
+//     return rv;
+//   };
+// };
+// history.pushState = _wr("pushState");
+// history.replaceState = _wr("replaceState");
+// window.addEventListener("popstate", start);
+// window.addEventListener("hashchange", start);
+// window.addEventListener("replaceState", start);
+// window.addEventListener("pushState", start);
 
 declare global {
   interface Window {

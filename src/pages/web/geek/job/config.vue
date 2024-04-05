@@ -10,7 +10,7 @@ import formItem from "@/components/form/formItem.vue";
 import formSelect from "@/components/form/formSelect.vue";
 import deepmerge from "@/utils/deepmerge";
 import { FormData } from "@/types/formData";
-import { useFormData } from "./hooks/useForm";
+import { useFormData, formInfoData } from "./hooks/useForm";
 const {
   formData,
   deliverLock,
@@ -32,7 +32,7 @@ const {
     :disabled="deliverLock"
   >
     <form-item
-      v-bind="formData.company"
+      v-bind="formInfoData.company"
       v-model:enable="formData.company.enable"
       v-model:include="formData.company.include"
       :disabled="deliverLock"
@@ -43,7 +43,7 @@ const {
       />
     </form-item>
     <form-item
-      v-bind="formData.jobTitle"
+      v-bind="formInfoData.jobTitle"
       v-model:enable="formData.jobTitle.enable"
       v-model:include="formData.jobTitle.include"
       :disabled="deliverLock"
@@ -54,7 +54,7 @@ const {
       />
     </form-item>
     <form-item
-      v-bind="formData.jobContent"
+      v-bind="formInfoData.jobContent"
       v-model:enable="formData.jobContent.enable"
       v-model:include="formData.jobContent.include"
       :disabled="deliverLock"
@@ -65,13 +65,13 @@ const {
       />
     </form-item>
     <form-item
-      v-bind="formData.salaryRange"
+      v-bind="formInfoData.salaryRange"
       v-model:enable="formData.salaryRange.enable"
     >
       <el-input v-model="formData.salaryRange.value" style="width: 240px" />
     </form-item>
     <form-item
-      v-bind="formData.companySizeRange"
+      v-bind="formInfoData.companySizeRange"
       v-model:enable="formData.companySizeRange.enable"
     >
       <el-input
@@ -81,7 +81,7 @@ const {
     </form-item>
 
     <form-item
-      v-bind="formData.customGreeting"
+      v-bind="formInfoData.customGreeting"
       v-model:enable="formData.customGreeting.enable"
     >
       <el-input
