@@ -53,22 +53,14 @@ let t: NodeJS.Timeout;
 
 // // if (window.top !== window.self)
 // Hook();
-async function start() {
-  const app = createApp(App);
-  app.mount(
-    (() => {
-      const appEl = document.createElement("div");
-      appEl.id = "boos-helper";
-      document.body.append(appEl);
-      return appEl;
-    })()
-  );
+async function start(e?: any) {
+  // console.log(location.href, e);
   clearTimeout(t);
   t = setTimeout(async () => {
     const parsedUrl = new URL(location.href);
-    logger.info("BoosHelper加载成功");
     let module = {
       run() {
+        logger.info("BoosHelper加载成功");
         logger.warn("当前页面无对应hook脚本", parsedUrl.pathname);
       },
     };
@@ -81,7 +73,19 @@ async function start() {
         break;
     }
     module.run();
-  }, 1500);
+    if (document.querySelector("#boos-helper")) {
+      return;
+    }
+    const app = createApp(App);
+    app.mount(
+      (() => {
+        const appEl = document.createElement("div");
+        appEl.id = "boos-helper";
+        document.body.append(appEl);
+        return appEl;
+      })()
+    );
+  }, 500);
 }
 
 logger.debug("开始运行");

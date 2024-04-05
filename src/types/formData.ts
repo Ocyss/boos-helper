@@ -21,6 +21,9 @@ export interface FormData {
   greetingVariable: FormDataCheckbox;
   activityFilter: FormDataCheckbox;
   notification: FormDataCheckbox;
+  aiGreeting: FormDataAi;
+  // aiFiltering: FormDataAi;
+  // aiReply: FormDataAi;
 }
 
 export interface FormDataSelect {
@@ -42,3 +45,35 @@ export interface FormDataCheckbox {
   help?: string;
   value: boolean;
 }
+export interface FormDataAi {
+  label: string;
+  model?: string;
+  word: string;
+  enable: boolean;
+}
+
+export type modelData = {
+  key: string;
+  name: string;
+  default: boolean;
+  data:
+    | {
+        mode: "ChatGPT";
+        url: string;
+        model: string;
+        apiKey: string;
+      }
+    | {
+        mode: "自定义";
+        url: string;
+        header: string;
+        data: string;
+      }
+    | {
+        mode: "仅记录";
+        url: string;
+        header: string;
+        data: string;
+        wait: boolean;
+      };
+};

@@ -74,6 +74,7 @@ const clone = async () => {
   position: fixed;
   top: 55px;
   right: 10px;
+  z-index: 999;
 }
 .el-dropdown .el-avatar {
   border: 2px solid #fff;

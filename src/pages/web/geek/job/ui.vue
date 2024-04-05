@@ -117,7 +117,7 @@ onMounted(() => {
     <el-tab-pane label="配置" help="建议全文背诵">
       <configVue></configVue>
     </el-tab-pane>
-    <el-tab-pane label="AI" help="我可是为了你,重写了整个项目啊!">
+    <el-tab-pane label="AI" help="AI时代，脚本怎么能落伍!">
       <aiVue></aiVue>
     </el-tab-pane>
     <el-tab-pane label="日志" help="反正你也不看">

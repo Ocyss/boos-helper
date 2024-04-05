@@ -9,6 +9,9 @@ export async function run() {
     if (!jobSearchWrapper) {
       return;
     }
+    if (document.querySelector("boos-helper-job")) {
+      return;
+    }
     const app = createApp(uiVue);
     app.mount(
       (() => {
@@ -24,5 +27,5 @@ export async function run() {
     );
     clearInterval(timingCutPageTask);
     return;
-  });
+  }, 500);
 }
