@@ -18,7 +18,11 @@ import {
 import { logData, useLog } from "./useLog";
 const { formData, todayData, deliverStop } = useFormData();
 import { Message } from "@/pages/web/geek/chat/protobuf";
-
+// @ts-ignore
+import { miTem } from "mitem";
+import { requestGpt, useModel } from "./useModel";
+import { ElMessage } from "element-plus";
+const { modelData } = useModel();
 type handleArgs = {
   el: Element;
   title?: string;
@@ -343,25 +347,49 @@ export const useDeliver = () => {
       });
     }
     // 自定义招呼语
-    if (formData.customGreeting.enable) {
+    if (formData.customGreeting.enable || formData.aiGreeting.enable) {
+      const template = miTem.compile(
+        formData.aiGreeting.enable
+          ? formData.aiGreeting.word
+          : formData.customGreeting.value
+      );
+      const model = formData.aiGreeting.enable
+        ? modelData.value.find((v) => v.key === formData.aiGreeting.model)
+        : undefined;
       handlesAfter.push(async (args: handleArgs, ctx) => {
-        const boosData = await getBossData(args.card!);
-        let msg = formData.customGreeting.value;
-        if (formData.greetingVariable.value && args.card) {
-          msg = msg.replaceAll("JOBNAME", args.card.jobName);
-          msg = msg.replaceAll("COMPANYNAME", args.card.brandName);
-          msg = msg.replaceAll("BOSSNAME", args.card.bossName);
+        try {
+          const boosData = await getBossData(args.card!);
+          let msg = formData.customGreeting.value;
+          if (
+            (formData.greetingVariable.value || formData.aiGreeting.enable) &&
+            args.card
+          ) {
+            msg = template({ card: args.card });
+          }
+          if (formData.aiGreeting.enable) {
+            if (!model) {
+              ElMessage.warning("没有找到招呼语的模型");
+              return;
+            }
+            const gptMsg = await requestGpt(model, msg);
+            if (gptMsg) {
+              msg = gptMsg;
+            } else {
+              return;
+            }
+          }
+          const buf = new Message({
+            form_uid: window._PAGE.uid.toString(),
+            to_uid: boosData.data.bossId.toString(),
+            to_name: boosData.data.encryptBossId, // encryptUserId
+            content: msg,
+          });
+          ctx.message = msg;
+          console.log("send", buf.hex, buf.toArrayBuffer());
+          window.ChatWebsocket.send(buf); // 不用手动构造mqtt真爽
+        } catch (e: any) {
+          throw new GreetError(e?.message);
         }
-        const buf = new Message({
-          form_uid: window._PAGE.uid.toString(),
-          to_uid: boosData.data.bossId.toString(),
-          to_name: boosData.data.encryptBossId, // encryptUserId
-          content: msg,
-        });
-        ctx.message = msg;
-        console.log("send", buf.hex, buf.toArrayBuffer());
-
-        window.ChatWebsocket.send(buf); // 不用手动构造mqtt真爽
       });
     }
     return {

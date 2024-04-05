@@ -14,6 +14,9 @@ dependencies:
   element-plus:
     specifier: ^2.5.6
     version: 2.5.6(vue@3.4.19)
+  mitem:
+    specifier: ^1.0.9
+    version: 1.0.9
   nanoassert:
     specifier: ^2.0.0
     version: 2.0.0
@@ -1339,6 +1342,12 @@ packages:
       brace-expansion: 2.0.1
     dev: true
 
+  /mitem@1.0.9:
+    resolution: {integrity: sha512-Pe3QpkdHgp9D5BrJL2Y1SjzH7tWo0tmhFlO9OwROgpwz6NcmG0Eh8YrtpLrx5H3+cHc9ounDMqS7P+wyVXI47Q==}
+    dependencies:
+      yarn: 1.22.22
+    dev: false
+
   /mrmime@1.0.1:
     resolution: {integrity: sha512-hzzEagAgDyoU1Q6yg5uI+AorQgdvMCur3FcKf7NhMKWsaYg+RnbTyHRa/9IlLF9rf455MOCtcqqrQQ83pPP7Uw==}
     engines: {node: '>=10'}
@@ -1821,6 +1830,13 @@ packages:
   /yallist@4.0.0:
     resolution: {integrity: sha512-3wdGidZyq5PB084XLES5TpOSRA3wjXAlIWMhum2kRcv/41Sn2emQ0dycQW4uZXLejwKvg6EsvbdlVL+FYEct7A==}
     dev: true
+
+  /yarn@1.22.22:
+    resolution: {integrity: sha512-prL3kGtyG7o9Z9Sv8IPfBNrWTDmXB4Qbes8A9rEzt6wkJV8mUvoirjU0Mp3GGAU06Y0XQyA3/2/RQFVuK7MTfg==}
+    engines: {node: '>=4.0.0'}
+    hasBin: true
+    requiresBuild: true
+    dev: false
 
   /yn@3.1.1:
     resolution: {integrity: sha512-Ux4ygGWsu2c7isFWe8Yu1YluJmqVhxqK2cLXNQA5AcC3QfbGNpM7fu0Y8b/z16pXLnFxZYvWhd3fhBY9DLmC6Q==}

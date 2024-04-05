@@ -57,7 +57,7 @@ export const defaultFormData: FormData = {
   },
   greetingVariable: {
     label: "招呼语变量",
-    help: "打开将替换招呼语中的部分单词为对应信息;JOBNAME:岗位名;COMPANYNAME:公司名; BOSSNAME:招聘人",
+    help: "使用mitem模板引擎来对招呼语进行渲染;",
     value: false,
   },
   activityFilter: {
@@ -70,6 +70,33 @@ export const defaultFormData: FormData = {
     help: "可以在网站管理中打开通知权限,当停止时会自动发送桌面端通知提醒。",
     value: false,
   },
+  aiGreeting: {
+    label: "AI招呼语",
+    enable: false,
+    word: `我现在需要求职，所以请你来写求职招呼语来向boos或hr打招呼，你需要代入我的身份也就是一名求职者.
+我的能力：\"我叫xxx,今年xx岁了，我会......\"
+要求:
+1.我会告诉你岗位信息,你只需要回答招呼语，请优先礼貌为主不要过于使用书信格式而是聊天一样的招呼语，最好能根据岗位信息来改变语气。
+2.一定不可以编造能力,我会啥上面写的很清楚了,如果有我没说的技术栈那就是不会,可以展示其他优势.不要乱写
+3.我需要你在结束的时候告诉他这是ai生成的内容仅供参考
+>>>
+岗位名:{{ card.jobName }}
+岗位描述:{{ card.postDescription }}
+薪酬:{{ card.salaryDesc }}
+经验要求:{{ card.experienceName }},学历要求:{{ card.degreeName }}
+相关标签:{{ card.jobLabels }}
+`,
+  },
+  // aiFiltering: {
+  //   label: "AI过滤",
+  //   enable: false,
+  //   word: "",
+  // },
+  // aiReply: {
+  //   label: "AI回复",
+  //   enable: false,
+  //   word: "",
+  // },
 };
 
 const todayData = reactiveComputed<Statistics>(() => {

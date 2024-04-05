@@ -12,6 +12,7 @@
     "@types/nanoassert": "^2.0.3",
     "axios": "^1.6.7",
     "element-plus": "^2.5.6",
+    "mitem": "^1.0.9",
     "nanoassert": "^2.0.0",
     "vue": "^3.4.14"
   },
