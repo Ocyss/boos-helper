@@ -23,6 +23,7 @@ import { Message } from "@/pages/web/geek/chat/protobuf";
 import { miTem } from "mitem";
 import { requestGpt, useModel } from "./useModel";
 import { ElMessage } from "element-plus";
+import { ref } from "vue";
 const { modelData } = useModel();
 type handleArgs = {
   el: Element;
@@ -30,7 +31,8 @@ type handleArgs = {
   company?: string;
   card?: JobCard;
 };
-
+const total = ref(0);
+const current = ref(0);
 function getCookieValue(key: string) {
   const cookies = document.cookie.split(";");
   for (const cookie of cookies) {
@@ -520,13 +522,17 @@ interface aiFiltering {
 
   async function jobListHandle(jobList: NodeListOf<Element>) {
     log.info("获取岗位", `本次获取到 ${jobList.length} 个`);
+    total.value = jobList.length;
+    jobList.forEach((job) => job.setAttribute("state", "wait"));
     const h = createHandle();
-    for (const i in jobList) {
+    for (let i = jobList.length - 1; i >= 0; i--) {
+      current.value = Number(i);
       if (deliverStop.value) {
-        log.info("暂停投递", `剩余 ${jobList.length - Number(i)} 个未处理`);
+        log.info("暂停投递", `剩余 ${i} 个未处理`);
         return;
       }
       try {
+        jobList[i].setAttribute("state", "handle");
         const title = getElText(".job-title .job-name", jobList[i]);
         const company = getElText(
           ".job-card-right .company-name a",
@@ -542,9 +548,17 @@ interface aiFiltering {
           );
           log.add(title, null, ctx, ctx.message);
           todayData.success++;
+          jobList[i].setAttribute("state", "success");
         } catch (e: any) {
+          jobList[i].setAttribute(
+            "state",
+            e.state === "danger" ? "error" : "warn"
+          );
           log.add(title, e, ctx);
         }
+      } catch (e) {
+        if (jobList[i]) jobList[i].setAttribute("state", "error");
+        console.log("未知报错", e, jobList[i]);
       } finally {
         todayData.total++;
         await delay(2000);
@@ -556,5 +570,7 @@ interface aiFiltering {
     jobListHandle,
     rangeMatch,
     sendPublishReq,
+    total,
+    current,
   };
 };

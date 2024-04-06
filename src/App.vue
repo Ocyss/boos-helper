@@ -9,11 +9,11 @@ import {
   ElDropdownItem,
   ElAvatar,
 } from "element-plus";
-import { GM_deleteValue, GM_listValues } from "$";
+import { GM_deleteValue, GM_getValue, GM_listValues, GM_setValue } from "$";
 import storeVue from "@/components/conf/store.vue";
 import userVue from "@/components/conf/user.vue";
 import logVue from "@/components/conf/log.vue";
-import { ref } from "vue";
+import { onMounted, ref } from "vue";
 logger.info("BoosHelper挂载成功");
 ElMessage("BoosHelper挂载成功!");
 const confBox = ref(false);
@@ -23,7 +23,7 @@ const confs = {
   log: { name: "日志配置", component: logVue },
 };
 const confKey = ref<keyof typeof confs>("store");
-
+const dark = ref(GM_getValue("theme-dark", false));
 const clone = async () => {
   if (confirm("将清空脚本全部的设置!!")) {
     const asyncKeys = await GM_listValues();
@@ -37,6 +37,14 @@ const clone = async () => {
     window.alert("OK!");
   }
 };
+function themeChange() {
+  dark.value = !dark.value;
+  document.documentElement.classList.toggle("dark", dark.value);
+  GM_setValue("theme-dark", dark.value);
+}
+onMounted(() => {
+  document.documentElement.classList.toggle("dark", dark.value);
+});
 </script>
 
 <template>
@@ -60,6 +68,9 @@ const clone = async () => {
           "
         >
           {{ v.name }}
+        </el-dropdown-item>
+        <el-dropdown-item @click="themeChange">
+          暗黑模式（{{ dark ? "开" : "关" }}）
         </el-dropdown-item>
       </el-dropdown-menu>
     </template>
