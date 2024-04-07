@@ -2,7 +2,7 @@
 import { onMounted, ref, watch, watchEffect } from "vue";
 import { ElTabPane, ElTabs, ElCheckbox, ElTooltip } from "element-plus";
 import { findEl, removeEl } from "@/utils/element";
-
+import cardVue from "./card.vue";
 import { computed } from "vue";
 import { useMouse, useMouseInElement } from "@vueuse/core";
 
@@ -96,7 +96,7 @@ onMounted(() => {
 <template>
   <h2>
     Boos-Helper
-    <span v-if="total > 0">{{ current }}/{{ total }}</span>
+    <span v-if="total > 0">{{ total - current }}/{{ total }}</span>
   </h2>
   <div
     style="
@@ -146,6 +146,9 @@ onMounted(() => {
       </template>
     </el-tab-pane>
   </el-tabs>
+  <Teleport to=".page-job-inner .page-job-content">
+    <cardVue></cardVue>
+  </Teleport>
 </template>
 
 <style lang="scss">
@@ -219,7 +222,11 @@ onMounted(() => {
 .job-card-wrapper {
   width: 100% !important;
 }
-
+.page-job-inner .page-job-content {
+  display: flex;
+  flex-direction: column;
+  order: 2;
+}
 .job-card-wrapper {
   border: 3px solid transparent;
   .job-card-footer,
@@ -384,6 +391,7 @@ onMounted(() => {
   .subway-select-wrapper .subway-line-list li,
   .condition-filter-select .current-select,
   .el-vl__wrapper,
+  .el-checkbox__label,
   #boos-helper-job h2 {
     color: #cfd3dc !important;
   }

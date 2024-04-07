@@ -71,7 +71,10 @@ function startBatch() {
       if (next.parentElement) next = next.parentElement;
       else throw new Error("未找到下一页按钮");
       while (next.className !== "disabled" && !deliverStop.value) {
-        await findAllEl(".job-card-wrapper", { el }).then(jobListHandle);
+        await findAllEl(
+          ".job-card-wrapper:not([state]),.job-card-wrapper[state='wait']",
+          { el }
+        ).then(jobListHandle);
         if (deliverStop.value) {
           return;
         }

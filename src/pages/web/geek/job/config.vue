@@ -1,6 +1,14 @@
 <script lang="ts" setup>
 import { reactive, toRaw } from "vue";
-import { ElButton, ElForm, ElInput, ElCheckbox } from "element-plus";
+import {
+  ElButton,
+  ElForm,
+  ElInput,
+  ElCheckbox,
+  ElFormItem,
+  ElSelect,
+  ElOption,
+} from "element-plus";
 
 import { GM_getValue, GM_setValue } from "$";
 
@@ -89,6 +97,18 @@ const {
         style="width: 240px"
       />
     </form-item>
+    <el-form-item label="处理动画">
+      <el-select
+        @v-model="formData.animation"
+        clearable
+        style="width: 240px"
+        placeholder="无动画"
+      >
+        <el-option label="边框" value="frame" />
+        <el-option label="卡片" value="card" />
+        <el-option label="一起" value="together" />
+      </el-select>
+    </el-form-item>
     <div>
       <el-checkbox
         v-bind="formData.greetingVariable"

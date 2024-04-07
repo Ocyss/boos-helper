@@ -24,6 +24,7 @@ export interface FormData {
   aiGreeting: FormDataAi;
   aiFiltering: FormDataAi;
   aiReply: FormDataAi;
+  animation?: "frame" | "card" | "together";
 }
 
 export type FormInfoData = {
