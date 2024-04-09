@@ -5,6 +5,7 @@ import * as url from "url";
 import { logger } from "@/utils/logger";
 import App from "./App.vue";
 import { createApp, ref, watch } from "vue";
+import { delay } from "./utils";
 
 logger.debug("初始化");
 let t: NodeJS.Timeout;
@@ -54,29 +55,25 @@ let t: NodeJS.Timeout;
 
 // if (window.top !== window.self)
 // Hook();
-async function start(e?: any) {
-  // console.log(location.href, e);
-  clearTimeout(t);
-  t = setTimeout(async () => {
-    const parsedUrl = new URL(location.href);
-    let module = {
-      run() {
-        logger.info("BoosHelper加载成功");
-        logger.warn("当前页面无对应hook脚本", parsedUrl.pathname);
-      },
-    };
-    switch (parsedUrl.pathname) {
-      case "/web/geek/job":
-        module = await import("./pages/web/geek/job");
-        break;
-      case "/web/geek/chat":
-        // module = await import("./pages/web/geek/chat");
-        break;
-    }
-    module.run();
-    if (document.querySelector("#boos-helper")) {
-      return;
-    }
+
+async function main(router: any) {
+  let module = {
+    run() {
+      logger.info("BoosHelper加载成功");
+      logger.warn("当前页面无对应hook脚本", router.path);
+    },
+  };
+  switch (router.path) {
+    case "/web/geek/job":
+      module = await import("./pages/web/geek/job");
+      break;
+    case "/web/geek/chat":
+      // module = await import("./pages/web/geek/chat");
+      break;
+  }
+  module.run();
+  const helper = document.querySelector("#boos-helper");
+  if (!helper) {
     const app = createApp(App);
     app.mount(
       (() => {
@@ -86,30 +83,21 @@ async function start(e?: any) {
         return appEl;
       })()
     );
-  }, 500);
+  }
+}
+
+async function start() {
+  let wrap;
+  while (!wrap) {
+    await delay(100);
+    wrap = document.querySelector<Element & { __vue__: any }>("#wrap");
+  }
+  wrap.__vue__.$router.afterHooks.push(main);
+  main(wrap.__vue__.$route);
 }
 
 logger.debug("开始运行");
 start();
-
-// const _wr = function (type: keyof History) {
-//   var orig = history[type];
-//   return function () {
-//     // @ts-ignore
-//     var rv = orig.apply(this, arguments);
-//     var e = new Event(type);
-//     // @ts-ignore
-//     e.arguments = arguments;
-//     window.dispatchEvent(e);
-//     return rv;
-//   };
-// };
-// history.pushState = _wr("pushState");
-// history.replaceState = _wr("replaceState");
-// window.addEventListener("popstate", start);
-// window.addEventListener("hashchange", start);
-// window.addEventListener("replaceState", start);
-// window.addEventListener("pushState", start);
 
 declare global {
   interface Window {

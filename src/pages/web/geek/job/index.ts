@@ -9,7 +9,7 @@ export async function run() {
     if (!jobSearchWrapper) {
       return;
     }
-    if (document.querySelector("boos-helper-job")) {
+    if (document.querySelector("#boos-helper-job")) {
       return;
     }
     const app = createApp(uiVue);

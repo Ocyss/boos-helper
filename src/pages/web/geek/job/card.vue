@@ -1,7 +1,10 @@
 <script lang="ts" setup>
 import { getElText } from "@/utils/element";
-import { ref } from "vue";
+import { ref, onMounted, shallowReadonly, watch } from "vue";
 import { ElTag, ElSpace } from "element-plus";
+import { jobWrapper } from "./hooks/useVue";
+import { JobList } from "@/types/jobList";
+import { syncRefs, toRef } from "@vueuse/core";
 const cards = ref<HTMLDivElement>();
 function scroll(e: any) {
   e.preventDefault();
@@ -11,53 +14,51 @@ function scroll(e: any) {
   let left = -e.wheelDelta || e.deltaY / 2;
   cards.value.scrollLeft = cards.value.scrollLeft + left;
 }
-const _jobList = document.querySelectorAll(
-  ".job-card-wrapper:not([state]),.job-card-wrapper[state='wait']"
-);
-const jobList = Array.from(_jobList).map((e) => {
-  return {
-    jobName: getElText(".job-name", e),
-    jobLabel: Array.from(e.querySelectorAll(".job-info .tag-list li")).map(
-      (e) => e.textContent
-    ),
-    jobArea: getElText(".job-area", e),
-    jobSalary: getElText(".salary", e),
-    jobTechnology: Array.from(
-      e.querySelectorAll(".job-card-footer .tag-list li")
-    ).map((e) => e.textContent),
-    companyTag: Array.from(e.querySelectorAll(".company-tag-list li"))
-      .map((e) => e.textContent)
-      .join(", "),
-    companyDesc: getElText(".info-desc", e),
-    companyAvatar:
-      e.querySelector(".company-logo img")?.getAttribute("src") || "",
-    companyName: getElText(".company-name a", e),
-    hr: getElText(".info-public", e),
-  };
+function convertVue2ToVue3(vue2Data: any) {
+  const reactiveData = shallowReadonly(vue2Data);
+  // for (const key in reactiveData) {
+  //   if (Object.prototype.hasOwnProperty.call(reactiveData, key)) {
+  //     reactiveData[key] = ref(reactiveData[key]);
+  //   }
+  // }
+  return reactiveData;
+}
+const jobVue = jobWrapper();
+const jobList = ref<JobList>(jobVue.jobList);
+
+let originalSet = jobVue.__lookupSetter__("jobList");
+Object.defineProperty(jobVue, "jobList", {
+  set(val) {
+    jobList.value = val;
+    originalSet.call(this, val);
+  },
 });
 </script>
 
 <template>
   <div style="order: -1">
-    <div ref="cards" @wheel.stop="scroll" class="mini-card-grid">
-      <div class="mini-card" v-for="v in jobList">
-        <div class="mini-card-tag">{{ v.companyTag }}</div>
-        <h3 class="mini-card-title">{{ v.jobName }}</h3>
+    <div ref="cards" @wheel.stop="scroll" class="card-grid">
+      <div class="card" v-for="v in jobList">
+        <div class="card-tag">
+          {{ v.brandIndustry }},{{ v.jobDegree }},{{ v.brandScaleName }}
+        </div>
+        <h3 class="card-title">{{ v.jobName }}</h3>
+        <h3 class="card-salary">{{ v.salaryDesc }}</h3>
         <div>
-          <el-space :size="3" wrap>
+          <el-space :size="3" spacer="|" wrap>
             <el-tag
               size="small"
-              v-for="tag in v.jobLabel"
+              v-for="tag in v.skills"
               effect="plain"
               type="warning"
             >
               {{ tag }}
             </el-tag>
           </el-space>
-          <el-space :size="3" spacer="|" wrap>
+          <el-space :size="3" wrap>
             <el-tag
               size="small"
-              v-for="tag in v.jobTechnology"
+              v-for="tag in v.jobLabels"
               effect="plain"
               type="success"
             >
@@ -65,16 +66,21 @@ const jobList = Array.from(_jobList).map((e) => {
             </el-tag>
           </el-space>
         </div>
-        <div class="mini-card-footer">{{ v.companyDesc }}</div>
+        <div class="card-footer">{{ v.welfareList.join(",") }}</div>
         <div class="author-row">
           <img
             alt=""
             class="avatar"
             height="80"
-            :src="v.companyAvatar"
+            :src="v.brandLogo"
             width="80"
           />
-          <span class="company-name">{{ v.companyName }}</span>
+          <div>
+            <span class="company-name">{{ v.brandName }}</span>
+            <h4>
+              {{ v.cityName }}/{{ v.areaDistrict }}/{{ v.businessDistrict }}
+            </h4>
+          </div>
         </div>
       </div>
     </div>
@@ -84,7 +90,7 @@ const jobList = Array.from(_jobList).map((e) => {
 <style lang="scss" scoped>
 // https://css-tricks.com/
 
-.mini-card-grid {
+.card-grid {
   display: grid;
   gap: 1rem;
   grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
@@ -120,7 +126,7 @@ const jobList = Array.from(_jobList).map((e) => {
 .company-name {
   color: #fff;
 }
-.mini-card {
+.card {
   padding: 1.5rem;
   border-radius: 16px;
   background: linear-gradient(85deg, #434343, #262626);
@@ -155,7 +161,7 @@ const jobList = Array.from(_jobList).map((e) => {
 
   @media (max-width: 1200px) {
     & {
-      min-width: 220px;
+      min-width: 250px;
     }
 
     &:not(:first-child) {
@@ -171,17 +177,22 @@ const jobList = Array.from(_jobList).map((e) => {
     }
   }
 }
-.mini-card-tag {
+.card-tag {
   display: block;
   margin: 0 0 0.25rem;
   color: #777;
   font-size: 0.7rem;
 }
-.mini-card-title {
+.card-title {
   font-size: 1.3rem;
-  margin: 0 0 1rem;
+  margin: 0 0 8px;
 }
-.mini-card-footer {
+.card-salary {
+  font-size: 1.1rem;
+  margin: 0 0 1rem;
+  color: #ff442e;
+}
+.card-footer {
   -webkit-margin-before: auto;
   margin-block-start: auto;
   padding: 5px 0;
