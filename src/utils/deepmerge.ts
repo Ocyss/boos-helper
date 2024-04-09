@@ -1,3 +1,4 @@
+// 深度合并
 // https://github.com/sindresorhus/is-plain-obj/blob/main/index.js
 export function isPlainObject(
   item: unknown

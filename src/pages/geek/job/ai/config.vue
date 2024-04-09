@@ -8,11 +8,11 @@ import {
   ElText,
   ElLink,
 } from "element-plus";
-import { useModel } from "../hooks/useModel";
-import { useFormData, formInfoData } from "../hooks/useForm";
+import { useModel } from "@/hooks/useModel";
+import { useConfFormData, formInfoData } from "@/hooks/useConfForm";
 import { onMounted, ref } from "vue";
 import { FormDataAi, FormData } from "@/types/formData";
-const { formData, confSaving, defaultFormData } = useFormData();
+const { formData, confSaving, defaultFormData } = useConfFormData();
 const { modelData } = useModel();
 const props = defineProps<{
   data: "aiGreeting" | "aiFiltering" | "aiReply";

@@ -60,7 +60,7 @@
     "contact": false
 }
 */
-export interface JobListData {
+interface JobListData {
   securityId: string;
   bossAvatar: string;
   bossCert: number;
@@ -109,4 +109,4 @@ export interface JobListData {
   contact: boolean;
 }
 
-export type JobList = JobListData[];
+type JobList = JobListData[];

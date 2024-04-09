@@ -14,14 +14,21 @@ import {
   ElMessage,
 } from "element-plus";
 import { findAllEl, findEl } from "@/utils/element";
-import { useFormData } from "./hooks/useForm";
+
 import { useDeliver } from "./hooks/useDeliver";
 import { delay } from "@/utils";
-import { useLog } from "./hooks/useLog";
+import { useLog } from "@/hooks/useLog";
+import { useCommon } from "@/hooks/useCommon";
+import { useStatistics } from "@/hooks/useStatistics";
+import { useJobList } from "./hooks/useJobList";
+import { usePager } from "./hooks/usePager";
 
 const log = useLog();
-const { todayData, deliverLock, deliverStop, statisticsData } = useFormData();
+const { todayData, statisticsData } = useStatistics();
+const { deliverLock, deliverStop } = useCommon();
 const { jobListHandle } = useDeliver();
+const { jobList } = useJobList();
+const { next, page, prev } = usePager();
 const statisticCycle = ref(1);
 const statisticCycleData = [
   {
@@ -59,39 +66,26 @@ const cycle = computed(() => {
   return ans;
 });
 
-function startBatch() {
+async function startBatch() {
   log.reset();
   deliverLock.value = true;
-  Promise.all([
-    findEl(".job-list-wrapper .search-job-result"),
-    findEl(".job-list-wrapper .options-pages .ui-icon-arrow-right"),
-  ])
-    .then(async ([el, next]) => {
-      console.log("start batch", el, next);
-      if (next.parentElement) next = next.parentElement;
-      else throw new Error("未找到下一页按钮");
-      while (next.className !== "disabled" && !deliverStop.value) {
-        await findAllEl(
-          ".job-card-wrapper:not([state]),.job-card-wrapper[state='wait']",
-          { el }
-        ).then(jobListHandle);
-        if (deliverStop.value) {
-          return;
-        }
-        (next as HTMLLinkElement).click();
-        await delay(20000);
-      }
-    })
-    .catch((e) => {
-      console.log("获取失败", e);
-      ElMessage.error("获取失败!");
-    })
-    .finally(() => {
-      console.log(log.data);
-      ElMessage.info("投递结束");
-      deliverLock.value = false;
-      deliverStop.value = false;
-    });
+  try {
+    console.log("start batch", page);
+    while (page.value.page <= 10) {
+      await delay(10000);
+      jobListHandle(jobList.value);
+      await delay(120000);
+      next();
+    }
+  } catch (e) {
+    console.log("获取失败", e);
+    ElMessage.error("获取失败!");
+  } finally {
+    console.log(log.data);
+    ElMessage.info("投递结束");
+    deliverLock.value = false;
+    deliverStop.value = false;
+  }
 }
 
 function stopBatch() {

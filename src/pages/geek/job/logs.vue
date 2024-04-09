@@ -10,7 +10,7 @@ import {
   ElAutoResizer,
   TableV2Instance,
 } from "element-plus";
-import { useLog } from "./hooks/useLog";
+import { useLog } from "@/hooks/useLog";
 import { onRowRenderedParams } from "element-plus/es/components/table-v2/src/grid";
 const tableRef = ref<TableV2Instance>();
 const { data, columns, Row } = useLog();

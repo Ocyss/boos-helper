@@ -1,17 +1,23 @@
 <script lang="ts" setup>
 import { ElButton, ElButtonGroup, ElSpace } from "element-plus";
-import { useFormData, formInfoData } from "./hooks/useForm";
+import { useConfFormData, formInfoData } from "@/hooks/useConfForm";
 import settingsVue from "@/components/icon/settings.vue";
 import { ref } from "vue";
 import configVue from "./ai/config.vue";
 import modelVue from "./ai/model.vue";
 import { FormDataAi } from "@/types/formData";
 import formAiVue from "@/components/form/formAi.vue";
-const { formData, deliverLock, confSaving } = useFormData();
+import { useCommon } from "@/hooks/useCommon";
 
+const { formData, confSaving } = useConfFormData();
+const { deliverLock } = useCommon();
 const aiBoxShow = ref(false);
 const aiConfBoxShow = ref(false);
 const aiBox = ref<"aiGreeting" | "aiFiltering" | "aiReply">("aiGreeting");
+function change(v: FormDataAi) {
+  v.enable = !v.enable;
+  confSaving();
+}
 </script>
 
 <template>
@@ -19,18 +25,22 @@ const aiBox = ref<"aiGreeting" | "aiFiltering" | "aiReply">("aiGreeting");
     <formAiVue
       v-bind="formInfoData.aiGreeting"
       :data="formData.aiGreeting"
+      :lock="deliverLock"
       @show="
         aiBox = 'aiGreeting';
         aiBoxShow = true;
       "
+      @change="change"
     />
     <formAiVue
       v-bind="formInfoData.aiFiltering"
       :data="formData.aiFiltering"
+      :lock="deliverLock"
       @show="
         aiBox = 'aiFiltering';
         aiBoxShow = true;
       "
+      @change="change"
     />
     <formAiVue
       v-bind="formInfoData.aiReply"
@@ -39,6 +49,7 @@ const aiBox = ref<"aiGreeting" | "aiFiltering" | "aiReply">("aiGreeting");
         aiBox = 'aiReply';
         aiBoxShow = true;
       "
+      @change="change"
       disabled
     />
   </el-space>

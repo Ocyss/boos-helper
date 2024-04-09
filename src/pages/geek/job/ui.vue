@@ -12,7 +12,10 @@ import configVue from "./config.vue";
 import logsVue from "./logs.vue";
 import statisticsVue from "./statistics.vue";
 import { useDeliver } from "./hooks/useDeliver";
-
+import { useJobList } from "./hooks/useJobList";
+import { usePager } from "./hooks/usePager";
+const { initPager } = usePager();
+const { initJobList } = useJobList();
 const { x, y } = useMouse({ type: "client" });
 const { total, current } = useDeliver();
 const helpVisible = ref(false);
@@ -70,6 +73,8 @@ function findHelp(dom: Element | null) {
 }
 
 onMounted(() => {
+  initJobList();
+  initPager();
   Promise.all([
     findEl(".job-search-wrapper .job-search-box.clearfix"),
     findEl(".job-search-wrapper .search-condition-wrapper.clearfix"),
@@ -302,48 +307,7 @@ onMounted(() => {
   flex-direction: column;
 
   .job-card-wrapper {
-    background: #5d809833;
     margin: 16px auto;
-    &[state="wait"] {
-      order: 2;
-      background: #5d8098;
-    }
-    &[state="handle"] {
-      order: 1;
-      background: linear-gradient(
-        90deg,
-        #e3ff31,
-        #4bb1ff,
-        #e74c3c,
-        #84e50e,
-        #f01ee9
-      );
-      background-size: 900% 900%;
-      animation: changeGradient 5s ease infinite;
-      @keyframes changeGradient {
-        0% {
-          background-position: 0% 50%;
-        }
-        50% {
-          background-position: 100% 50%;
-        }
-        100% {
-          background-position: 0% 50%;
-        }
-      }
-    }
-    &[state="error"] {
-      order: 5;
-      background: #e74c3c;
-    }
-    &[state="warn"] {
-      order: 4;
-      background: #f39c12;
-    }
-    &[state="success"] {
-      order: 3;
-      background: #2ecc71;
-    }
   }
 }
 .job-search-box .job-search-form {

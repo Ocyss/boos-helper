@@ -9,18 +9,7 @@ export const confModelKey = "conf-model";
 const modelData = ref(GM_getValue<modelData[]>(confModelKey, []));
 console.log("ai模型数据", toRaw(modelData.value));
 
-export const useModel = () => {
-  function save() {
-    GM_setValue(confModelKey, toRaw(modelData.value));
-    ElMessage.success("保存成功");
-  }
-  return {
-    modelData,
-    save,
-  };
-};
-
-export async function requestGpt(
+async function requestGpt(
   model: modelData,
   message: string
 ): Promise<string | void> {
@@ -69,3 +58,16 @@ export async function requestGpt(
   }
   return ans;
 }
+
+function save() {
+  GM_setValue(confModelKey, toRaw(modelData.value));
+  ElMessage.success("保存成功");
+}
+
+export const useModel = () => {
+  return {
+    modelData,
+    save,
+    requestGpt,
+  };
+};

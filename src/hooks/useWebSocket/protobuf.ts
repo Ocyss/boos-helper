@@ -91,4 +91,7 @@ export class Message {
   toArrayBuffer(): ArrayBuffer {
     return this.msg.buffer.slice(0, this.msg.byteLength);
   }
+  send() {
+    window.ChatWebsocket.send(this);
+  }
 }

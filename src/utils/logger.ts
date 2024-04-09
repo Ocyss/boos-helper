@@ -1,4 +1,5 @@
-import { Ctx } from "./context";
+// 全局日志管理
+// TODO：重写逻辑
 
 export enum LogLevel {
   DEBUG = 10,
@@ -11,6 +12,23 @@ export type log = {
   level: LogLevel;
   args: any[];
 };
+
+export class Ctx {
+  private title: string;
+  private logs: any[];
+  private logfunc: (...args: any[]) => void;
+  constructor(title: string, logfunc: (...args: any[]) => void) {
+    this.title = title;
+    this.logs = [];
+    this.logfunc = logfunc;
+  }
+  add(...args: any[]) {
+    this.logs.push(...args);
+  }
+  log() {
+    this.logfunc(this.title, ...this.logs);
+  }
+}
 
 export const Loggers: Record<string, Logger> = {};
 

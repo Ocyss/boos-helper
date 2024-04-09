@@ -9,7 +9,7 @@ import {
   JobDescriptionError,
   UnknownError,
   errMap,
-} from "./types";
+} from "@/types/deliverError";
 
 type logErr =
   | null

@@ -1,10 +1,6 @@
 <script lang="ts" setup>
 import { GM_cookie, GM_getValue, GM_setValue } from "$";
-import {
-  useFormData,
-  formDataKey,
-  todayKey,
-} from "@/pages/web/geek/job/hooks/useForm";
+import { useConfFormData, formDataKey, todayKey } from "@/hooks/useConfForm";
 import {
   ElDialog,
   ElButton,
@@ -17,10 +13,11 @@ import {
   ElPopconfirm,
 } from "element-plus";
 import { FormData, Statistics } from "@/types/formData";
-
+import { useStatistics } from "@/hooks/useStatistics";
 import { computed, reactive, ref, toRaw } from "vue";
 const confUserKey = "conf-user";
-const { formData, todayData } = useFormData();
+const { formData } = useConfFormData();
+const { todayData } = useStatistics();
 const show = defineModel<boolean>({ required: true });
 type Data = {
   uid: string;

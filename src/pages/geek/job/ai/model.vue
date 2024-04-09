@@ -14,7 +14,7 @@ import {
 import { ref, toRaw } from "vue";
 import deepmerge from "@/utils/deepmerge";
 import { type modelData } from "@/types/formData";
-import { useModel } from "../hooks/useModel";
+import { useModel } from "@/hooks/useModel";
 const show = defineModel<boolean>({ required: true });
 const { modelData, save } = useModel();
 let createData = ref<modelData>({

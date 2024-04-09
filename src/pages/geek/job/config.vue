@@ -18,16 +18,11 @@ import formItem from "@/components/form/formItem.vue";
 import formSelect from "@/components/form/formSelect.vue";
 import deepmerge from "@/utils/deepmerge";
 import { FormData } from "@/types/formData";
-import { useFormData, formInfoData } from "./hooks/useForm";
-const {
-  formData,
-  deliverLock,
-  confDelete,
-  confExport,
-  confImport,
-  confReload,
-  confSaving,
-} = useFormData();
+import { useConfFormData, formInfoData } from "@/hooks/useConfForm";
+import { useCommon } from "@/hooks/useCommon";
+const { formData, confDelete, confExport, confImport, confReload, confSaving } =
+  useConfFormData();
+const { deliverLock } = useCommon();
 </script>
 
 <template>

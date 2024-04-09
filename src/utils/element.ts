@@ -1,3 +1,6 @@
+// 各种异步+延迟获取元素方法
+// 尽量减少使用
+
 export async function removeEl(
   selectors = "div",
   { el = document.body as Element, retry = 0, time = 200 } = {}
