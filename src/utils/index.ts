@@ -64,21 +64,22 @@ export function delay(ms: number) {
     cancelAnimationFrame(delayLoadId);
     delayLoadId = undefined;
   }
-  animate({
-    duration: ms,
-    callId(id) {
-      delayLoadId = id;
-    },
-    timing(timeFraction) {
-      return timeFraction;
-    },
-    draw(progress) {
-      load.style.width = progress * 100 + "%";
-    },
-    end() {
-      load.style.width = "0%";
-    },
-  });
+  if (load)
+    animate({
+      duration: ms,
+      callId(id) {
+        delayLoadId = id;
+      },
+      timing(timeFraction) {
+        return timeFraction;
+      },
+      draw(progress) {
+        if (load) load.style.width = progress * 100 + "%";
+      },
+      end() {
+        if (load) load.style.width = "0%";
+      },
+    });
   return new Promise((resolve) => setTimeout(resolve, ms));
 }
 
