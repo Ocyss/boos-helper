@@ -88,7 +88,9 @@ greasyfork地址: <https://greasyfork.org/zh-CN/scripts/491340>
 
 - <https://github.com/yangfeng20/boss_batch_push>
 - <https://github.com/lisonge/vite-plugin-monkey>
-
+- <https://github.com/chatanywhere/GPT_API_free>
+  
+- <https://uiverse.io/>
 - <https://www.runoob.com/manual/mqtt/protocol/MQTT-3.1.1-CN.pdf>
   
 ## 类似项目
