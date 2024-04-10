@@ -71,12 +71,15 @@ async function startBatch() {
   deliverLock.value = true;
   try {
     console.log("start batch", page);
-    while (page.value.page <= 10) {
-      jobMap.actions.clear();
+    while (page.value.page <= 10 && !deliverStop.value) {
       await delay(10000);
-      jobListHandle(jobList.value, jobMap.actions);
+      await jobListHandle(jobList.value, jobMap.actions);
+      if (deliverStop.value) {
+        break;
+      }
       await delay(120000);
       next();
+      jobMap.actions.clear();
     }
   } catch (e) {
     console.log("获取失败", e);

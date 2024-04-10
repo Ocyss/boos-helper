@@ -17,8 +17,68 @@ export function notification(content: string) {
   });
 }
 
+// 动画
+export function animate({
+  duration,
+  draw,
+  timing,
+  end,
+  callId,
+}: {
+  duration: number;
+  draw: (progress: number) => void;
+  timing: (timeFraction: number) => number;
+  callId: (id: number) => void;
+  end?: () => void;
+}) {
+  let start = performance.now();
+
+  callId(
+    requestAnimationFrame(function animate(time) {
+      let timeFraction = (time - start) / duration;
+      if (timeFraction > 1) timeFraction = 1;
+
+      let progress = timing(timeFraction);
+
+      draw(progress);
+
+      if (timeFraction < 1) {
+        callId(requestAnimationFrame(animate));
+      } else if (end) {
+        end();
+      }
+    })
+  );
+}
+let delayLoadId: number | undefined = undefined;
 // 延迟
 export function delay(ms: number) {
+  let load = document.querySelector<HTMLDivElement>("#loader");
+  if (!load) {
+    const l = document.createElement("div");
+    l.id = "loader";
+    document.querySelector("#header")?.appendChild(l);
+    load = l;
+  }
+  if (delayLoadId) {
+    cancelAnimationFrame(delayLoadId);
+    delayLoadId = undefined;
+  }
+  animate({
+    duration: ms,
+    callId(id) {
+      delayLoadId = id;
+    },
+    timing(timeFraction) {
+      return timeFraction;
+    },
+    draw(progress) {
+      load.style.width = progress * 100 + "%";
+    },
+    end() {
+      load.style.width = "0%";
+    },
+  });
   return new Promise((resolve) => setTimeout(resolve, ms));
 }
 

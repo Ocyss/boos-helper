@@ -26,19 +26,21 @@ async function jobListHandle(
   total.value = jobList.length;
   const h = createHandle();
   jobList.forEach((v) => {
-    jobMap.set(v.encryptJobId, {
-      state: "wait",
-      msg: "等待中",
-    });
+    if (!jobMap.has(v.encryptJobId))
+      jobMap.set(v.encryptJobId, {
+        state: "wait",
+        msg: "等待中",
+      });
   });
-  for (let i in jobList) {
-    current.value = Number(i);
+  for (const [index, data] of jobList.entries()) {
+    current.value = index;
     if (deliverStop.value) {
-      log.info("暂停投递", `剩余 ${i} 个未处理`);
+      log.info("暂停投递", `剩余 ${jobList.length - index} 个未处理`);
       return;
     }
+    if (jobMap.get(data.encryptJobId)?.state !== "wait") continue;
+
     try {
-      const data = jobList[i];
       jobMap.set(data.encryptJobId, {
         state: "running",
         msg: "处理中",
@@ -62,11 +64,11 @@ async function jobListHandle(
         log.add(data.jobName, e, ctx);
       }
     } catch (e) {
-      jobMap.set(jobList[i].encryptJobId, {
+      jobMap.set(data.encryptJobId, {
         state: "error",
         msg: "未知报错",
       });
-      console.log("未知报错", e, jobList[i]);
+      console.log("未知报错", e, data);
     } finally {
       todayData.total++;
       await delay(2000);
