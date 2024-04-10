@@ -1,12 +1,16 @@
 <script lang="ts" setup>
-import { reactive, ref } from "vue";
+import { reactive, ref, watchEffect } from "vue";
 import { ElTag, ElSpace } from "element-plus";
 import { useJobList } from "./hooks/useJobList";
-import { ElTabPane, ElTabs } from "element-plus";
+import { ElTabPane, ElTabs, ElSwitch } from "element-plus";
+import { useDeliver } from "./hooks/useDeliver";
 const {
   jobList,
   jobMap: { actions: jobMap },
 } = useJobList();
+const { current } = useDeliver();
+const jobListRef = ref<HTMLElement[]>();
+const autoScroll = ref(true);
 const cards = ref<HTMLDivElement>();
 function scroll(e: any) {
   e.preventDefault();
@@ -15,7 +19,19 @@ function scroll(e: any) {
   }
   let left = -e.wheelDelta || e.deltaY / 2;
   cards.value.scrollLeft = cards.value.scrollLeft + left;
+  autoScroll.value = false;
 }
+watchEffect(() => {
+  const d = jobListRef.value;
+  if (autoScroll.value && d && d.length > current.value) {
+    d[current.value].scrollIntoView({
+      behavior: "smooth",
+      block: "nearest",
+      inline: "center",
+    });
+  }
+});
+
 function stateColor(state?: string): string {
   switch (state) {
     case "wait":
@@ -51,8 +67,10 @@ function stateColor(state?: string): string {
         </div>
       </div>
     </div>
+
     <div ref="cards" @wheel.stop="scroll" class="card-grid">
       <div
+        ref="jobListRef"
         class="card"
         v-for="v in jobList"
         :style="{
@@ -108,6 +126,12 @@ function stateColor(state?: string): string {
         </div>
       </div>
     </div>
+    <el-switch
+      v-model="autoScroll"
+      inline-prompt
+      active-text="自动滚动"
+      inactive-text="自动滚动"
+    />
   </div>
 </template>
 
