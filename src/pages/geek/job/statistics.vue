@@ -27,7 +27,7 @@ const log = useLog();
 const { todayData, statisticsData } = useStatistics();
 const { deliverLock, deliverStop } = useCommon();
 const { jobListHandle } = useDeliver();
-const { jobList } = useJobList();
+const { jobList, jobMap } = useJobList();
 const { next, page, prev } = usePager();
 const statisticCycle = ref(1);
 const statisticCycleData = [
@@ -72,8 +72,9 @@ async function startBatch() {
   try {
     console.log("start batch", page);
     while (page.value.page <= 10) {
+      jobMap.actions.clear();
       await delay(10000);
-      jobListHandle(jobList.value);
+      jobListHandle(jobList.value, jobMap.actions);
       await delay(120000);
       next();
     }

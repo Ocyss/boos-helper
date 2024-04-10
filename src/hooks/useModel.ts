@@ -26,6 +26,10 @@ async function requestGpt(
             },
           ],
           model: model.data.model,
+          params: {
+            n: 1,
+            response_format: { type: "json_object" },
+          },
         },
         {
           headers: {

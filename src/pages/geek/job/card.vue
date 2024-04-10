@@ -1,8 +1,12 @@
 <script lang="ts" setup>
-import { ref } from "vue";
+import { reactive, ref } from "vue";
 import { ElTag, ElSpace } from "element-plus";
 import { useJobList } from "./hooks/useJobList";
-const { jobList } = useJobList();
+import { ElTabPane, ElTabs } from "element-plus";
+const {
+  jobList,
+  jobMap: { actions: jobMap },
+} = useJobList();
 const cards = ref<HTMLDivElement>();
 function scroll(e: any) {
   e.preventDefault();
@@ -11,6 +15,21 @@ function scroll(e: any) {
   }
   let left = -e.wheelDelta || e.deltaY / 2;
   cards.value.scrollLeft = cards.value.scrollLeft + left;
+}
+function stateColor(state?: string): string {
+  switch (state) {
+    case "wait":
+      return "#CECECE";
+    case "error":
+      return "#e74c3c";
+    case "warn":
+      return "#f39c12";
+    case "success":
+      return "#2ecc71";
+    case "running":
+      return "#98F5F9";
+  }
+  return "#CECECE";
 }
 </script>
 
@@ -33,7 +52,14 @@ function scroll(e: any) {
       </div>
     </div>
     <div ref="cards" @wheel.stop="scroll" class="card-grid">
-      <div class="card" v-for="v in jobList">
+      <div
+        class="card"
+        v-for="v in jobList"
+        :style="{
+          '--state-color': stateColor(jobMap.get(v.encryptJobId)?.state),
+          '--state-show': jobMap.has(v.encryptJobId) ? 'block' : 'none',
+        }"
+      >
         <div class="card-tag">
           {{ v.brandIndustry }},{{ v.jobDegree }},{{ v.brandScaleName }}
         </div>
@@ -77,6 +103,9 @@ function scroll(e: any) {
             </h4>
           </div>
         </div>
+        <div class="card-status">
+          {{ jobMap.get(v.encryptJobId)?.msg || "无内容" }}
+        </div>
       </div>
     </div>
   </div>
@@ -98,6 +127,7 @@ function scroll(e: any) {
   padding: 3rem 0 3rem 2rem;
   margin: 0;
   display: flex;
+  color: #fff;
   -webkit-overflow-scrolling: touch;
   &::-webkit-scrollbar {
     width: 10px;
@@ -118,64 +148,59 @@ function scroll(e: any) {
       #262626
     );
   }
-  .company-name {
-    color: #fff;
+}
+.card {
+  --state-color: #f00;
+  --state-show: block;
+  padding: 1.5rem;
+  border-radius: 16px;
+  background: linear-gradient(85deg, #434343, #262626);
+  color: #fff;
+  display: flex;
+  flex-direction: column;
+  transition: 0.2s;
+  margin: 0;
+  position: relative;
+  min-width: 300px;
+  min-height: 350px;
+  box-shadow: -2rem 0 1rem -2rem #000;
+  * {
+    user-select: none;
   }
-  .card {
-    padding: 1.5rem;
-    border-radius: 16px;
-    background: linear-gradient(85deg, #434343, #262626);
+  .card-status {
+    position: absolute;
+    display: var(--state-show);
+    border-radius: 30px;
+    border-bottom-left-radius: 0;
+    border-top-left-radius: 0;
+    background-color: var(--state-color);
     color: #fff;
-    display: flex;
-    flex-direction: column;
-    transition: 0.2s;
-    margin: 0;
-
-    min-width: 300px;
-    min-height: 350px;
-    box-shadow: -2rem 0 1rem -2rem #000;
-    &:focus-within,
-    &:hover {
-      transform: translateY(-1rem) rotate(3deg);
-    }
-
-    &:focus-within ~ &,
-    &:hover ~ & {
-      transform: translateX(130px);
-    }
-
-    &:first-child:focus-within,
-    &:first-child:hover {
-      transform: translate(-0.5rem, -1rem) rotate(3deg);
-    }
-
-    &:not(:first-child) {
-      margin-left: -130px;
-      box-shadow: -3rem 0 3rem -3rem #000;
-    }
-
-    @media (max-width: 1200px) {
-      & {
-        min-width: 250px;
-      }
-
-      &:not(:first-child) {
-        margin-left: -30px;
-      }
-
-      &:hover {
-        transform: translateY(-1rem);
-      }
-
-      &:hover ~ & {
-        transform: translateX(30px);
-      }
-    }
+    padding: 7px 17px;
+    text-wrap: nowrap;
+    font-size: 12px;
+    font-weight: bold;
+    letter-spacing: 5px;
+    left: -6px;
+    bottom: -14px;
+    transition: all 0.25s ease;
+    box-shadow: 1px -7px 12px -2px rgb(167 167 167 / 40%);
+  }
+  &::after {
+    position: absolute;
+    content: "";
+    display: var(--state-show);
+    left: -6px;
+    bottom: 18px;
+    width: 0;
+    height: 0;
+    border-left: 6px solid transparent;
+    border-right: 0px solid transparent;
+    border-bottom: 10px solid oklch(from var(--state-color) calc(l * 0.75) c h);
   }
   .card-tag {
     display: block;
     margin: 0 0 0.25rem;
-    color: #777;
+    color: #b4b4b4;
     font-size: 0.7rem;
   }
   .card-title {
@@ -203,14 +228,55 @@ function scroll(e: any) {
     grid-template-columns: 40px 1fr;
     gap: 0.5rem;
     align-items: center;
-    color: #565656;
+    color: #a09f9f;
     line-height: 1.3;
     padding-top: 0.5rem;
+    .company-name {
+      color: #fff;
+    }
+  }
+  &:focus-within,
+  &:hover {
+    transform: translateY(-1rem) rotate(3deg);
+  }
+
+  &:focus-within ~ &,
+  &:hover ~ & {
+    transform: translateX(130px);
+  }
+
+  &:first-child:focus-within,
+  &:first-child:hover {
+    transform: translate(-0.5rem, -1rem) rotate(3deg);
+  }
+
+  &:not(:first-child) {
+    margin-left: -130px;
+    box-shadow: -3rem 0 3rem -3rem #000;
+  }
+
+  @media (max-width: 1200px) {
+    & {
+      min-width: 250px;
+    }
+
+    &:not(:first-child) {
+      margin-left: -30px;
+    }
+
+    &:hover {
+      transform: translateY(-1rem);
+    }
+
+    &:hover ~ & {
+      transform: translateX(30px);
+    }
   }
 }
 
 .helper {
-  $zoom: 0.5;
+  display: none;
+  $zoom: 0.3;
   .eva {
     --EVA-ROTATION-DURATION: 4s;
     transform-style: preserve-3d;

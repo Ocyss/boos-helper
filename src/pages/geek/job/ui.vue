@@ -101,7 +101,7 @@ onMounted(() => {
 <template>
   <h2>
     Boos-Helper
-    <span v-if="total > 0">{{ total - current }}/{{ total }}</span>
+    <span v-if="total > 0">{{ current + 1 }}/{{ total }}</span>
   </h2>
   <div
     style="
