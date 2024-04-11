@@ -246,7 +246,7 @@ export const aiGreeting: handleCFn = (h) => {
         form_uid: window._PAGE.uid.toString(),
         to_uid: boosData.data.bossId.toString(),
         to_name: boosData.data.encryptBossId, // encryptUserId
-        content: msg,
+        content: gptMsg, // !!! 重大失误
       });
       buf.send();
     } catch (e: any) {
