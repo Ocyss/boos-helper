@@ -146,12 +146,12 @@ function stateColor(state?: string): string {
   margin: 0 0 1.5rem;
   position: relative;
   overflow-x: scroll;
-  scrollbar-color: #666 #201c29;
+  scrollbar-color: #c6c6c6 #e9e9e9;
   scrollbar-gutter: always;
   padding: 3rem 0 3rem 2rem;
   margin: 0;
   display: flex;
-  color: #fff;
+  color: #000;
   -webkit-overflow-scrolling: touch;
   &::-webkit-scrollbar {
     width: 10px;
@@ -178,8 +178,8 @@ function stateColor(state?: string): string {
   --state-show: block;
   padding: 1.5rem;
   border-radius: 16px;
-  background: linear-gradient(85deg, #434343, #262626);
-  color: #fff;
+  background: linear-gradient(85deg, #f2eeee, #eff0f6);
+  color: #000;
   display: flex;
   flex-direction: column;
   transition: 0.2s;
@@ -187,7 +187,8 @@ function stateColor(state?: string): string {
   position: relative;
   min-width: 300px;
   min-height: 350px;
-  box-shadow: -2rem 0 1rem -2rem #000;
+  box-shadow: -2rem 0 1rem -2rem #cdb9b9;
+
   * {
     user-select: none;
   }
@@ -224,7 +225,7 @@ function stateColor(state?: string): string {
   .card-tag {
     display: block;
     margin: 0 0 0.25rem;
-    color: #b4b4b4;
+    color: #6a6868;
     font-size: 0.7rem;
   }
   .card-title {
@@ -256,7 +257,7 @@ function stateColor(state?: string): string {
     line-height: 1.3;
     padding-top: 0.5rem;
     .company-name {
-      color: #fff;
+      color: #000;
     }
   }
   &:focus-within,
@@ -276,7 +277,7 @@ function stateColor(state?: string): string {
 
   &:not(:first-child) {
     margin-left: -130px;
-    box-shadow: -3rem 0 3rem -3rem #000;
+    box-shadow: -3rem 0 3rem -3rem #b4adad;
   }
 
   @media (max-width: 1200px) {
@@ -457,6 +458,58 @@ function stateColor(state?: string): string {
     }
     100% {
       opacity: 0;
+    }
+  }
+}
+
+html.dark {
+  .card-grid {
+    scrollbar-color: #666 #201c29;
+    color: #fff;
+    &::-webkit-scrollbar-thumb {
+      background: #434343;
+      box-shadow: inset 2px 2px 2px hsla(0, 0%, 100%, 0.25),
+        inset -2px -2px 2px rgba(0, 0, 0, 0.25);
+    }
+    &::-webkit-scrollbar-track {
+      background: linear-gradient(
+        90deg,
+        #434343,
+        #434343 1px,
+        #262626 0,
+        #262626
+      );
+    }
+  }
+  .card {
+    background: linear-gradient(85deg, #434343, #262626);
+    color: #fff;
+    box-shadow: -2rem 0 1rem -2rem #000;
+
+    .card-status {
+      color: #fff;
+
+      box-shadow: 1px -7px 12px -2px rgb(167 167 167 / 40%);
+    }
+
+    .card-tag {
+      color: #b4b4b4;
+    }
+
+    .card-salary {
+      color: #ff442e;
+    }
+
+    .author-row {
+      color: #a09f9f;
+
+      .company-name {
+        color: #fff;
+      }
+    }
+
+    &:not(:first-child) {
+      box-shadow: -3rem 0 3rem -3rem #000;
     }
   }
 }
