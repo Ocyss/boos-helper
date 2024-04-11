@@ -1,5 +1,7 @@
 // 因为window.ChatWebsocket的出现,暂时用不到了
 
+import { logger } from "@/utils/logger";
+
 export function encodeLength(len: number) {
   const output = [];
   let x = len;
@@ -88,7 +90,7 @@ export const mqtt = {
       try {
         id = parseMessageId(buffer, idStart);
       } catch {
-        console.log(`错的id?: `, {
+        logger.error(`错的id?: `, {
           payloadStart,
           topicStart,
           topic,

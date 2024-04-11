@@ -20,11 +20,12 @@ import {
   ActivityError,
   GreetError,
 } from "@/types/deliverError";
+import { useStore } from "../useStore";
 
 const { modelData, requestGpt } = useModel();
 const { formData } = useConfFormData();
 const { todayData } = useStatistics();
-
+const { userInfo } = useStore();
 export const communicated: handleCFn = (h) => {
   //   h.push(async ({ data }) => {
   //     try {
@@ -202,6 +203,12 @@ export const activityFilter: handleCFn = (h) =>
 
 export const customGreeting: handleCFn = (h) => {
   const template = miTem.compile(formData.customGreeting.value);
+  const uid =
+    userInfo.value?.userId || window?._PAGE?.uid || window?._PAGE?.userId;
+  if (!uid) {
+    ElMessage.error("没有获取到uid,请刷新重试");
+    throw new GreetError("没有获取到uid");
+  }
   h.push(async (args, ctx) => {
     try {
       const boosData = await requestBossData(args.card!);
@@ -211,7 +218,7 @@ export const customGreeting: handleCFn = (h) => {
       }
       ctx.message = msg;
       const buf = new Message({
-        form_uid: window._PAGE.uid.toString(),
+        form_uid: uid.toString(),
         to_uid: boosData.data.bossId.toString(),
         to_name: boosData.data.encryptBossId, // encryptUserId
         content: msg,
@@ -227,6 +234,12 @@ export const aiGreeting: handleCFn = (h) => {
   const model = modelData.value.find(
     (v) => v.key === formData.aiGreeting.model
   );
+  const uid =
+    userInfo.value?.userId || window?._PAGE?.uid || window?._PAGE?.userId;
+  if (!uid) {
+    ElMessage.error("没有获取到uid,请刷新重试");
+    throw new GreetError("没有获取到uid");
+  }
   h.push(async (args, ctx) => {
     try {
       const boosData = await requestBossData(args.card!);
@@ -243,7 +256,7 @@ export const aiGreeting: handleCFn = (h) => {
 
       ctx.message = gptMsg;
       const buf = new Message({
-        form_uid: window._PAGE.uid.toString(),
+        form_uid: uid.toString(),
         to_uid: boosData.data.bossId.toString(),
         to_name: boosData.data.encryptBossId, // encryptUserId
         content: gptMsg, // !!! 重大失误

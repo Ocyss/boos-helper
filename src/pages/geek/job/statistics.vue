@@ -22,6 +22,7 @@ import { useCommon } from "@/hooks/useCommon";
 import { useStatistics } from "@/hooks/useStatistics";
 import { useJobList } from "./hooks/useJobList";
 import { usePager } from "./hooks/usePager";
+import { logger } from "@/utils/logger";
 
 const log = useLog();
 const { todayData, statisticsData } = useStatistics();
@@ -70,7 +71,7 @@ async function startBatch() {
   log.reset();
   deliverLock.value = true;
   try {
-    console.log("start batch", page);
+    logger.debug("start batch", page);
     while (page.value.page <= 10 && !deliverStop.value) {
       await delay(10000);
       await jobListHandle(jobList.value, jobMap.actions);
@@ -82,10 +83,10 @@ async function startBatch() {
       jobMap.actions.clear();
     }
   } catch (e) {
-    console.log("获取失败", e);
+    logger.error("获取失败", e);
     ElMessage.error("获取失败!");
   } finally {
-    console.log(log.data);
+    logger.debug(log.data);
     ElMessage.info("投递结束");
     deliverLock.value = false;
     deliverStop.value = false;

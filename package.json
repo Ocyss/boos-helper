@@ -6,7 +6,8 @@
   "scripts": {
     "dev": "vite",
     "build": "vue-tsc --noEmit && vite build",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "tslint": "vue-tsc --noEmit"
   },
   "dependencies": {
     "@types/nanoassert": "^2.0.3",

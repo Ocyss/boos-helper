@@ -7,6 +7,7 @@ import { reactiveComputed, watchThrottled } from "@vueuse/core";
 import deepmerge from "@/utils/deepmerge";
 import { FormData, FormInfoData, Statistics } from "@/types/formData";
 import { getCurDay } from "@/utils";
+import { logger } from "@/utils/logger";
 
 export const formDataKey = "web-geek-job-FormData";
 export const todayKey = "web-geek-job-Today";
@@ -135,7 +136,7 @@ const formData: FormData = reactive(
 watchThrottled(
   formData,
   (v) => {
-    console.log("formData改变", toRaw(v));
+    logger.debug("formData改变", toRaw(v));
   },
   { throttle: 2000 }
 );
@@ -143,12 +144,12 @@ watchThrottled(
 function confSaving() {
   const v = toRaw(formData);
   GM_setValue(formDataKey, v);
-  console.log("formData保存", toRaw(v));
+  logger.debug("formData保存", toRaw(v));
 }
 function confReload() {
   const v = deepmerge<FormData>(defaultFormData, GM_getValue(formDataKey, {}));
   deepmerge(formData, v, { clone: false });
-  console.log("formData已重置");
+  logger.debug("formData已重置");
 }
 function confExport() {
   alert("请你吃大饼啦...");
@@ -158,7 +159,7 @@ function confImport() {
 }
 function confDelete() {
   deepmerge(formData, defaultFormData, { clone: false });
-  console.log("formData已清空");
+  logger.debug("formData已清空");
 }
 
 export const useConfFormData = () => {

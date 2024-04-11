@@ -6,6 +6,7 @@ import { logger } from "@/utils/logger";
 import App from "./App.vue";
 import { createApp, ref, watch } from "vue";
 import { delay } from "./utils";
+import { getRootVue } from "./hooks/useVue";
 
 logger.debug("初始化");
 let t: NodeJS.Timeout;
@@ -34,10 +35,10 @@ let t: NodeJS.Timeout;
 //       try {
 //         if (udata[0] === 0x33) {
 //           const ma = mqtt.decode(udata);
-//           console.log("sendMa", data, ma);
+//           logger.warn("sendMa", data, ma);
 //           const m = AwesomeMessage.decode(ma.payload);
 //           AwesomeMessage;
-//           console.log("send", data, JSON.stringify(m));
+//           logger.warn("send", data, JSON.stringify(m));
 //         } else throw new Error("不是消息");
 //       } catch (e) {
 //         logger.error("解析失败", data, e);
@@ -87,13 +88,9 @@ async function main(router: any) {
 }
 
 async function start() {
-  let wrap;
-  while (!wrap) {
-    await delay(100);
-    wrap = document.querySelector<Element & { __vue__: any }>("#wrap");
-  }
-  wrap.__vue__.$router.afterHooks.push(main);
-  main(wrap.__vue__.$route);
+  const v = await getRootVue();
+  v.$router.afterHooks.push(main);
+  main(v.$route);
 }
 
 logger.debug("开始运行");

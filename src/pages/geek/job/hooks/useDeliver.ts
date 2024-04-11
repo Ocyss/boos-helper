@@ -7,6 +7,7 @@ const { deliverStop } = useCommon();
 import { ref } from "vue";
 import { createHandle, sendPublishReq } from "@/hooks/useApplying";
 import { Actions } from "@/hooks/useMap";
+import { logger } from "@/utils/logger";
 
 const total = ref(0);
 const current = ref(0);
@@ -62,13 +63,14 @@ async function jobListHandle(
           msg: e.name || "没有消息",
         });
         log.add(data.jobName, e, ctx);
+        logger.warn("过滤", ctx);
       }
     } catch (e) {
       jobMap.set(data.encryptJobId, {
         state: "error",
         msg: "未知报错",
       });
-      console.log("未知报错", e, data);
+      logger.error("未知报错", e, data);
     } finally {
       todayData.total++;
       await delay(2000);

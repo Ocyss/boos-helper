@@ -3,6 +3,7 @@ import { Statistics } from "@/types/formData";
 import { getCurDay } from "@/utils";
 import { reactiveComputed, watchThrottled } from "@vueuse/core";
 import { todayKey, statisticsKey } from "./useConfForm";
+import { logger } from "@/utils/logger";
 
 const todayData = reactiveComputed<Statistics>(() => {
   const date = getCurDay();
@@ -19,7 +20,7 @@ const todayData = reactiveComputed<Statistics>(() => {
     repeat: 0,
   };
   const g = GM_getValue(todayKey, current);
-  console.log("统计数据:", g);
+  logger.debug("统计数据:", g);
 
   if (g.date === date) {
     return g;

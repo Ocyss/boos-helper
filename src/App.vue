@@ -31,7 +31,7 @@ const clone = async () => {
       if (!asyncKeys.hasOwnProperty(index)) {
         continue;
       }
-      console.log(asyncKeys[index]);
+      logger.debug(asyncKeys[index]);
       await GM_deleteValue(asyncKeys[index]);
     }
     window.alert("OK!");

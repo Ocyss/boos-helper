@@ -1,6 +1,9 @@
 import { GreetError, PublishError } from "@/types/deliverError";
 import axios from "axios";
+import { useStore } from "../useStore";
+import { ElMessage } from "element-plus";
 
+const { userInfo } = useStore();
 export function requestCard(params: { securityId: string; lid: string }) {
   return axios.get<{
     code: number;
@@ -33,13 +36,17 @@ export async function sendPublishReq(
     jobId: data.encryptJobId,
     lid: data.lid,
   };
-
+  const token = userInfo.value?.token || window?._PAGE?.zp_token;
+  if (!token) {
+    ElMessage.error("没有获取到token,请刷新重试");
+    throw new PublishError("没有获取到token");
+  }
   try {
     const res = await axios({
       url,
       params,
       method: "POST",
-      headers: { Zp_token: window._PAGE.zp_token },
+      headers: { Zp_token: token },
     });
     if (
       res.data.code === 1 &&
@@ -70,6 +77,11 @@ export async function requestBossData(
     throw new GreetError(errorMsg || "重试多次失败");
   }
   const url = "https://www.zhipin.com/wapi/zpchat/geek/getBossData";
+  const token = userInfo.value?.token || window?._PAGE?.zp_token;
+  if (!token) {
+    ElMessage.error("没有获取到token,请刷新重试");
+    throw new GreetError("没有获取到token");
+  }
   try {
     const data = new FormData();
     data.append("bossId", card.encryptUserId);
@@ -83,7 +95,7 @@ export async function requestBossData(
       url,
       data: data,
       method: "POST",
-      headers: { Zp_token: window._PAGE.zp_token },
+      headers: { Zp_token: token },
     });
     if (res.data.code !== 0 && res.data.message !== "非好友关系") {
       throw new GreetError("状态错误:" + res.data.message);

@@ -1,4 +1,5 @@
 import { GM_notification } from "$";
+import { logger } from "./logger";
 
 // 通知
 export function notification(content: string) {
@@ -11,7 +12,7 @@ export function notification(content: string) {
     silent: true, // 布尔值，是否播放声音
     timeout: 10000, // 设置通知隐藏时间
     onclick: function () {
-      console.log("点击了通知");
+      logger.info("点击了通知");
     },
     ondone() {}, // 在通知关闭（无论这是由超时还是单击触发）或突出显示选项卡时调用
   });

@@ -15,9 +15,12 @@ import {
 import { FormData, Statistics } from "@/types/formData";
 import { useStatistics } from "@/hooks/useStatistics";
 import { computed, reactive, ref, toRaw } from "vue";
+import { useStore } from "@/hooks/useStore";
+import { logger } from "@/utils/logger";
 const confUserKey = "conf-user";
 const { formData } = useConfFormData();
 const { todayData } = useStatistics();
+const { userInfo } = useStore();
 const show = defineModel<boolean>({ required: true });
 type Data = {
   uid: string;
@@ -34,7 +37,7 @@ type Data = {
 
 const data = reactive(GM_getValue<{ [keys: string]: Data }>(confUserKey, {}));
 const tableData = computed<Data[]>(() => Object.values(data));
-console.log("账户数据", toRaw(data));
+logger.debug("账户数据", toRaw(data));
 
 const currentRow = ref<Data | undefined>();
 
@@ -54,19 +57,18 @@ async function create(flag = true) {
       });
     });
 
-    const pg = window._PAGE;
-    let uid: string | number | undefined = pg.uid || pg.userId;
+    let uid: string | number | undefined = userInfo.value?.userId;
     if (!uid) {
       return;
     }
     uid = String(uid);
     data[uid] = {
       uid,
-      user: pg.showName || pg.name,
-      avatar: pg.tinyAvatar || pg.largeAvatar,
+      user: userInfo.value?.showName || userInfo.value?.name || "nil",
+      avatar: userInfo.value?.tinyAvatar || userInfo.value?.largeAvatar || "",
       remark: "",
-      gender: pg.gender === 0 ? "man" : "woman",
-      flag: pg.studentFlag ? "student" : "staff",
+      gender: userInfo.value?.gender === 0 ? "man" : "woman",
+      flag: userInfo.value?.studentFlag ? "student" : "staff",
       date: new Date().toLocaleString(),
       cookie: JSON.stringify(list),
       form: toRaw(formData),
@@ -102,14 +104,14 @@ async function change() {
     ElMessage.success("切换完成,即将刷新");
     window.location.reload();
   } catch (e: any) {
-    console.log("错误,切换失败", e);
+    logger.error("错误,切换失败", e);
 
     if (e.name !== "err" || !e.name) ElMessage.error("错误,切换失败");
   }
 }
 function del(d: Data) {
   delete data[d.uid];
-  console.log(data);
+  logger.debug(data);
 
   GM_setValue(confUserKey, toRaw(data));
   ElMessage.success("删除成功");

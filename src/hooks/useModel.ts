@@ -1,5 +1,6 @@
 import { GM_getValue, GM_setValue } from "$";
 import { type modelData } from "@/types/formData";
+import { logger } from "@/utils/logger";
 import axios from "axios";
 import { ElMessage } from "element-plus";
 import { ref, toRaw } from "vue";
@@ -7,7 +8,7 @@ import { ref, toRaw } from "vue";
 export const confModelKey = "conf-model";
 
 const modelData = ref(GM_getValue<modelData[]>(confModelKey, []));
-console.log("ai模型数据", toRaw(modelData.value));
+logger.debug("ai模型数据", toRaw(modelData.value));
 
 async function requestGpt(
   model: modelData,
