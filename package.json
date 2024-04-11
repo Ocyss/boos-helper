@@ -7,7 +7,7 @@
     "dev": "vite",
     "build": "vue-tsc --noEmit && vite build",
     "preview": "vite preview",
-    "tslint": "vue-tsc --noEmit"
+    "check": "vue-tsc --noEmit"
   },
   "dependencies": {
     "@types/nanoassert": "^2.0.3",

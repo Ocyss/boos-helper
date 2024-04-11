@@ -3,7 +3,8 @@ import vue from "@vitejs/plugin-vue";
 import monkey, { cdn } from "vite-plugin-monkey";
 import process from "process";
 import path from "path";
-
+import fs from "fs";
+const rootDir = process.cwd();
 const pathSrc = path.resolve(__dirname, "src");
 
 // https://vitejs.dev/config/
@@ -16,6 +17,24 @@ export default defineConfig(() => {
       vue(),
       monkey({
         entry: "src/main.ts",
+        format: {
+          generate(uOptions) {
+            if (uOptions.mode === "build") {
+              const filePath = path.join(rootDir, "update.log");
+              const fileContent = fs.readFileSync(filePath, "utf-8");
+              const lines = fileContent.trim().split("\n");
+              const lastTenLines = lines.slice(-10);
+              const log = lastTenLines
+                .reverse()
+                .map((line) => `// ${line}`)
+                .join("\n");
+              return (
+                uOptions.userscript +
+                `\n// 更新日志[只显示最新的10条,🌟🤡 分别代表新功能和bug修复]\n${log}`
+              );
+            }
+          },
+        },
         userscript: {
           name:
             VITE_RELEASE_MODE === "release"
@@ -30,6 +49,7 @@ export default defineConfig(() => {
           homepage: "https://github.com/Ocyss/boos-helper",
           match: ["https://*.zhipin.com/*"],
           author: "Ocyss",
+
           // "run-at": "document-start",
         },
         build: {
