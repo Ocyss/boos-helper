@@ -3,6 +3,7 @@ import { onMounted, ref, watch, watchEffect } from "vue";
 import { ElTabPane, ElTabs, ElCheckbox, ElTooltip } from "element-plus";
 import { findEl, removeEl } from "@/utils/element";
 import cardVue from "./card.vue";
+import chatVue from "./chat.vue";
 import { computed } from "vue";
 import { useMouse, useMouseInElement } from "@vueuse/core";
 
@@ -153,6 +154,9 @@ onMounted(() => {
   </el-tabs>
   <Teleport to=".page-job-inner .page-job-content">
     <cardVue></cardVue>
+  </Teleport>
+  <Teleport to=".page-job-wrapper">
+    <chatVue></chatVue>
   </Teleport>
 </template>
 
@@ -324,7 +328,7 @@ onMounted(() => {
     margin: 0 15px;
   }
 }
-.dark {
+html.dark {
   body {
     background-color: #212121;
   }

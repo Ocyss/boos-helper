@@ -45,7 +45,6 @@ export const jobTitle: handleCFn = (h) =>
     try {
       const text = data.jobName;
       if (!text) throw new Error("岗位名为空");
-      ctx.jobName = text;
       for (const x of formData.jobTitle.value) {
         if (text.includes(x)) {
           if (formData.jobTitle.include) {
@@ -68,7 +67,7 @@ export const company: handleCFn = (h) =>
     try {
       const text = data.brandName;
       if (!text) throw new Error("公司名为空");
-      ctx.companyName = text;
+
       for (const x of formData.jobTitle.value) {
         if (text.includes(x)) {
           if (formData.jobTitle.include) {
@@ -89,7 +88,7 @@ export const salaryRange: handleCFn = (h) =>
   h.push(async ({ data }, ctx) => {
     try {
       const text = data.salaryDesc;
-      ctx.salary = text;
+
       const [v, err] = rangeMatch(text, formData.salaryRange.value);
       if (!v)
         throw new SalaryError(
@@ -104,7 +103,7 @@ export const companySizeRange: handleCFn = (h) =>
   h.push(async ({ data }, ctx) => {
     try {
       const text = data.brandScaleName;
-      ctx.companySize = text;
+
       const [v, err] = rangeMatch(text, formData.companySizeRange.value);
       if (!v)
         throw new CompanySizeError(
@@ -116,7 +115,7 @@ export const companySizeRange: handleCFn = (h) =>
     }
   });
 export const jobContent: handleCFn = (h) =>
-  h.push(async ({ card }) => {
+  h.push(async ({}, { card }) => {
     try {
       const content = card?.postDescription;
       for (const x of formData.jobContent.value) {
@@ -162,14 +161,14 @@ interface aiFiltering {
   const model = modelData.value.find(
     (v) => v.key === formData.aiGreeting.model
   );
-  h.push(async ({ card }, ctx) => {
+  h.push(async ({}, ctx) => {
     try {
-      const msg = template({ card: card });
+      const msg = template({ card: ctx.card });
       if (!model) {
         ElMessage.warning("没有找到AI筛选的模型");
         return;
       }
-      const gptMsg = await requestGpt(model, msg);
+      const gptMsg = await requestGpt(model, msg, { json: true });
       if (!gptMsg) {
         return;
       }
@@ -190,7 +189,7 @@ interface aiFiltering {
   });
 };
 export const activityFilter: handleCFn = (h) =>
-  h.push(async ({ card }) => {
+  h.push(async ({}, { card }) => {
     try {
       const activeText = card?.activeTimeDesc;
       if (!activeText || activeText.includes("月") || activeText.includes("年"))
@@ -211,10 +210,10 @@ export const customGreeting: handleCFn = (h) => {
   }
   h.push(async (args, ctx) => {
     try {
-      const boosData = await requestBossData(args.card!);
+      const boosData = await requestBossData(ctx.card!);
       let msg = formData.customGreeting.value;
-      if (formData.greetingVariable.value && args.card) {
-        msg = template({ card: args.card });
+      if (formData.greetingVariable.value && ctx.card) {
+        msg = template({ card: ctx.card });
       }
       ctx.message = msg;
       const buf = new Message({
@@ -242,14 +241,14 @@ export const aiGreeting: handleCFn = (h) => {
   }
   h.push(async (args, ctx) => {
     try {
-      const boosData = await requestBossData(args.card!);
-      const msg = template({ card: args.card });
+      const boosData = await requestBossData(ctx.card!);
+      const msg = template({ card: ctx.card });
 
       if (!model) {
         ElMessage.warning("没有找到招呼语的模型");
         return;
       }
-      const gptMsg = await requestGpt(model, msg);
+      const gptMsg = await requestGpt(model, msg, {});
       if (!gptMsg) {
         return;
       }

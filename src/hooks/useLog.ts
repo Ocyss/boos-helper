@@ -21,16 +21,8 @@ type logErr =
   | CompanySizeError
   | JobDescriptionError
   | UnknownError;
-export type logData = {
-  jobName?: string; // 岗位名
-  companyName?: string; // 公司名
-  salary?: string; // 薪资
-  experience?: string; // 工作经验
-  degree?: string; // 学历要求
-  jobLabels?: string[]; // 岗位标签
-  companyLabel?: string[]; //公司标签
-  companySize?: string; //公司规模
-  address?: string; //地址
+export type logData = JobListData & {
+  el?: Element;
   card?: JobCard;
   boosData?: BoosData;
   message?: string;

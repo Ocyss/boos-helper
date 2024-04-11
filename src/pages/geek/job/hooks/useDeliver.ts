@@ -46,11 +46,11 @@ async function jobListHandle(
         state: "running",
         msg: "处理中",
       });
-      const ctx: logData = {};
+      const ctx: logData = JSON.parse(JSON.stringify(data));
       try {
         await h.before({ data }, ctx);
         await sendPublishReq(data);
-        await h.after({ data, card: ctx.card }, ctx);
+        await h.after({ data }, ctx);
         log.add(data.jobName, null, ctx, ctx.message);
         todayData.success++;
         jobMap.set(data.encryptJobId, {

@@ -63,6 +63,7 @@ export type modelData = {
         url: string;
         model: string;
         apiKey: string;
+        temperature: number;
       }
     | {
         mode: "自定义";

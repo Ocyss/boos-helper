@@ -26,6 +26,7 @@ let createData = ref<modelData>({
     url: "",
     model: "gpt-3.5-turbo",
     apiKey: "",
+    temperature: 0.35,
   },
 });
 
@@ -41,6 +42,7 @@ function create() {
       url: "",
       model: "gpt-3.5-turbo",
       apiKey: "",
+      temperature: 0.35,
     },
   };
   createBoxShow.value = true;

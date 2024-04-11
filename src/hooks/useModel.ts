@@ -12,7 +12,8 @@ logger.debug("ai模型数据", toRaw(modelData.value));
 
 async function requestGpt(
   model: modelData,
-  message: string
+  message: string,
+  { timeout = 120000, json = false }
 ): Promise<string | void> {
   let ans: string | undefined;
   switch (model.data.mode) {
@@ -27,17 +28,15 @@ async function requestGpt(
             },
           ],
           model: model.data.model,
-          params: {
-            n: 1,
-            response_format: { type: "json_object" },
-          },
+          temperature: model.data.temperature || 0.35,
+          response_format: json ? { type: "json_object" } : undefined,
         },
         {
           headers: {
             Authorization: `Bearer ${model.data.apiKey}`,
             "Content-Type": "application/json",
           },
-          timeout: 120000,
+          timeout,
         }
       );
       ans = res.data?.choices[0]?.message?.content;
@@ -56,6 +55,7 @@ async function requestGpt(
           headers: model.data.header
             ? JSON.parse(model.data.header)
             : undefined,
+          timeout,
         }
       );
       break;

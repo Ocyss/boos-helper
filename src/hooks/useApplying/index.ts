@@ -47,18 +47,8 @@ export function createHandle(): {
             securityId: args.data.securityId,
           });
           if (res.data.code == 0) {
-            args.card = res.data.zpData.jobCard;
-            ctx = {
-              ...ctx,
-              jobName: args.card.jobName,
-              companyName: args.card.brandName,
-              salary: args.card.salaryDesc,
-              experience: args.card.experienceName,
-              degree: args.card.degreeName,
-              jobLabels: args.card.jobLabels,
-              address: args.card.address,
-              card: args.card,
-            };
+            ctx.card = res.data.zpData.jobCard;
+
             await Promise.all(handlesRes.map((handle) => handle(args, ctx)));
           } else {
             throw new UnknownError("请求响应错误:" + res.data.message);
@@ -74,13 +64,13 @@ export function createHandle(): {
     after: async (args, ctx) => {
       if (handlesAfter.length === 0) return;
       try {
-        if (!args.card) {
+        if (!ctx.card) {
           const res = await requestCard({
             lid: args.data.lid,
             securityId: args.data.securityId,
           });
           if (res.data.code == 0) {
-            args.card = res.data.zpData.jobCard;
+            ctx.card = res.data.zpData.jobCard;
           } else {
             throw new UnknownError("请求响应错误:" + res.data.message);
           }
