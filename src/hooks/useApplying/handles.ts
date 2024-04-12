@@ -21,11 +21,13 @@ import {
   GreetError,
 } from "@/types/deliverError";
 import { useStore } from "../useStore";
+import { unsafeWindow } from "$";
 
 const { modelData, requestGpt } = useModel();
 const { formData } = useConfFormData();
 const { todayData } = useStatistics();
 const { userInfo } = useStore();
+
 export const communicated: handleCFn = (h) => {
   //   h.push(async ({ data }) => {
   //     try {
@@ -203,7 +205,11 @@ export const activityFilter: handleCFn = (h) =>
 export const customGreeting: handleCFn = (h) => {
   const template = miTem.compile(formData.customGreeting.value);
   const uid =
-    userInfo.value?.userId || window?._PAGE?.uid || window?._PAGE?.userId;
+    userInfo.value?.userId ||
+    unsafeWindow?._PAGE?.uid ||
+    unsafeWindow?._PAGE?.userId ||
+    window?._PAGE?.uid ||
+    window?._PAGE?.userId;
   if (!uid) {
     ElMessage.error("没有获取到uid,请刷新重试");
     throw new GreetError("没有获取到uid");
@@ -234,7 +240,11 @@ export const aiGreeting: handleCFn = (h) => {
     (v) => v.key === formData.aiGreeting.model
   );
   const uid =
-    userInfo.value?.userId || window?._PAGE?.uid || window?._PAGE?.userId;
+    userInfo.value?.userId ||
+    unsafeWindow?._PAGE?.uid ||
+    unsafeWindow?._PAGE?.userId ||
+    window?._PAGE?.uid ||
+    window?._PAGE?.userId;
   if (!uid) {
     ElMessage.error("没有获取到uid,请刷新重试");
     throw new GreetError("没有获取到uid");

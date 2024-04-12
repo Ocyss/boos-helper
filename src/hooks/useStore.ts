@@ -1,5 +1,6 @@
 import { ref } from "vue";
 import { getRootVue, useHookVueData } from "./useVue";
+import { logger } from "@/utils/logger";
 
 const userInfo = ref<{
   userId: number;
@@ -31,6 +32,7 @@ const storeInit = async () => {
   const v = await getRootVue();
   const store = v?.$store?.state;
   userInfo.value = store?.userInfo;
+  logger.debug("userInfo: ", userInfo.value);
 };
 
 export const useStore = () => {

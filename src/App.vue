@@ -14,8 +14,10 @@ import storeVue from "@/components/conf/store.vue";
 import userVue from "@/components/conf/user.vue";
 import logVue from "@/components/conf/log.vue";
 import { onMounted, ref } from "vue";
+import { useStore } from "./hooks/useStore";
 logger.info("BoosHelper挂载成功");
 ElMessage("BoosHelper挂载成功!");
+const { storeInit } = useStore();
 const confBox = ref(false);
 const confs = {
   store: { name: "存储配置", component: storeVue },
@@ -42,8 +44,9 @@ function themeChange() {
   document.documentElement.classList.toggle("dark", dark.value);
   GM_setValue("theme-dark", dark.value);
 }
-onMounted(() => {
+onMounted(async () => {
   document.documentElement.classList.toggle("dark", dark.value);
+  await storeInit();
 });
 </script>
 

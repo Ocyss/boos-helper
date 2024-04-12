@@ -49,7 +49,7 @@ export default defineConfig(() => {
           homepage: "https://github.com/Ocyss/boos-helper",
           match: ["https://*.zhipin.com/*"],
           author: "Ocyss",
-
+          grant: ["unsafeWindow"],
           // "run-at": "document-start",
         },
         build: {

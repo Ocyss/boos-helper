@@ -93,6 +93,6 @@ export class Logger {
 
 export const logger = new Logger(
   process.env.NODE_ENV === "production"
-    ? undefined
+    ? { level: LogLevel.DEBUG, print: true }
     : { level: LogLevel.DEBUG, print: true }
 );

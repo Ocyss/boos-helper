@@ -1,5 +1,6 @@
 import protobuf from "protobufjs";
 import { TechwolfChatProtocol } from "./type";
+import { unsafeWindow } from "$";
 
 var Root = protobuf.Root,
   Type = protobuf.Type,
@@ -92,6 +93,6 @@ export class Message {
     return this.msg.buffer.slice(0, this.msg.byteLength);
   }
   send() {
-    window.ChatWebsocket.send(this);
+    (window.ChatWebsocket || unsafeWindow.ChatWebsocket).send(this);
   }
 }
