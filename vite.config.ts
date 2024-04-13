@@ -23,7 +23,7 @@ export default defineConfig(() => {
               const filePath = path.join(rootDir, "update.log");
               const fileContent = fs.readFileSync(filePath, "utf-8");
               const lines = fileContent.trim().split("\n");
-              const lastTenLines = lines.slice(-10);
+              const lastTenLines = lines.slice(-30);
               const log = lastTenLines
                 .reverse()
                 .map((line) => `// ${line}`)
@@ -32,6 +32,8 @@ export default defineConfig(() => {
                 uOptions.userscript +
                 `\n// 更新日志[只显示最新的10条,🌟🤡 分别代表新功能和bug修复]\n${log}`
               );
+            } else {
+              return uOptions.userscript;
             }
           },
         },
@@ -68,6 +70,9 @@ export default defineConfig(() => {
             "element-plus/dist/index.css": cdn.jsdelivr(),
             "element-plus/theme-chalk/dark/css-vars.css": cdn.jsdelivr(),
           },
+        },
+        server: {
+          prefix: false,
         },
       }),
     ],
