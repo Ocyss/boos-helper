@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { ElButton, ElButtonGroup, ElSpace } from "element-plus";
+import { ElButton, ElSpace, ElDialog, ElSelectV2, ElAlert } from "element-plus";
 import { useConfFormData, formInfoData } from "@/hooks/useConfForm";
 import settingsVue from "@/components/icon/settings.vue";
 import { ref } from "vue";
@@ -8,16 +8,27 @@ import modelVue from "./ai/model.vue";
 import { FormDataAi } from "@/types/formData";
 import formAiVue from "@/components/form/formAi.vue";
 import { useCommon } from "@/hooks/useCommon";
+import { useModel } from "@/hooks/useModel";
 
 const { formData, confSaving } = useConfFormData();
 const { deliverLock } = useCommon();
+const useModelData = useModel();
+const modelData = useModelData.modelData.value.filter(
+  (m) => m.data.mode === "仅记录"
+);
 const aiBoxShow = ref(false);
 const aiConfBoxShow = ref(false);
-const aiBox = ref<"aiGreeting" | "aiFiltering" | "aiReply">("aiGreeting");
-function change(v: FormDataAi) {
+const aiBox = ref<"aiGreeting" | "aiFiltering" | "aiReply" | "record">(
+  "aiGreeting"
+);
+function change(v: Partial<FormDataAi>) {
   v.enable = !v.enable;
   confSaving();
 }
+
+// 写的依托
+const m = formData.record.model || [];
+const recordModel = ref(Array.isArray(m) ? m : [m]);
 </script>
 
 <template>
@@ -52,6 +63,15 @@ function change(v: FormDataAi) {
       @change="change"
       disabled
     />
+    <formAiVue
+      v-bind="formInfoData.record"
+      :data="formData.record"
+      @show="
+        aiBox = 'record';
+        aiBoxShow = true;
+      "
+      @change="change"
+    />
   </el-space>
   <div style="margin-top: 15px">
     <el-button
@@ -65,11 +85,52 @@ function change(v: FormDataAi) {
   <Teleport to="body">
     <modelVue v-model="aiConfBoxShow" />
     <configVue
-      v-if="aiBoxShow"
+      v-if="aiBoxShow && aiBox !== 'record'"
       v-key="aiBox"
       :data="aiBox"
       v-model="aiBoxShow"
     />
+    <el-dialog
+      v-model="aiBoxShow"
+      :title="formInfoData.record.label"
+      width="70%"
+      align-center
+      destroy-on-close
+      :z-index="20"
+    >
+      <el-select-v2
+        v-model="recordModel"
+        :options="modelData"
+        :props="{ label: 'name', value: 'key' }"
+        placeholder="选择模型"
+        multiple
+        style="width: 45%; margin-bottom: 8px"
+      />
+      <el-alert
+        title="数据是宝贵的，每一次投递完都会去请求一次，不要问为什么在AI类别里面为啥是AI同款模型"
+        type="warning"
+        show-icon
+        :closable="false"
+      />
+      <template #footer>
+        <div>
+          <el-button @click="aiBoxShow = false">取消</el-button>
+
+          <el-button
+            type="primary"
+            @click="
+              () => {
+                formData.record.model = recordModel;
+                confSaving();
+                aiBoxShow = false;
+              }
+            "
+          >
+            保存
+          </el-button>
+        </div>
+      </template>
+    </el-dialog>
   </Teleport>
 </template>
 

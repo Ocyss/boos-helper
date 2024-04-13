@@ -10,6 +10,10 @@ import {
   ElRadioGroup,
   ElRadioButton,
   ElForm,
+  ElSlider,
+  ElAlert,
+  ElSelect,
+  ElOption,
 } from "element-plus";
 import { ref, toRaw } from "vue";
 import deepmerge from "@/utils/deepmerge";
@@ -186,6 +190,17 @@ function edit(d: modelData) {
           <el-form-item label="apiKey:">
             <el-input v-model="createData.data.apiKey" />
           </el-form-item>
+          <el-alert title="高级配置，不懂勿改" type="warning" show-icon />
+          <el-form-item label="temperature:">
+            <el-slider
+              v-model="createData.data.temperature"
+              :min="0"
+              :max="1"
+              :step="0.01"
+              show-input
+              :marks="{ [0.2]: '严谨', [0.8]: '想象' }"
+            />
+          </el-form-item>
         </div>
         <div
           v-else-if="
@@ -193,10 +208,16 @@ function edit(d: modelData) {
             createData.data.mode === '仅记录'
           "
         >
+          <el-form-item label="请求方式:">
+            <el-select model-value="post" disabled style="width: 240px">
+              <el-option label="POST" value="post" />
+            </el-select>
+          </el-form-item>
+
           <el-form-item label="url:">
             <el-input
               v-model="createData.data.url"
-              placeholder="只支持Post请求"
+              placeholder="请输入请求地址"
             />
           </el-form-item>
           <el-form-item label="header:">
@@ -204,17 +225,30 @@ function edit(d: modelData) {
               autosize
               type="textarea"
               v-model="createData.data.header"
-              placeholder="只支持Json格式"
+              placeholder="使用Json格式"
             />
           </el-form-item>
+          <el-alert
+            title="Json格式，其中{{message}}为发给GPT的消息，后续支持更多会变量"
+            type="info"
+            show-icon
+          />
           <el-form-item label="data:">
-            <el-input
-              autosize
-              type="textarea"
-              v-model="createData.data.data"
-              placeholder="只支持Json格式，其中${MESSAGE}在调用时候会替换成对应消息,不需要引用包裹"
-            />
+            <el-input autosize type="textarea" v-model="createData.data.data" />
           </el-form-item>
+          <div v-if="createData.data.mode === '自定义'">
+            <el-alert
+              title="响应内容提取，返回体将作为模板引擎的数据传入，数据一般在data.data，最终产物将作为gpt响应发给boos或筛选判断。（发送给Boos需要字符串，筛选需要json格式）"
+              type="info"
+              show-icon
+            />
+            <el-form-item label="req:">
+              <el-input
+                v-model="createData.data.req"
+                placeholder="示例：data.message[0]"
+              />
+            </el-form-item>
+          </div>
         </div>
       </el-form>
       <template #footer>

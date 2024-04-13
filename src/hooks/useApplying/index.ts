@@ -31,7 +31,7 @@ export function createHandle(): {
   // AI过滤
   if (formData.aiFiltering.enable) h.aiFiltering(handlesRes);
   // 活跃度过滤
-  if (formData.activityFilter) h.activityFilter(handlesRes);
+  if (formData.activityFilter.value) h.activityFilter(handlesRes);
   // 自定义招呼语
   if (formData.customGreeting.enable && !formData.customGreeting.enable)
     h.customGreeting(handlesAfter);
@@ -85,3 +85,5 @@ export function createHandle(): {
     },
   };
 }
+
+export const record = h.record;

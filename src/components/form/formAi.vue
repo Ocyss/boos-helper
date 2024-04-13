@@ -8,11 +8,11 @@ const props = defineProps<{
   lock?: boolean;
   help?: string;
   disabled?: boolean;
-  data: FormDataAi;
+  data: Partial<FormDataAi>;
 }>();
 
 const emit = defineEmits<{
-  (e: "change", data: FormDataAi): void;
+  (e: "change", data: Partial<FormDataAi>): void;
   (e: "show"): void;
 }>();
 </script>

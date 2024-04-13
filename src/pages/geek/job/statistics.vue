@@ -15,13 +15,14 @@ import {
 } from "element-plus";
 
 import { useDeliver } from "./hooks/useDeliver";
-import { delay } from "@/utils";
+import { delay, notification } from "@/utils";
 import { useLog } from "@/hooks/useLog";
 import { useCommon } from "@/hooks/useCommon";
 import { useStatistics } from "@/hooks/useStatistics";
 import { useJobList } from "./hooks/useJobList";
 import { usePager } from "./hooks/usePager";
 import { logger } from "@/utils/logger";
+import { useConfFormData } from "@/hooks/useConfForm";
 
 const log = useLog();
 const { todayData, statisticsData } = useStatistics();
@@ -29,6 +30,7 @@ const { deliverLock, deliverStop } = useCommon();
 const { jobListHandle } = useDeliver();
 const { jobList, jobMap } = useJobList();
 const { next, page, prev } = usePager();
+const { formData } = useConfFormData();
 const statisticCycle = ref(1);
 const statisticCycleData = [
   {
@@ -87,6 +89,9 @@ async function startBatch() {
   } finally {
     logger.debug(log.data);
     ElMessage.info("投递结束");
+    if (formData.notification.value) {
+      notification("投递结束");
+    }
     deliverLock.value = false;
     deliverStop.value = false;
   }

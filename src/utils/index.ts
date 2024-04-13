@@ -54,6 +54,12 @@ export function animate({
 let delayLoadId: number | undefined = undefined;
 // 延迟
 export function delay(ms: number) {
+  loader({ ms });
+  return new Promise((resolve) => setTimeout(resolve, ms));
+}
+
+// 加载进度条
+export function loader({ ms = 10000, color = "#54f98d", onDone = () => {} }) {
   let load = document.querySelector<HTMLDivElement>("#loader");
   if (!load) {
     const l = document.createElement("div");
@@ -61,6 +67,7 @@ export function delay(ms: number) {
     document.querySelector("#header")?.appendChild(l);
     load = l;
   }
+  load.style.background = color;
   if (delayLoadId) {
     cancelAnimationFrame(delayLoadId);
     delayLoadId = undefined;
@@ -79,11 +86,16 @@ export function delay(ms: number) {
       },
       end() {
         if (load) load.style.width = "0%";
+        onDone();
       },
     });
-  return new Promise((resolve) => setTimeout(resolve, ms));
+  return () => {
+    if (delayLoadId) cancelAnimationFrame(delayLoadId);
+    delayLoadId = undefined;
+    const load = document.querySelector<HTMLDivElement>("#loader");
+    if (load) load.style.width = "0%";
+  };
 }
-
 // 获取当前日期
 export function getCurDay() {
   const currentDate = new Date();

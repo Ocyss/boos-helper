@@ -19,7 +19,8 @@ const props = defineProps<{
 }>();
 const show = defineModel<boolean>({ required: true });
 const val = ref(formData[props.data].word);
-const model = ref(formData[props.data].model);
+const m = formData[props.data].model || [];
+const model = ref(Array.isArray(m) ? m : [m]);
 </script>
 
 <template>
@@ -36,6 +37,7 @@ const model = ref(formData[props.data].model);
       :options="modelData"
       :props="{ label: 'name', value: 'key' }"
       placeholder="选择模型"
+      multiple
       style="width: 45%; margin-bottom: 8px"
     />
     <el-text>
@@ -45,9 +47,9 @@ const model = ref(formData[props.data].model);
         href="https://www.npmjs.com/package/mitem"
         target="_blank"
       >
-        迷你的模板引擎 mitem
+        模板引擎 mitem
       </el-link>
-      来渲染模板
+      来渲染模板。当配置多个模型的时候将依次调用，使用第一个响应.
     </el-text>
 
     <el-input
@@ -56,7 +58,8 @@ const model = ref(formData[props.data].model);
       :autosize="{ minRows: 10, maxRows: 18 }"
       type="textarea"
       placeholder="如果无内容或错误内容请直接恢复默认，示例会随脚本更新"
-    />
+    ></el-input>
+
     <template #footer>
       <div>
         <el-button @click="show = false">取消</el-button>

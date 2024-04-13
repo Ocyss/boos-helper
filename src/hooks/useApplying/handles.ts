@@ -20,6 +20,7 @@ import {
 } from "@/types/deliverError";
 import { useStore } from "../useStore";
 import { unsafeWindow } from "$";
+import { logData } from "../useLog";
 
 const { modelData, requestGpt } = useModel();
 const { formData } = useConfFormData();
@@ -157,14 +158,13 @@ interface aiFiltering {
   negative: string[] | string; // 扣分项，可以是一句话为什么扣分，也可以是数组代表多个扣分项
   positive: string[] | string; // 加分项，可以是一句话为什么加分，也可以是数组代表多个加分项
 }`);
-
-  const model = modelData.value.find(
-    (v) => v.key === formData.aiGreeting.model
-  );
+  let m = formData.aiFiltering.model || [];
+  m = Array.isArray(m) ? m : [m];
+  const model = modelData.value.filter((v) => m.includes(v.key));
   h.push(async ({}, ctx) => {
     try {
       const msg = template({ card: ctx.card });
-      if (!model) {
+      if (!model || model.length === 0) {
         ElMessage.warning("没有找到AI筛选的模型");
         return;
       }
@@ -232,9 +232,9 @@ export const customGreeting: handleCFn = (h) => {
 };
 export const aiGreeting: handleCFn = (h) => {
   const template = miTem.compile(formData.aiGreeting.word);
-  const model = modelData.value.find(
-    (v) => v.key === formData.aiGreeting.model
-  );
+  let m = formData.aiGreeting.model || [];
+  m = Array.isArray(m) ? m : [m];
+  const model = modelData.value.filter((v) => m.includes(v.key));
   const uid =
     userInfo.value?.userId ||
     unsafeWindow?._PAGE?.uid ||
@@ -248,7 +248,7 @@ export const aiGreeting: handleCFn = (h) => {
       const boosData = await requestBossData(ctx.card!);
       const msg = template({ card: ctx.card });
 
-      if (!model) {
+      if (!model || model.length === 0) {
         ElMessage.warning("没有找到招呼语的模型");
         return;
       }
@@ -269,4 +269,10 @@ export const aiGreeting: handleCFn = (h) => {
       throw new GreetError(e?.message);
     }
   });
+};
+export const record = async (ctx: logData) => {
+  let m = formData.record.model || [];
+  m = Array.isArray(m) ? m : [m];
+  const model = modelData.value.filter((v) => m.includes(v.key));
+  await requestGpt(model, ctx, {});
 };

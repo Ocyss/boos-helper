@@ -1,13 +1,15 @@
 import { ElMessage, ElMessageBox } from "element-plus";
 import "element-plus/dist/index.css";
 import "element-plus/theme-chalk/dark/css-vars.css";
+import "./main.scss";
 import * as url from "url";
 import { logger } from "@/utils/logger";
 import App from "./App.vue";
 import { createApp, ref, watch } from "vue";
-import { delay } from "./utils";
+import { delay, loader } from "./utils";
 import { getRootVue } from "./hooks/useVue";
 import { GM_getValue } from "$";
+import axios from "axios";
 
 logger.debug("初始化");
 let t: NodeJS.Timeout;
@@ -93,6 +95,29 @@ async function start() {
   const v = await getRootVue();
   v.$router.afterHooks.push(main);
   main(v.$route);
+  let axiosLoad: () => void;
+  axios.interceptors.request.use(
+    function (config) {
+      if (config.timeout) {
+        axiosLoad = loader({ ms: config.timeout, color: "#F79E63" });
+      }
+      return config;
+    },
+    function (error) {
+      if (axiosLoad) axiosLoad();
+      return Promise.reject(error);
+    }
+  );
+  axios.interceptors.response.use(
+    function (response) {
+      if (axiosLoad) axiosLoad();
+      return response;
+    },
+    function (error) {
+      if (axiosLoad) axiosLoad();
+      return Promise.reject(error);
+    }
+  );
 }
 
 logger.debug("开始运行");

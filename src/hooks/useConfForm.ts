@@ -61,6 +61,10 @@ export const formInfoData: FormInfoData = {
     label: "AI回复",
     help: "万一消息太多，回不过来了呢，也许能和AiHR聊到地球爆炸？魔法击败魔法",
   },
+  record: {
+    label: "内容记录",
+    help: "拿这些数据去训练个Ai岂不是美滋滋咯？",
+  },
 };
 
 export const defaultFormData: FormData = {
@@ -126,6 +130,9 @@ export const defaultFormData: FormData = {
   aiReply: {
     enable: false,
     word: "",
+  },
+  record: {
+    enable: false,
   },
 };
 

@@ -24,6 +24,7 @@ export interface FormData {
   aiGreeting: FormDataAi;
   aiFiltering: FormDataAi;
   aiReply: FormDataAi;
+  record: Omit<FormDataAi, "word">;
   animation?: "frame" | "card" | "together";
 }
 
@@ -48,7 +49,7 @@ export interface FormDataCheckbox {
   value: boolean;
 }
 export interface FormDataAi {
-  model?: string;
+  model?: string | string[];
   word: string;
   enable: boolean;
 }
@@ -70,6 +71,7 @@ export type modelData = {
         url: string;
         header: string;
         data: string;
+        req: string;
       }
     | {
         mode: "仅记录";
