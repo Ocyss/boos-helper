@@ -7,6 +7,7 @@ import App from "./App.vue";
 import { createApp, ref, watch } from "vue";
 import { delay } from "./utils";
 import { getRootVue } from "./hooks/useVue";
+import { GM_getValue } from "$";
 
 logger.debug("初始化");
 let t: NodeJS.Timeout;
@@ -76,18 +77,19 @@ async function main(router: any) {
   const helper = document.querySelector("#boos-helper");
   if (!helper) {
     const app = createApp(App);
-    app.mount(
-      (() => {
-        const appEl = document.createElement("div");
-        appEl.id = "boos-helper";
-        document.body.append(appEl);
-        return appEl;
-      })()
-    );
+    const appEl = document.createElement("div");
+    appEl.id = "boos-helper";
+    document.body.append(appEl);
+    app.mount(appEl);
   }
 }
 
 async function start() {
+  document.documentElement.classList.toggle(
+    "dark",
+    GM_getValue("theme-dark", false)
+  );
+
   const v = await getRootVue();
   v.$router.afterHooks.push(main);
   main(v.$route);

@@ -1,6 +1,6 @@
 import { defineConfig, loadEnv } from "vite";
 import vue from "@vitejs/plugin-vue";
-import monkey, { cdn } from "vite-plugin-monkey";
+import monkey, { cdn, util } from "vite-plugin-monkey";
 import process from "process";
 import path from "path";
 import fs from "fs";
@@ -50,11 +50,23 @@ export default defineConfig(() => {
           match: ["https://*.zhipin.com/*"],
           author: "Ocyss",
           grant: ["unsafeWindow"],
-          // "run-at": "document-start",
+          require: ["https://scriptcat.org/lib/513/2.0.0/ElementGetter.js"],
+          "run-at": "document-start",
         },
         build: {
           externalGlobals: {
-            vue: cdn.jsdelivr("Vue", "dist/vue.global.prod.js"),
+            vue: cdn
+              .jsdelivr("Vue", "dist/vue.global.prod.js")
+              .concat(util.dataUrl(";window.Vue=Vue;")),
+            "element-plus": cdn.jsdelivr(
+              "ElementPlus",
+              "dist/index.full.min.js"
+            ),
+            protobufjs: cdn.jsdelivr("protobuf", "dist/light/protobuf.min.js"),
+          },
+          externalResource: {
+            "element-plus/dist/index.css": cdn.jsdelivr(),
+            "element-plus/theme-chalk/dark/css-vars.css": cdn.jsdelivr(),
           },
         },
       }),
@@ -67,6 +79,7 @@ export default defineConfig(() => {
     build: {
       minify: false,
     },
+    css: {},
     // server: {
     //   host: "logapi.zhipin.com",
     //   port: 80,

@@ -1,5 +1,3 @@
-import { getElText } from "@/utils/element";
-
 import { useStatistics } from "@/hooks/useStatistics";
 import { handleCFn } from "./type";
 import { useConfFormData } from "../useConfForm";
@@ -207,9 +205,7 @@ export const customGreeting: handleCFn = (h) => {
   const uid =
     userInfo.value?.userId ||
     unsafeWindow?._PAGE?.uid ||
-    unsafeWindow?._PAGE?.userId ||
-    window?._PAGE?.uid ||
-    window?._PAGE?.userId;
+    unsafeWindow?._PAGE?.userId;
   if (!uid) {
     ElMessage.error("没有获取到uid,请刷新重试");
     throw new GreetError("没有获取到uid");
@@ -242,9 +238,7 @@ export const aiGreeting: handleCFn = (h) => {
   const uid =
     userInfo.value?.userId ||
     unsafeWindow?._PAGE?.uid ||
-    unsafeWindow?._PAGE?.userId ||
-    window?._PAGE?.uid ||
-    window?._PAGE?.userId;
+    unsafeWindow?._PAGE?.userId;
   if (!uid) {
     ElMessage.error("没有获取到uid,请刷新重试");
     throw new GreetError("没有获取到uid");

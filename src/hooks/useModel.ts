@@ -29,7 +29,8 @@ async function requestGpt(
           ],
           model: model.data.model,
           temperature: model.data.temperature || 0.35,
-          response_format: json ? { type: "json_object" } : undefined,
+          // TODO: 部分模型不支持json格式，需要判断
+          response_format: false && json ? { type: "json_object" } : undefined,
         },
         {
           headers: {

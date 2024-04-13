@@ -9,7 +9,14 @@ import {
   ElDropdownItem,
   ElAvatar,
 } from "element-plus";
-import { GM_deleteValue, GM_getValue, GM_listValues, GM_setValue } from "$";
+import {
+  GM_deleteValue,
+  GM_getValue,
+  GM_listValues,
+  GM_setValue,
+  monkeyWindow,
+  unsafeWindow,
+} from "$";
 import storeVue from "@/components/conf/store.vue";
 import userVue from "@/components/conf/user.vue";
 import logVue from "@/components/conf/log.vue";
@@ -39,13 +46,16 @@ const clone = async () => {
     window.alert("OK!");
   }
 };
+
 function themeChange() {
   dark.value = !dark.value;
   document.documentElement.classList.toggle("dark", dark.value);
   GM_setValue("theme-dark", dark.value);
 }
+
+// console.log(monkeyWindow, window, unsafeWindow);
+
 onMounted(async () => {
-  document.documentElement.classList.toggle("dark", dark.value);
   await storeInit();
 });
 </script>

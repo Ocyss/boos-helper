@@ -13,7 +13,6 @@ import {
   ElIcon,
   ElMessage,
 } from "element-plus";
-import { findAllEl, findEl } from "@/utils/element";
 
 import { useDeliver } from "./hooks/useDeliver";
 import { delay } from "@/utils";

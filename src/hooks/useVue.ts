@@ -1,4 +1,5 @@
 import { delay } from "@/utils";
+import elmGetter from "@/utils/elmGetter";
 import { ElMessage } from "element-plus";
 import { ref, Ref } from "vue";
 
@@ -6,11 +7,9 @@ const rootVue = ref();
 
 export const getRootVue = async () => {
   if (rootVue.value) return rootVue.value;
-  let wrap;
-  while (!wrap) {
-    await delay(100);
-    wrap = document.querySelector<Element & { __vue__: any }>("#wrap");
-  }
+
+  let wrap = await elmGetter.get<Element & { __vue__: any }>("#wrap");
+
   if (wrap.__vue__) rootVue.value = wrap.__vue__;
   else {
     ElMessage.error("未找到vue根组件");

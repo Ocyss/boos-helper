@@ -93,6 +93,6 @@ export class Message {
     return this.msg.buffer.slice(0, this.msg.byteLength);
   }
   send() {
-    (window.ChatWebsocket || unsafeWindow.ChatWebsocket).send(this);
+    unsafeWindow.ChatWebsocket.send(this);
   }
 }
