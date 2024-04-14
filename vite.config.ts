@@ -52,7 +52,6 @@ export default defineConfig(() => {
           match: ["https://*.zhipin.com/*"],
           author: "Ocyss",
           grant: ["unsafeWindow"],
-          require: ["https://scriptcat.org/lib/513/2.0.0/ElementGetter.js"],
           "run-at": "document-start",
         },
         build: {
