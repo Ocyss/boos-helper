@@ -91,6 +91,7 @@ const recordModel = ref(Array.isArray(m) ? m : [m]);
       v-model="aiBoxShow"
     />
     <el-dialog
+      v-if="aiBoxShow && aiBox === 'record'"
       v-model="aiBoxShow"
       :title="formInfoData.record.label"
       width="70%"

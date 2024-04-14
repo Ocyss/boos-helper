@@ -5,7 +5,7 @@ import { useStatistics } from "@/hooks/useStatistics";
 const { todayData } = useStatistics();
 const { deliverStop } = useCommon();
 import { ref } from "vue";
-import { createHandle, sendPublishReq, record } from "@/hooks/useApplying";
+import { createHandle, sendPublishReq } from "@/hooks/useApplying";
 import { Actions } from "@/hooks/useMap";
 import { logger } from "@/utils/logger";
 
@@ -58,6 +58,7 @@ async function jobListHandle(
           msg: "投递成功",
         });
         logger.warn("成功", ctx);
+        ctx.state = "成功";
       } catch (e: any) {
         jobMap.set(data.encryptJobId, {
           state: e.state === "warning" ? "warn" : "error",
@@ -65,8 +66,10 @@ async function jobListHandle(
         });
         log.add(data.jobName, e, ctx);
         logger.warn("过滤", ctx);
+        ctx.state = "过滤";
+        ctx.err = e.message || "";
       } finally {
-        await record(ctx);
+        await h.record(ctx);
       }
     } catch (e) {
       jobMap.set(data.encryptJobId, {

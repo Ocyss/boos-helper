@@ -173,7 +173,7 @@ function edit(d: modelData) {
             @update:model-value="changeMode as never"
           >
             <el-radio-button label="ChatGPT" value="ChatGPT" />
-            <el-radio-button label="自定义" value="自定义" disabled />
+            <el-radio-button label="自定义" value="自定义" />
             <el-radio-button label="仅记录" value="仅记录" />
           </el-radio-group>
         </el-form-item>
@@ -229,7 +229,7 @@ function edit(d: modelData) {
             />
           </el-form-item>
           <el-alert
-            title="Json格式，其中{{message}}为发给GPT的消息，后续支持更多会变量"
+            title="Json格式，其中{{message}}为发给GPT的消息,需要引号包裹，{{raw}}为原始数据，不需要引号包裹通常作为json值对象，在记录模式下很使用"
             type="info"
             show-icon
           />

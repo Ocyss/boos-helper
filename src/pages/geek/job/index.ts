@@ -28,7 +28,7 @@ function removeAd() {
 }
 
 export async function run() {
-  logger.slice("加载/web/geek/job页面Hook");
+  logger.info("加载/web/geek/job页面Hook");
   removeAd();
   mountVue();
 }

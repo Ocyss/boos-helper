@@ -3,12 +3,14 @@ import { handleFn } from "./type";
 import { requestCard } from "./api";
 import { useConfFormData } from "../useConfForm";
 import * as h from "./handles";
+import { logData } from "../useLog";
 export * from "./api";
 const { formData } = useConfFormData();
 
 export function createHandle(): {
   before: handleFn;
   after: handleFn;
+  record: (ctx: logData) => Promise<void>;
 } {
   // 无需调用接口
   const handles: handleFn[] = [];
@@ -83,7 +85,9 @@ export function createHandle(): {
         throw new UnknownError("预期外:" + e.message);
       }
     },
+    record: (ctx) => {
+      if (formData.record.enable) return h.record(ctx);
+      return Promise.resolve();
+    },
   };
 }
-
-export const record = h.record;

@@ -26,7 +26,14 @@ export type logData = JobListData & {
   card?: JobCard;
   boosData?: BoosData;
   message?: string;
-  aiFiltering?: string; //Ai筛选
+  state?: string;
+  err?: string;
+  aiFilteringQ?: string;
+  aiFilteringAraw?: string;
+  aiFilteringAjson?: object;
+  aiFilteringAtext?: string;
+  aiGreetingQ?: string;
+  aiGreetingA?: string;
 };
 type logState = "info" | "success" | "warning" | "danger";
 
@@ -51,7 +58,7 @@ const columns: Column<log>[] = [
     width: 150,
     align: "center",
     cellRenderer: ({ rowData }) =>
-      h(ElTag, { type: rowData.state ?? "primary" }, rowData.state_name),
+      h(ElTag, { type: rowData.state ?? "primary" }, () => rowData.state_name),
   },
   {
     key: "message",

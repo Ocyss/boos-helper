@@ -53,6 +53,7 @@ async function requestGpt(
           const template = miTem.compile(m.data.data);
           const msg = template({
             message: JSON.stringify(message).replace(/^(\s|")+|(\s|")+$/g, ""),
+            raw: JSON.stringify(message),
           });
           const req = await axios.post(m.data.url, JSON.parse(msg), {
             headers: m.data.header ? JSON.parse(m.data.header) : undefined,
