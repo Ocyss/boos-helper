@@ -3,15 +3,16 @@
 
 Boos直聘助手, 皆在减少投递简历的麻烦, 和提高投递简历的效率,技术栈使用VIte + Vue3 + element-plus, 代码由 Vite 打包无加密混淆最小化,开源在 Github 欢迎前来Pr
 
-[x.x.x] 为正式版本,同步github的release版本,不保证稳定性只是功能相对完善
+[1+.x.x] 为正式版本,同步github的release版本,不保证稳定性只是功能相对完善
 
-[202x.x.x.alpha] 为测试版本,同步github的master分支,每日自动构建
+[202x.x.x.alpha]/[0.x.x] 为测试版本,同步github的master分支,自动构建
 
-> 本项目处于积极维护状态
 > 24.04.11 后续会加上各个版本的更新内容，并且进行认真测试。最近在优化过程中，不慎将GPT内容发送给了老板而导致了严重的尴尬局面。以此为戒
 
 ## 项目预览
 
+[![卡片状态](https://s21.ax1x.com/2024/04/14/pFvtxGF.png)](https://imgse.com/i/pFvtxGF)
+[![账户配置](https://s21.ax1x.com/2024/04/14/pFvtvPU.png)](https://imgse.com/i/pFvtvPU)
 [![统计界面](https://s21.ax1x.com/2024/04/02/pFHa3ZD.png)](https://imgse.com/i/pFHa3ZD)
 [![配置界面](https://s21.ax1x.com/2024/04/02/pFHa8de.png)](https://imgse.com/i/pFHa8de)
 [![日志界面](https://s21.ax1x.com/2024/04/02/pFHalqO.png)](https://imgse.com/i/pFHalqO)
