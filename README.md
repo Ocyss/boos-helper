@@ -25,6 +25,8 @@ Boos直聘助手, 皆在减少投递简历的麻烦, 和提高投递简历的效
 
 [202x.x.x.alpha]/[0.x.x] 为测试版本,同步github的master分支,自动构建
 
+[README.user.md](README.user.md) 为用户使用说明，重要变更此处不再说明
+
 ## 未来计划
 
 - [x] 优化UI去除广告
