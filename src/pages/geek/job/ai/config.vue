@@ -19,9 +19,8 @@ const props = defineProps<{
   data: "aiGreeting" | "aiFiltering" | "aiReply";
 }>();
 const show = defineModel<boolean>({ required: true });
-const val = ref(formData[props.data].word);
-const m = formData[props.data].model || [];
-const model = ref(Array.isArray(m) ? m : [m]);
+const val = ref(formData[props.data].prompt);
+const model = ref(formData[props.data].model);
 </script>
 
 <template>
@@ -54,6 +53,7 @@ const model = ref(Array.isArray(m) ? m : [m]);
     </el-text>
 
     <el-input
+      v-if="typeof val === 'string'"
       v-model="val"
       style="width: 100%"
       :autosize="{ minRows: 10, maxRows: 18 }"
@@ -81,7 +81,7 @@ const model = ref(Array.isArray(m) ? m : [m]);
         <el-button @click="show = false">取消</el-button>
         <el-popconfirm
           title="恢复默认但不保存～"
-          @confirm="val = defaultFormData[data].word"
+          @confirm="val = defaultFormData[data].prompt"
         >
           <template #reference>
             <el-button type="info">默认</el-button>
@@ -92,7 +92,7 @@ const model = ref(Array.isArray(m) ? m : [m]);
           @click="
             () => {
               formData[data].model = model;
-              formData[data].word = val;
+              formData[data].prompt = val;
               confSaving();
               show = false;
             }

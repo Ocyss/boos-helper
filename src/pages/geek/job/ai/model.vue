@@ -17,21 +17,14 @@ import {
 } from "element-plus";
 import { ref, toRaw } from "vue";
 import deepmerge from "@/utils/deepmerge";
-import { type modelData } from "@/types/formData";
-import { useModel } from "@/hooks/useModel";
+import { useModel, type modelData } from "@/hooks/useModel";
 const show = defineModel<boolean>({ required: true });
 const { modelData, save } = useModel();
 let createData = ref<modelData>({
   key: "",
   name: "",
-  default: false,
-  data: {
-    mode: "ChatGPT",
-    url: "",
-    model: "gpt-3.5-turbo",
-    apiKey: "",
-    temperature: 0.35,
-  },
+  mode: "openai",
+  data: undefined,
 });
 
 const createBoxShow = ref(false);

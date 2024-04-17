@@ -157,5 +157,6 @@ declare global {
       multiExpect: boolean;
       uid: number;
     };
+    parseGptJson: (json: any) => any;
   }
 }

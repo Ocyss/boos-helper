@@ -3,7 +3,6 @@ import { handleCFn } from "./type";
 import { useConfFormData } from "../useConfForm";
 import { ElMessage } from "element-plus";
 import { Message } from "../useWebSocket";
-// @ts-ignore
 import { miTem } from "mitem";
 import { useModel } from "../useModel";
 import { requestBossData } from "./api";
@@ -18,11 +17,14 @@ import {
   ActivityError,
   GreetError,
 } from "@/types/deliverError";
+
 import { useStore } from "../useStore";
 import { unsafeWindow } from "$";
 import { logData } from "../useLog";
+import { logger } from "@/utils/logger";
+import { parseGptJson } from "@/utils/parse";
 
-const { modelData, requestGpt } = useModel();
+const { modelData, getGpt } = useModel();
 const { formData } = useConfFormData();
 const { todayData } = useStatistics();
 const { userInfo } = useStore();
@@ -142,47 +144,34 @@ export const jobContent: handleCFn = (h) =>
     }
   });
 export const aiFiltering: handleCFn = (h) => {
-  const template =
-    miTem.compile(`我现在需要求职，让你根据我的需要对岗位进行评分，方便我筛选岗位。
-我的要求是:
-${formData.aiFiltering.word}
->>>下面是岗位相关信息:
-岗位描述:{{ card.postDescription}}
-薪酬:{{card.salaryDesc}}
-经验要求:{{card.experienceName}},学历要求:{{card.degreeName}}
-相关标签:{{card.jobLabels}},公司福利：{{data.welfareList}}
->>>>>>>>>>我需要你输出Json格式的字符串，符合以下的定义
-interface aiFiltering {
-  rating: number; // 分数，0-100分，低于60的我会筛选掉
-  negative: string[] | string; // 扣分项，可以是一句话为什么扣分，也可以是数组代表多个扣分项
-  positive: string[] | string; // 加分项，可以是一句话为什么加分，也可以是数组代表多个加分项
-}`);
-  let m = formData.aiFiltering.model || [];
-  m = Array.isArray(m) ? m : [m];
-  const model = modelData.value.filter((v) => m.includes(v.key));
+  const model = modelData.value.find(
+    (v) => formData.aiFiltering.model === v.key
+  );
+  if (!model) {
+    throw new AIFilteringError("没有找到AI筛选的模型");
+  }
+  const gpt = getGpt(model, formData.aiFiltering.prompt);
   h.push(async ({}, ctx) => {
     try {
-      const msg = template({ data: ctx, card: ctx.card });
-      if (!model || model.length === 0) {
-        ElMessage.warning("没有找到AI筛选的模型");
+      const { content, prompt } = await gpt.message({
+        data: ctx,
+        card: ctx.card,
+      });
+      ctx.aiFilteringQ = prompt;
+      if (!content) {
         return;
       }
-      ctx.aiFilteringQ = msg;
-      const gptMsg = await requestGpt(model, msg, { json: true });
-      if (!gptMsg) {
-        return;
-      }
-      ctx.aiFilteringAraw = gptMsg;
-      const data: {
+      ctx.aiFilteringAraw = content;
+      const data = parseGptJson<{
         rating: number;
         negative: string[] | string;
         positive: string[] | string;
-      } = JSON.parse(gptMsg);
-      ctx.aiFilteringAjson = data;
-      const mg = `分数${data.rating}\n消极：${data.negative}\n积极：${data.positive}`;
-      ctx.aiFilteringAtext = msg;
+      }>(content);
+      ctx.aiFilteringAjson = data || {};
+      const mg = `分数${data?.rating}\n消极：${data?.negative}\n积极：${data?.positive}`;
+      ctx.aiFilteringAtext = content;
 
-      if (data.rating < 60) {
+      if (!data || !data.rating || data.rating < 40) {
         throw new AIFilteringError(mg);
       }
     } catch (e: any) {
@@ -234,10 +223,15 @@ export const customGreeting: handleCFn = (h) => {
   });
 };
 export const aiGreeting: handleCFn = (h) => {
-  const template = miTem.compile(formData.aiGreeting.word);
-  let m = formData.aiGreeting.model || [];
-  m = Array.isArray(m) ? m : [m];
-  const model = modelData.value.filter((v) => m.includes(v.key));
+  // const template = miTem.compile(formData.aiGreeting.prompt);
+  const model = modelData.value.find(
+    (v) => formData.aiGreeting.model === v.key
+  );
+  if (!model) {
+    ElMessage.warning("没有找到招呼语的模型");
+    return;
+  }
+  const gpt = getGpt(model, formData.aiGreeting.prompt);
   const uid =
     userInfo.value?.userId ||
     unsafeWindow?._PAGE?.uid ||
@@ -249,24 +243,21 @@ export const aiGreeting: handleCFn = (h) => {
   h.push(async (args, ctx) => {
     try {
       const boosData = await requestBossData(ctx.card!);
-      const msg = template({ data: ctx, card: ctx.card });
-
-      if (!model || model.length === 0) {
-        ElMessage.warning("没有找到招呼语的模型");
+      const { content, prompt } = await gpt.message({
+        data: ctx,
+        card: ctx.card,
+      });
+      ctx.aiGreetingQ = prompt;
+      if (!content) {
         return;
       }
-      ctx.aiGreetingQ = msg;
-      const gptMsg = await requestGpt(model, msg, {});
-      if (!gptMsg) {
-        return;
-      }
-      ctx.message = gptMsg;
-      ctx.aiGreetingA = gptMsg;
+      ctx.message = content;
+      ctx.aiGreetingA = content;
       const buf = new Message({
         form_uid: uid.toString(),
         to_uid: boosData.data.bossId.toString(),
         to_name: boosData.data.encryptBossId, // encryptUserId
-        content: gptMsg, // !!! 重大失误
+        content,
       });
       buf.send();
     } catch (e: any) {
@@ -275,8 +266,8 @@ export const aiGreeting: handleCFn = (h) => {
   });
 };
 export const record = async (ctx: logData) => {
-  let m = formData.record.model || [];
-  m = Array.isArray(m) ? m : [m];
-  const model = modelData.value.filter((v) => m.includes(v.key));
-  await requestGpt(model, ctx, {});
+  const model = modelData.value.filter((v) =>
+    formData.record.model?.includes(v.key)
+  );
+  // await requestGpt(model, ctx, {});
 };

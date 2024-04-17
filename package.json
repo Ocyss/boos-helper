@@ -16,6 +16,7 @@
     "element-plus": "^2.7.0",
     "mitem": "^1.0.9",
     "nanoassert": "^2.0.0",
+    "partial-json": "^0.1.6",
     "vue": "^3.4.21"
   },
   "devDependencies": {

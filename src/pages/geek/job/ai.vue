@@ -13,9 +13,6 @@ import { useModel } from "@/hooks/useModel";
 const { formData, confSaving } = useConfFormData();
 const { deliverLock } = useCommon();
 const useModelData = useModel();
-const modelData = useModelData.modelData.value.filter(
-  (m) => m.data.mode === "仅记录"
-);
 const aiBoxShow = ref(false);
 const aiConfBoxShow = ref(false);
 const aiBox = ref<"aiGreeting" | "aiFiltering" | "aiReply" | "record">(
@@ -63,7 +60,7 @@ const recordModel = ref(Array.isArray(m) ? m : [m]);
       @change="change"
       disabled
     />
-    <formAiVue
+    <!-- <formAiVue
       v-bind="formInfoData.record"
       :data="formData.record"
       @show="
@@ -71,7 +68,7 @@ const recordModel = ref(Array.isArray(m) ? m : [m]);
         aiBoxShow = true;
       "
       @change="change"
-    />
+    /> -->
   </el-space>
   <div style="margin-top: 15px">
     <el-button
@@ -90,7 +87,7 @@ const recordModel = ref(Array.isArray(m) ? m : [m]);
       :data="aiBox"
       v-model="aiBoxShow"
     />
-    <el-dialog
+    <!-- <el-dialog
       v-if="aiBoxShow && aiBox === 'record'"
       v-model="aiBoxShow"
       :title="formInfoData.record.label"
@@ -131,7 +128,7 @@ const recordModel = ref(Array.isArray(m) ? m : [m]);
           </el-button>
         </div>
       </template>
-    </el-dialog>
+    </el-dialog> -->
   </Teleport>
 </template>
 

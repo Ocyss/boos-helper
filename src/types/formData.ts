@@ -24,7 +24,7 @@ export interface FormData {
   aiGreeting: FormDataAi;
   aiFiltering: FormDataAi;
   aiReply: FormDataAi;
-  record: Omit<FormDataAi, "word">;
+  record: { model?: string[]; enable: boolean };
   animation?: "frame" | "card" | "together";
 }
 
@@ -48,36 +48,9 @@ export interface FormDataInput {
 export interface FormDataCheckbox {
   value: boolean;
 }
+
 export interface FormDataAi {
-  model?: string | string[];
-  word: string;
+  model?: string;
+  prompt: string;
   enable: boolean;
 }
-
-export type modelData = {
-  key: string;
-  name: string;
-  default: boolean;
-  data:
-    | {
-        mode: "ChatGPT";
-        url: string;
-        model: string;
-        apiKey: string;
-        temperature: number;
-      }
-    | {
-        mode: "自定义";
-        url: string;
-        header: string;
-        data: string;
-        req: string;
-      }
-    | {
-        mode: "仅记录";
-        url: string;
-        header: string;
-        data: string;
-        wait: boolean;
-      };
-};

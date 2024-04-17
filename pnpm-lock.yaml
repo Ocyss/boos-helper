@@ -20,6 +20,9 @@ dependencies:
   nanoassert:
     specifier: ^2.0.0
     version: 2.0.0
+  partial-json:
+    specifier: ^0.1.6
+    version: 0.1.6
   vue:
     specifier: ^3.4.21
     version: 3.4.21(typescript@5.4.5)
@@ -1436,6 +1439,10 @@ packages:
       is-inside-container: 1.0.0
       is-wsl: 2.2.0
     dev: true
+
+  /partial-json@0.1.6:
+    resolution: {integrity: sha512-pvJPiUMwQ0eWGpxVNJecOVV2eFYlMEKCfo+FXtEjN9Xfw5aIQ2q0dmKpqszw7QA86lMV6oIFxsmxeVHDlL4p6Q==}
+    dev: false
 
   /path-browserify@1.0.1:
     resolution: {integrity: sha512-b7uo2UCUOYZcnF/3ID0lulOJi/bafxa1xPe7ZPsammBSpjSWQkjNxlt635YGS2MiR9GjvuXCtz2emr3jbsz98g==}

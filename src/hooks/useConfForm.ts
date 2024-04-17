@@ -109,27 +109,16 @@ export const defaultFormData: FormData = {
   },
   aiGreeting: {
     enable: false,
-    word: `我现在需要求职，所以请你来写求职招呼语来向boos或hr打招呼，你需要代入我的身份也就是一名求职者.
-我的能力：\"我叫xxx,今年xx岁了，我会......\"
-要求:
-1.我会告诉你岗位信息,你只需要回答招呼语，请优先礼貌为主不要过于使用书信格式而是聊天一样的招呼语，最好能根据岗位信息来改变语气。
-2.一定不可以编造能力,我会啥上面写的很清楚了,如果有我没说的技术栈那就是不会,可以展示其他优势.不要乱写
-3.我需要你在结束的时候告诉他这是ai生成的内容仅供参考
->>>
-岗位名:{{ card.jobName }}
-岗位描述:{{ card.postDescription }}
-薪酬:{{ card.salaryDesc }}
-经验要求:{{ card.experienceName }},学历要求:{{ card.degreeName }}
-相关标签:{{ card.jobLabels }}
-`,
+    prompt: ``,
   },
   aiFiltering: {
     enable: false,
-    word: "我想要早九晚五和双休，公司同事们最好年轻一些要有良好的氛围。我不希望岗位有任何的销售性质，我也不会上门去服务。我想要的是加分项而不是扣分项，没早九晚五也没事，我是社畜～",
+    prompt:
+      "我想要早九晚五和双休，公司同事们最好年轻一些要有良好的氛围。我不希望岗位有任何的销售性质，我也不会上门去服务。我想要的是加分项而不是扣分项，没早九晚五也没事，我是社畜～",
   },
   aiReply: {
     enable: false,
-    word: "",
+    prompt: "",
   },
   record: {
     enable: false,
