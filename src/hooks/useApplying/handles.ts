@@ -31,7 +31,7 @@ export const communicated: handleCFn = (h) => {
   //   h.push(async ({ data }) => {
   //     try {
   //       const text = getElText(".start-chat-btn", el);
-  //       if (!text) throw new Error("沟通按钮为空");
+  //       if (!text) throw new RepeatError("沟通按钮为空");
   //       if (!text.includes("立即沟通"))
   //         throw new RepeatError(`已经沟通过,按钮状态为 [${text}]`);
   //     } catch (e: any) {
@@ -45,7 +45,7 @@ export const jobTitle: handleCFn = (h) =>
   h.push(async ({ data }, ctx) => {
     try {
       const text = data.jobName;
-      if (!text) throw new Error("岗位名为空");
+      if (!text) throw new JobTitleError("岗位名为空");
       for (const x of formData.jobTitle.value) {
         if (text.includes(x)) {
           if (formData.jobTitle.include) {
@@ -59,7 +59,7 @@ export const jobTitle: handleCFn = (h) =>
       }
     } catch (e: any) {
       todayData.jobTitle++;
-      throw new e.JobTitleError(e.message);
+      throw new JobTitleError(e.message);
     }
   });
 
@@ -67,22 +67,22 @@ export const company: handleCFn = (h) =>
   h.push(async ({ data }, ctx) => {
     try {
       const text = data.brandName;
-      if (!text) throw new Error("公司名为空");
+      if (!text) throw new CompanyNameError("公司名为空");
 
-      for (const x of formData.jobTitle.value) {
+      for (const x of formData.company.value) {
         if (text.includes(x)) {
-          if (formData.jobTitle.include) {
+          if (formData.company.include) {
             return;
           }
           throw new CompanyNameError(`公司名含有排除关键词 [${x}]`);
         }
       }
-      if (formData.jobTitle.include) {
+      if (formData.company.include) {
         throw new CompanyNameError("公司名不包含关键词");
       }
     } catch (e: any) {
       todayData.company++;
-      throw new e.CompanyNameError(e.message);
+      throw new CompanyNameError(e.message);
     }
   });
 export const salaryRange: handleCFn = (h) =>
