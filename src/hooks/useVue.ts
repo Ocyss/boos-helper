@@ -12,7 +12,7 @@ export const getRootVue = async () => {
 
   if (wrap.__vue__) rootVue.value = wrap.__vue__;
   else {
-    ElMessage.error("未找到vue根组件");
+    // ElMessage.error("未找到vue根组件");
     throw new Error("未找到vue根组件");
   }
   return rootVue.value;

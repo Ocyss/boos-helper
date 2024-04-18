@@ -106,17 +106,17 @@ const { deliverLock } = useCommon();
     </el-form-item>
     <div>
       <el-checkbox
-        v-bind="formData.greetingVariable"
+        v-bind="formInfoData.greetingVariable"
         v-model="formData.greetingVariable.value"
         border
       />
       <el-checkbox
-        v-bind="formData.activityFilter"
+        v-bind="formInfoData.activityFilter"
         v-model="formData.activityFilter.value"
         border
       />
       <el-checkbox
-        v-bind="formData.notification"
+        v-bind="formInfoData.notification"
         v-model="formData.notification.value"
         border
       />
