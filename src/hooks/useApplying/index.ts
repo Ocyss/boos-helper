@@ -35,7 +35,7 @@ export function createHandle(): {
   // 活跃度过滤
   if (formData.activityFilter.value) h.activityFilter(handlesRes);
   // 自定义招呼语
-  if (formData.customGreeting.enable && !formData.customGreeting.enable)
+  if (formData.customGreeting.enable && !formData.aiGreeting.enable)
     h.customGreeting(handlesAfter);
   // AI招呼语
   if (formData.aiGreeting.enable) h.aiGreeting(handlesAfter);
