@@ -23,6 +23,7 @@ import { unsafeWindow } from "$";
 import { logData } from "../useLog";
 import { logger } from "@/utils/logger";
 import { parseGptJson } from "@/utils/parse";
+import { rangeMatch } from "./utils";
 
 const { modelData, getGpt } = useModel();
 const { formData } = useConfFormData();

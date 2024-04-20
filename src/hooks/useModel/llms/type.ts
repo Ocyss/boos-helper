@@ -23,9 +23,32 @@ export type messageReps<T = string> = {
   prompt?: string;
   usage?: { total_tokens: number; input_tokens: number; output_tokens: number };
 };
+export type llmConf<M extends string, T> = { mode: M } & T;
 
-export type llmInfo<T> = {
-  [K in keyof T]-?: T[K] extends Object
-    ? { value: T[K]; label?: string; desc?: string }
-    : { value: llmInfo<NonNullable<T[K]>>; label?: string; desc?: string };
+export type formElm = "input" | "inputNumber" | "select" | "slider" | "switch";
+
+export type llmInfoVal<T, R> = T extends Record<string, unknown>
+  ? {
+      value: llmInfo<NonNullable<T>>;
+      label?: string;
+      desc?: string;
+      alert: "success" | "warning" | "info" | "error";
+    }
+  : {
+      value?: T;
+      label?: string;
+      desc?: string;
+      type: formElm;
+      config?: any; // TODO: 类型推导
+    } & { [K in keyof R]: R[K] };
+
+export type llmInfo<T extends Record<string, unknown>> = {
+  [K in keyof T]-?: K extends "mode"
+    ? {
+        mode: T[K];
+        label?: string;
+        icon?: string;
+        desc?: string;
+      }
+    : llmInfoVal<T[K], undefined extends T[K] ? {} : { required: true }>;
 };

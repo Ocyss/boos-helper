@@ -1,5 +1,5 @@
 // 匹配范围
-function rangeMatch(
+export function rangeMatch(
   rangeStr: string,
   input?: string,
   by = 1

@@ -6,9 +6,10 @@ import { ref } from "vue";
 import configVue from "./ai/config.vue";
 import modelVue from "./ai/model.vue";
 import { FormDataAi } from "@/types/formData";
-import formAiVue from "@/components/form/formAi.vue";
+import formSwitch from "@/components/form/formSwitch.vue";
 import { useCommon } from "@/hooks/useCommon";
 import { useModel } from "@/hooks/useModel";
+import { llms } from "@/hooks/useModel";
 
 const { formData, confSaving } = useConfFormData();
 const { deliverLock } = useCommon();
@@ -22,7 +23,6 @@ function change(v: Partial<FormDataAi>) {
   v.enable = !v.enable;
   confSaving();
 }
-
 // 写的依托
 const m = formData.record.model || [];
 const recordModel = ref(Array.isArray(m) ? m : [m]);
@@ -30,7 +30,7 @@ const recordModel = ref(Array.isArray(m) ? m : [m]);
 
 <template>
   <el-space wrap fill :fill-ratio="32" style="width: 100%">
-    <formAiVue
+    <formSwitch
       v-bind="formInfoData.aiGreeting"
       :data="formData.aiGreeting"
       :lock="deliverLock"
@@ -40,7 +40,7 @@ const recordModel = ref(Array.isArray(m) ? m : [m]);
       "
       @change="change"
     />
-    <formAiVue
+    <formSwitch
       v-bind="formInfoData.aiFiltering"
       :data="formData.aiFiltering"
       :lock="deliverLock"
@@ -50,7 +50,7 @@ const recordModel = ref(Array.isArray(m) ? m : [m]);
       "
       @change="change"
     />
-    <formAiVue
+    <formSwitch
       v-bind="formInfoData.aiReply"
       :data="formData.aiReply"
       @show="
@@ -60,7 +60,7 @@ const recordModel = ref(Array.isArray(m) ? m : [m]);
       @change="change"
       disabled
     />
-    <!-- <formAiVue
+    <!-- <formSwitch
       v-bind="formInfoData.record"
       :data="formData.record"
       @show="
@@ -79,56 +79,15 @@ const recordModel = ref(Array.isArray(m) ? m : [m]);
       模型配置
     </el-button>
   </div>
+  <createLLM v-model="aiBoxShow"></createLLM>
   <Teleport to="body">
-    <modelVue v-model="aiConfBoxShow" />
+    <!-- <modelVue v-model="aiConfBoxShow" />
     <configVue
       v-if="aiBoxShow && aiBox !== 'record'"
       v-key="aiBox"
       :data="aiBox"
       v-model="aiBoxShow"
-    />
-    <!-- <el-dialog
-      v-if="aiBoxShow && aiBox === 'record'"
-      v-model="aiBoxShow"
-      :title="formInfoData.record.label"
-      width="70%"
-      align-center
-      destroy-on-close
-      :z-index="20"
-    >
-      <el-select-v2
-        v-model="recordModel"
-        :options="modelData"
-        :props="{ label: 'name', value: 'key' }"
-        placeholder="选择模型"
-        multiple
-        style="width: 45%; margin-bottom: 8px"
-      />
-      <el-alert
-        title="数据是宝贵的，每一次投递完都会去请求一次，不要问为什么在AI类别里面为啥是AI同款模型"
-        type="warning"
-        show-icon
-        :closable="false"
-      />
-      <template #footer>
-        <div>
-          <el-button @click="aiBoxShow = false">取消</el-button>
-
-          <el-button
-            type="primary"
-            @click="
-              () => {
-                formData.record.model = recordModel;
-                confSaving();
-                aiBoxShow = false;
-              }
-            "
-          >
-            保存
-          </el-button>
-        </div>
-      </template>
-    </el-dialog> -->
+    /> -->
   </Teleport>
 </template>
 

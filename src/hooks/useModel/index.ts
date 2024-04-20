@@ -5,9 +5,13 @@ import { ElMessage } from "element-plus";
 import { ref, toRaw } from "vue";
 import * as mOpenai from "./llms/openai";
 import * as mUser from "./llms/user";
+import * as mMoonshot from "./llms/moonshot";
+import * as mBaidu from "./llms/baidu";
+import * as mAliyun from "./llms/aliyun";
 import { llm } from "./llms/type";
 
 export const confModelKey = "conf-model";
+export const llms = [mOpenai.info, mMoonshot.info, mAliyun.info, mBaidu.info];
 
 const modelData = ref(GM_getValue<modelData[]>(confModelKey, []));
 logger.debug("ai模型数据", toRaw(modelData.value));

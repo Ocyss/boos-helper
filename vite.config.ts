@@ -1,9 +1,14 @@
 import { defineConfig, loadEnv } from "vite";
 import vue from "@vitejs/plugin-vue";
 import monkey, { cdn, util } from "vite-plugin-monkey";
+import AutoImport from "unplugin-auto-import/vite";
+import Components from "unplugin-vue-components/vite";
+import { ElementPlusResolver } from "unplugin-vue-components/resolvers";
+
 import process from "process";
 import path from "path";
 import fs from "fs";
+
 const rootDir = process.cwd();
 const pathSrc = path.resolve(__dirname, "src");
 
@@ -15,6 +20,13 @@ export default defineConfig(() => {
   return {
     plugins: [
       vue(),
+      AutoImport({
+        imports: [util.unimportPreset],
+        resolvers: [ElementPlusResolver()],
+      }),
+      Components({
+        resolvers: [ElementPlusResolver()],
+      }),
       monkey({
         entry: "src/main.ts",
         format: {
