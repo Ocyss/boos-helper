@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { llmInfo, formElm, llmInfoVal } from "@/hooks/useModel/llms/type";
+import { llmInfo, formElm, llmInfoVal } from "@/hooks/useModel/type";
 import { llms } from "@/hooks/useModel";
 import {
   ElInput,
@@ -11,29 +11,33 @@ import {
 import info from "@/components/icon/info.vue";
 import { computed, onMounted } from "vue";
 const props = defineProps<{
-  value: llmInfoVal<any>;
+  value: llmInfoVal<unknown, { required: boolean }>;
   label: string | number | symbol;
   depth?: number;
 }>();
+
 const fromVal = defineModel<any>({ required: true });
-function getComponent(elm: formElm) {
+
+function getComponent(elm: formElm["type"] | undefined) {
   switch (elm) {
     case "input":
-      return ElInput;
+      return { el: ElInput, defaultConf: {} };
     case "inputNumber":
-      return ElInputNumber;
+      return { el: ElInputNumber, defaultConf: {} };
     case "select":
-      return ElSelectV2;
+      return { el: ElSelectV2, defaultConf: { options: [] } };
     case "slider":
-      return ElSlider;
+      return {
+        el: ElSlider,
+        defaultConf: { style: "margin: 0 10px;", showInput: true },
+      };
     case "switch":
-      return ElSwitch;
+      return { el: ElSwitch, defaultConf: {} };
   }
-  return ElInput;
+  return { el: undefined, defaultConf: {} };
 }
-const marginLeft = computed(() => {
-  return `margin-left: ${(props.depth || 0) * 10}px;`;
-});
+
+const { el, defaultConf } = getComponent(props.value.type);
 </script>
 
 <template>
@@ -44,7 +48,7 @@ const marginLeft = computed(() => {
       :type="value.alert"
       :closable="false"
       show-icon
-      :style="marginLeft"
+      :style="`margin: 10px 0px 20px ${(props.depth || 0) * 10}px;`"
     />
     <l-form-item
       v-for="(x, k) in value.value"
@@ -58,7 +62,7 @@ const marginLeft = computed(() => {
   <el-form-item
     v-else-if="value"
     :required="value.required"
-    :style="marginLeft"
+    :style="`margin-left: ${(props.depth || 0) * 10}px;`"
   >
     <template #label>
       <el-text size="large">
@@ -74,11 +78,10 @@ const marginLeft = computed(() => {
     </template>
     <component
       v-model="fromVal"
-      :is="getComponent(value.type)"
-      v-bind="value.config"
+      :is="el"
+      v-bind="{ ...defaultConf, ...value.config }"
     />
   </el-form-item>
 </template>
 
 <style lang="scss" scoped></style>
-@/hooks/useModel/type

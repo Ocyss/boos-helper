@@ -58,7 +58,7 @@ const info: llmInfo<baiduLLMConf> = {
       max_output_tokens: {
         type: "slider",
         value: 2048,
-        config: { min: 2, max: 2048, step: 2 },
+        config: { min: 2, max: 2048, step: 32 },
         desc: "指定模型最大输出token数",
       },
       disable_search: {

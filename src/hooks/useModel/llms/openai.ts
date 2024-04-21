@@ -33,6 +33,7 @@ const info: llmInfo<openaiLLMConf> = {
     config: {
       placeholder: "https://api.openai.com",
     },
+    value: "https://api.openai.com",
     required: true,
   },
   model: {
@@ -66,6 +67,7 @@ const info: llmInfo<openaiLLMConf> = {
       filterable: true,
       defaultFirstOption: true,
     },
+    value: "gpt-3.5-turbo",
     type: "select",
     required: true,
   },
@@ -113,7 +115,7 @@ const info: llmInfo<openaiLLMConf> = {
         config: {
           min: 512,
           max: 9216,
-          step: 4,
+          step: 64,
         },
         desc: desc.max_tokens,
       },

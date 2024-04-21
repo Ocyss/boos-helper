@@ -1,6 +1,6 @@
 import axios from "axios";
 import { llm, llmConf, llmInfo, messageReps } from "../type";
-import { other } from "../common";
+import { desc, other } from "../common";
 
 export type aliyunLLMConf = llmConf<
   "aliyun",
@@ -97,7 +97,14 @@ const info: llmInfo<aliyunLLMConf> = {
         desc: "生成时，采样候选集的大小。例如，取值为50时，仅将单次生成中得分最高的50个token组成随机采样的候选集。取值越大，生成的随机性越高；取值越小，生成的确定性越高。注意：如果top_k参数为空或者top_k的值大于100，表示不启用top_k策略，此时仅有top_p策略生效，默认是空。",
       },
       max_tokens: {
+        value: 1500,
         type: "slider",
+        config: {
+          min: 100,
+          max: 2000,
+          step: 100,
+        },
+        desc: desc.max_tokens,
       },
       enable_search: {
         type: "switch",

@@ -8,7 +8,7 @@ import { user, userLLMConf } from "./llms/user";
 import { moonshot, moonshotLLMConf } from "./llms/moonshot";
 import { baidu, baiduLLMConf } from "./llms/baidu";
 import { aliyun, aliyunLLMConf } from "./llms/aliyun";
-import { llm } from "./type";
+import { llm, prompt } from "./type";
 
 export const confModelKey = "conf-model";
 export const llms = [openai.info, moonshot.info, aliyun.info, baidu.info];
@@ -19,7 +19,6 @@ logger.debug("ai模型数据", toRaw(modelData.value));
 export type modelData = {
   key: string;
   name: string;
-  mode: string;
   data?:
     | moonshotLLMConf
     | userLLMConf
@@ -28,16 +27,16 @@ export type modelData = {
     | aliyunLLMConf;
 };
 
-function getGpt(model: modelData, prompt: string): llm {
+function getGpt(model: modelData, prompt: string | prompt): llm {
   if (!model.data) {
     throw new Error("GPT数据不存在");
   }
   try {
     switch (model.data.mode) {
       case "openai":
-        return new openai.gpt(model.data, prompt);
+        return new openai.gpt(model.data, prompt as string);
       case "moonshot":
-        return new moonshot.gpt(model.data, prompt);
+        return new moonshot.gpt(model.data, prompt as string);
       case "user":
         break;
     }

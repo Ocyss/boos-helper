@@ -33,17 +33,14 @@ export type messageReps<T = string> = {
 };
 export type llmConf<M extends string, T> = { mode: M } & T;
 
-export type formElm<T = string> =
-  | (T extends string
-      ? { type: "input"; config?: InstanceType<typeof ElInput>["$props"] }
-      : T extends number
-      ?
-          | {
-              type: "inputNumber";
-              config?: InstanceType<typeof ElInputNumber>["$props"];
-            }
-          | { type: "slider"; config?: InstanceType<typeof ElSlider>["$props"] }
-      : { type: "switch"; config?: InstanceType<typeof ElSwitch>["$props"] })
+export type formElm =
+  | { type: "input"; config?: InstanceType<typeof ElInput>["$props"] }
+  | {
+      type: "inputNumber";
+      config?: InstanceType<typeof ElInputNumber>["$props"];
+    }
+  | { type: "slider"; config?: InstanceType<typeof ElSlider>["$props"] }
+  | { type: "switch"; config?: InstanceType<typeof ElSwitch>["$props"] }
   | { type: "select"; config?: InstanceType<typeof ElSelectV2>["$props"] };
 
 export type llmInfoVal<T, R> = T extends Record<string, unknown>
@@ -57,7 +54,7 @@ export type llmInfoVal<T, R> = T extends Record<string, unknown>
       value?: T;
       label?: string;
       desc?: string;
-    } & formElm<T> & { [K in keyof R]: R[K] };
+    } & formElm & { [K in keyof R]: R[K] };
 
 export type llmInfo<T extends Record<string, unknown>> = {
   [K in keyof T]-?: K extends "mode"

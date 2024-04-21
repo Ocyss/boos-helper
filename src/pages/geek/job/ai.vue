@@ -1,15 +1,11 @@
 <script lang="ts" setup>
 import { ElButton, ElSpace, ElDialog, ElSelectV2, ElAlert } from "element-plus";
 import { useConfFormData, formInfoData } from "@/hooks/useConfForm";
-import settingsVue from "@/components/icon/settings.vue";
 import { ref } from "vue";
-import configVue from "./ai/config.vue";
-import modelVue from "./ai/model.vue";
 import { FormDataAi } from "@/types/formData";
 import formSwitch from "@/components/form/formSwitch.vue";
 import { useCommon } from "@/hooks/useCommon";
 import { useModel } from "@/hooks/useModel";
-import { llms } from "@/hooks/useModel";
 
 const { formData, confSaving } = useConfFormData();
 const { deliverLock } = useCommon();
@@ -81,8 +77,8 @@ const recordModel = ref(Array.isArray(m) ? m : [m]);
   </div>
   <createLLM v-model="aiBoxShow"></createLLM>
   <Teleport to="body">
-    <!-- <modelVue v-model="aiConfBoxShow" />
-    <configVue
+    <configLLM v-model="aiConfBoxShow" />
+    <!-- <configVue
       v-if="aiBoxShow && aiBox !== 'record'"
       v-key="aiBox"
       :data="aiBox"

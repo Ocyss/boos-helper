@@ -7,8 +7,10 @@ export {}
 
 declare module 'vue' {
   export interface GlobalComponents {
-    copy: typeof import('./src/components/llms/lForm copy.vue')['default']
+    ConfigLLM: typeof import('./src/components/llms/configLLM.vue')['default']
+    copy: typeof import('./src/components/llms/selectLLM copy.vue')['default']
     CreateLLM: typeof import('./src/components/llms/createLLM.vue')['default']
+    EditerLLM: typeof import('./src/components/llms/editerLLM.vue')['default']
     ElAlert: typeof import('element-plus/es')['ElAlert']
     ElButton: typeof import('element-plus/es')['ElButton']
     ElCollapse: typeof import('element-plus/es')['ElCollapse']
@@ -18,8 +20,11 @@ declare module 'vue' {
     ElFormItem: typeof import('element-plus/es')['ElFormItem']
     ElH3: typeof import('element-plus/es')['ElH3']
     ElIcon: typeof import('element-plus/es')['ElIcon']
+    ElInput: typeof import('element-plus/es')['ElInput']
     ElScrollbar: typeof import('element-plus/es')['ElScrollbar']
     ElSegmented: typeof import('element-plus/es')['ElSegmented']
+    ElTable: typeof import('element-plus/es')['ElTable']
+    ElTableColumn: typeof import('element-plus/es')['ElTableColumn']
     ElText: typeof import('element-plus/es')['ElText']
     ElTooltip: typeof import('element-plus/es')['ElTooltip']
     FormItem: typeof import('./src/components/form/formItem.vue')['default']
@@ -30,6 +35,7 @@ declare module 'vue' {
     LFormItem: typeof import('./src/components/llms/lFormItem.vue')['default']
     Log: typeof import('./src/components/conf/log.vue')['default']
     Logger: typeof import('./src/components/logger.vue')['default']
+    SelectLLM: typeof import('./src/components/llms/selectLLM.vue')['default']
     Settings: typeof import('./src/components/icon/settings.vue')['default']
     Store: typeof import('./src/components/conf/store.vue')['default']
     Tooltip: typeof import('./src/components/icon/tooltip.vue')['default']
