@@ -4,7 +4,7 @@ import { llms } from "@/hooks/useModel";
 import {
   ElInput,
   ElInputNumber,
-  ElSelect,
+  ElSelectV2,
   ElSlider,
   ElSwitch,
 } from "element-plus";
@@ -23,7 +23,7 @@ function getComponent(elm: formElm) {
     case "inputNumber":
       return ElInputNumber;
     case "select":
-      return ElSelect;
+      return ElSelectV2;
     case "slider":
       return ElSlider;
     case "switch":
@@ -81,3 +81,4 @@ const marginLeft = computed(() => {
 </template>
 
 <style lang="scss" scoped></style>
+@/hooks/useModel/type

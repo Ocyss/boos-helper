@@ -1,4 +1,12 @@
 import { miTem } from "mitem";
+import {
+  ElInput,
+  ElInputNumber,
+  ElSelectV2,
+  ElSlider,
+  ElSwitch,
+} from "element-plus";
+
 export abstract class llm<C = any, T extends Array<any> = Array<any>> {
   conf: C;
   tem: (object: any) => string;
@@ -25,7 +33,18 @@ export type messageReps<T = string> = {
 };
 export type llmConf<M extends string, T> = { mode: M } & T;
 
-export type formElm = "input" | "inputNumber" | "select" | "slider" | "switch";
+export type formElm<T = string> =
+  | (T extends string
+      ? { type: "input"; config?: InstanceType<typeof ElInput>["$props"] }
+      : T extends number
+      ?
+          | {
+              type: "inputNumber";
+              config?: InstanceType<typeof ElInputNumber>["$props"];
+            }
+          | { type: "slider"; config?: InstanceType<typeof ElSlider>["$props"] }
+      : { type: "switch"; config?: InstanceType<typeof ElSwitch>["$props"] })
+  | { type: "select"; config?: InstanceType<typeof ElSelectV2>["$props"] };
 
 export type llmInfoVal<T, R> = T extends Record<string, unknown>
   ? {
@@ -38,9 +57,7 @@ export type llmInfoVal<T, R> = T extends Record<string, unknown>
       value?: T;
       label?: string;
       desc?: string;
-      type: formElm;
-      config?: any; // TODO: 类型推导
-    } & { [K in keyof R]: R[K] };
+    } & formElm<T> & { [K in keyof R]: R[K] };
 
 export type llmInfo<T extends Record<string, unknown>> = {
   [K in keyof T]-?: K extends "mode"
@@ -49,6 +66,12 @@ export type llmInfo<T extends Record<string, unknown>> = {
         label?: string;
         icon?: string;
         desc?: string;
+        disabled?: boolean;
       }
     : llmInfoVal<T[K], undefined extends T[K] ? {} : { required: true }>;
 };
+
+export type prompt = Array<{
+  role: "system" | "user" | "assistant";
+  content: string;
+}>;

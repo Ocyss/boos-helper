@@ -43,3 +43,4 @@ const from = reactiveComputed<r>(() => {
 </template>
 
 <style lang="scss" scoped></style>
+@/hooks/useModel/type

@@ -119,7 +119,7 @@ export const companySizeRange: handleCFn = (h) =>
     }
   });
 export const jobContent: handleCFn = (h) =>
-  h.push(async ({}, { card }) => {
+  h.push(async (_, { card }) => {
     try {
       const content = card?.postDescription;
       for (const x of formData.jobContent.value) {
@@ -152,7 +152,7 @@ export const aiFiltering: handleCFn = (h) => {
     throw new AIFilteringError("没有找到AI筛选的模型");
   }
   const gpt = getGpt(model, formData.aiFiltering.prompt);
-  h.push(async ({}, ctx) => {
+  h.push(async (_, ctx) => {
     try {
       const { content, prompt } = await gpt.message({
         data: ctx,
@@ -182,7 +182,7 @@ export const aiFiltering: handleCFn = (h) => {
   });
 };
 export const activityFilter: handleCFn = (h) =>
-  h.push(async ({}, { card }) => {
+  h.push(async (_, { card }) => {
     try {
       const activeText = card?.activeTimeDesc;
       if (!activeText || activeText.includes("月") || activeText.includes("年"))

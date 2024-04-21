@@ -28,7 +28,7 @@ const selectLLM = ref(llms[0].mode);
 
 const formLLM = ref(llms[0]);
 
-const updateFormLLM = (v) => {
+const updateFormLLM = (v: string) => {
   formLLM.value = llms.find((l) => l.mode.mode === v) || llms[0];
 };
 

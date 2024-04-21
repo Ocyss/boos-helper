@@ -1,3 +1,5 @@
+import { prompt } from "@/hooks/useModel/type";
+
 export interface Statistics {
   date: string;
   success: number;
@@ -51,6 +53,6 @@ export interface FormDataCheckbox {
 
 export interface FormDataAi {
   model?: string;
-  prompt: string;
+  prompt: string | prompt;
   enable: boolean;
 }

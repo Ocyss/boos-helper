@@ -3,15 +3,15 @@ import { logger } from "@/utils/logger";
 import axios from "axios";
 import { ElMessage } from "element-plus";
 import { ref, toRaw } from "vue";
-import * as mOpenai from "./llms/openai";
-import * as mUser from "./llms/user";
-import * as mMoonshot from "./llms/moonshot";
-import * as mBaidu from "./llms/baidu";
-import * as mAliyun from "./llms/aliyun";
-import { llm } from "./llms/type";
+import { openai, openaiLLMConf } from "./llms/openai";
+import { user, userLLMConf } from "./llms/user";
+import { moonshot, moonshotLLMConf } from "./llms/moonshot";
+import { baidu, baiduLLMConf } from "./llms/baidu";
+import { aliyun, aliyunLLMConf } from "./llms/aliyun";
+import { llm } from "./type";
 
 export const confModelKey = "conf-model";
-export const llms = [mOpenai.info, mMoonshot.info, mAliyun.info, mBaidu.info];
+export const llms = [openai.info, moonshot.info, aliyun.info, baidu.info];
 
 const modelData = ref(GM_getValue<modelData[]>(confModelKey, []));
 logger.debug("ai模型数据", toRaw(modelData.value));
@@ -20,7 +20,12 @@ export type modelData = {
   key: string;
   name: string;
   mode: string;
-  data?: mOpenai.conf | mUser.conf;
+  data?:
+    | moonshotLLMConf
+    | userLLMConf
+    | openaiLLMConf
+    | baiduLLMConf
+    | aliyunLLMConf;
 };
 
 function getGpt(model: modelData, prompt: string): llm {
@@ -30,7 +35,9 @@ function getGpt(model: modelData, prompt: string): llm {
   try {
     switch (model.data.mode) {
       case "openai":
-        return new mOpenai.openaiGpt(model.data, prompt);
+        return new openai.gpt(model.data, prompt);
+      case "moonshot":
+        return new moonshot.gpt(model.data, prompt);
       case "user":
         break;
     }
