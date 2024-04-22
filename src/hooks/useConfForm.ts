@@ -45,6 +45,10 @@ export const formInfoData: FormInfoData = {
     label: "活跃度过滤",
     help: "打开后会自动过滤掉最近未活跃的Boss发布的工作。以免浪费每天的100次机会。",
   },
+  goldHunterFilter: {
+    label: "猎头过滤",
+    help: "Boss中有一些猎头发布的工作，但是一般而言这种工作不太行，点击可以过滤猎头发布的职位",
+  },
   notification: {
     label: "发送通知",
     help: "可以在网站管理中打开通知权限,当停止时会自动发送桌面端通知提醒。",
@@ -102,6 +106,9 @@ export const defaultFormData: FormData = {
     value: false,
   },
   activityFilter: {
+    value: false,
+  },
+  goldHunterFilter: {
     value: false,
   },
   notification: {
