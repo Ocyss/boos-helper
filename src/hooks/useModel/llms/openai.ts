@@ -1,6 +1,7 @@
 import axios from "axios";
 import { llm, llmConf, llmInfo, messageReps, prompt } from "../type";
 import { desc, other } from "../common";
+import { GM_xmlhttpRequest } from "$";
 
 export type openaiLLMConf = llmConf<
   "openai",
@@ -145,18 +146,22 @@ const info: llmInfo<openaiLLMConf> = {
 };
 
 class gpt extends llm<openaiLLMConf> {
-  constructor(conf: openaiLLMConf, template: string) {
+  constructor(conf: openaiLLMConf, template: string | prompt) {
     super(conf, template);
   }
   async chat(message: string) {
     const res = await this.post(this.buildPrompt(message));
     return res.data?.choices.pop()?.message?.content;
   }
-  async message(data: object): Promise<messageReps> {
-    const res = await this.post(this.buildPrompt(data));
+  async message(data: object, fn = (s: string) => {}): Promise<messageReps> {
+    const prompt = this.buildPrompt(data);
+    const res = await this.post(prompt);
+    if (this.conf.advanced.stream) {
+      res.data.on("data", (chunk) => {});
+    }
     return {
       content: res.data?.choices.pop()?.message?.content,
-      prompt: res.data?.choices.pop()?.message?.content,
+      prompt: prompt[prompt.length - 1].content,
       usage: {
         input_tokens: res.data?.usage.prompt_tokens,
         output_tokens: res.data?.usage.completion_tokens,
@@ -172,6 +177,10 @@ class gpt extends llm<openaiLLMConf> {
           role: "user",
         },
       ];
+    } else if (Array.isArray(this.template)) {
+      const temp = this.template;
+      temp[temp.length - 1].content = this.tem(data);
+      return temp;
     } else {
       return [
         {
@@ -182,32 +191,46 @@ class gpt extends llm<openaiLLMConf> {
     }
   }
   private async post(prompt: prompt) {
-    const res = await axios.post(
-      this.conf.url + "/v1/chat/completions",
-      {
+    GM_xmlhttpRequest({
+      method: "POST",
+      url: this.conf.url + "/v1/chat/completions",
+      data: {
         messages: prompt,
         model: this.conf.model,
+        stream: this.conf.advanced.stream,
         temperature: this.conf.advanced?.temperature,
         top_p: this.conf.advanced?.top_p,
         max_tokens: this.conf.advanced?.max_tokens,
-        presence_penalty: this.conf.advanced?.presence_penalty,
-        frequency_penalty: this.conf.advanced?.frequency_penalty,
-        response_format: this.conf.advanced?.json
-          ? { type: "json_object" }
-          : undefined,
       },
-      {
-        headers: {
-          Authorization: `Bearer ${this.conf.api_key}`,
-          "Content-Type": "application/json",
-        },
-        timeout: this.conf.other.timeout,
-      }
-    );
-    if (res.data?.error) {
-      throw new Error(res.data.error.message);
-    }
-    return res;
+    };
+    // const res = await axios.post(
+    //   this.conf.url + "/v1/chat/completions",
+    //   {
+    //     messages: prompt,
+    //     model: this.conf.model,
+    //     stream: this.conf.advanced.stream,
+    //     temperature: this.conf.advanced?.temperature,
+    //     top_p: this.conf.advanced?.top_p,
+    //     max_tokens: this.conf.advanced?.max_tokens,
+    //     presence_penalty: this.conf.advanced?.presence_penalty,
+    //     frequency_penalty: this.conf.advanced?.frequency_penalty,
+    //     response_format: this.conf.advanced?.json
+    //       ? { type: "json_object" }
+    //       : undefined,
+    //   },
+    //   {
+    //     headers: {
+    //       Authorization: `Bearer ${this.conf.api_key}`,
+    //       "Content-Type": "application/json",
+    //     },
+    //     timeout: this.conf.other.timeout,
+    //     responseType: this.conf.advanced.stream ? "stream" : "json",
+    //   }
+    // );
+    // if (!this.conf.advanced.stream && res.data?.error) {
+    //   throw new Error(res.data.error.message);
+    // }
+    // return res;
   }
 }
 

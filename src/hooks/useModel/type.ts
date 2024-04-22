@@ -10,19 +10,22 @@ import {
 export abstract class llm<C = any, T extends Array<any> = Array<any>> {
   conf: C;
   tem: (object: any) => string;
-  template: string;
-  constructor(conf: C, template: string) {
+  template: string | prompt;
+  constructor(conf: C, template: string | prompt) {
     this.conf = conf;
     this.template = template;
-    this.tem = miTem.compile(template);
-    // if (typeof template === "string") {
-    //   this.tem = miTem.compile(template);
-    // } else {
-    //   this.tem = miTem.compile(template.length)
-    // }
+
+    if (typeof template === "string") {
+      this.tem = miTem.compile(template);
+    } else {
+      if (template.length === 0) {
+        throw new Error("多对话提示词不能为空");
+      }
+      this.tem = miTem.compile(template[template.length - 1].content);
+    }
   }
 
-  abstract chat(message: string): Promise<string>;
+  abstract chat(message: string, fn: (s: string) => void): Promise<string>;
   abstract message(data: object): Promise<messageReps>;
 }
 

@@ -1,5 +1,5 @@
 import axios from "axios";
-import { llm, llmConf, llmInfo, messageReps } from "../type";
+import { llm, llmConf, llmInfo, messageReps, prompt } from "../type";
 import { openai } from "./openai";
 import { other } from "../common";
 
@@ -57,7 +57,7 @@ const info: llmInfo<moonshotLLMConf> = {
 };
 
 class gpt extends openai.gpt {
-  constructor(conf: moonshotLLMConf, template: string) {
+  constructor(conf: moonshotLLMConf, template: string | prompt) {
     super(conf as never, template);
   }
 }

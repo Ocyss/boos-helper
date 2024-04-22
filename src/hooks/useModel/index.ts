@@ -27,16 +27,16 @@ export type modelData = {
     | aliyunLLMConf;
 };
 
-function getGpt(model: modelData, prompt: string | prompt): llm {
+function getGpt(model: modelData, template: string | prompt): llm {
   if (!model.data) {
     throw new Error("GPT数据不存在");
   }
   try {
     switch (model.data.mode) {
       case "openai":
-        return new openai.gpt(model.data, prompt as string);
+        return new openai.gpt(model.data, template);
       case "moonshot":
-        return new moonshot.gpt(model.data, prompt as string);
+        return new moonshot.gpt(model.data, template);
       case "user":
         break;
     }
