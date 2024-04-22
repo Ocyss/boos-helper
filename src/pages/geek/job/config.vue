@@ -116,6 +116,11 @@ const { deliverLock } = useCommon();
         border
       />
       <el-checkbox
+        v-bind="formInfoData.goldHunterFilter"
+        v-model="formData.goldHunterFilter.value"
+        border
+      />
+      <el-checkbox
         v-bind="formInfoData.notification"
         v-model="formData.notification.value"
         border

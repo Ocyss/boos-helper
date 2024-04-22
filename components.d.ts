@@ -8,17 +8,12 @@ export {}
 declare module 'vue' {
   export interface GlobalComponents {
     ConfigLLM: typeof import('./src/components/llms/configLLM.vue')['default']
-    copy: typeof import('./src/components/llms/selectLLM copy.vue')['default']
     CreateLLM: typeof import('./src/components/llms/createLLM.vue')['default']
-    EditerLLM: typeof import('./src/components/llms/editerLLM.vue')['default']
     ElAlert: typeof import('element-plus/es')['ElAlert']
     ElButton: typeof import('element-plus/es')['ElButton']
-    ElCollapse: typeof import('element-plus/es')['ElCollapse']
-    ElCollapseItem: typeof import('element-plus/es')['ElCollapseItem']
     ElDialog: typeof import('element-plus/es')['ElDialog']
     ElForm: typeof import('element-plus/es')['ElForm']
     ElFormItem: typeof import('element-plus/es')['ElFormItem']
-    ElH3: typeof import('element-plus/es')['ElH3']
     ElIcon: typeof import('element-plus/es')['ElIcon']
     ElInput: typeof import('element-plus/es')['ElInput']
     ElScrollbar: typeof import('element-plus/es')['ElScrollbar']
@@ -38,7 +33,6 @@ declare module 'vue' {
     SelectLLM: typeof import('./src/components/llms/selectLLM.vue')['default']
     Settings: typeof import('./src/components/icon/settings.vue')['default']
     Store: typeof import('./src/components/conf/store.vue')['default']
-    Tooltip: typeof import('./src/components/icon/tooltip.vue')['default']
     User: typeof import('./src/components/conf/user.vue')['default']
   }
 }

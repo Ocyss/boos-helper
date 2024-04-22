@@ -10,6 +10,7 @@ export interface Statistics {
   salaryRange: number;
   companySizeRange: number;
   activityFilter: number;
+  goldHunterFilter: number;
   repeat: number;
 }
 
@@ -22,6 +23,7 @@ export interface FormData {
   customGreeting: FormDataInput;
   greetingVariable: FormDataCheckbox;
   activityFilter: FormDataCheckbox;
+  goldHunterFilter:FormDataCheckbox;
   notification: FormDataCheckbox;
   aiGreeting: FormDataAi;
   aiFiltering: FormDataAi;
