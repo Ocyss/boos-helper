@@ -28,6 +28,8 @@ export function createHandle(): {
   if (formData.salaryRange.enable) h.salaryRange(handles);
   // 公司规模筛选
   if (formData.companySizeRange.enable) h.companySizeRange(handles);
+  // 猎头过滤
+  if (formData.goldHunterFilter.value) h.goldHunterFilter(handles);
   // 工作内容筛选
   if (formData.jobContent.enable) h.jobContent(handlesRes);
   // AI过滤

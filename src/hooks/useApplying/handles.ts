@@ -15,7 +15,7 @@ import {
   JobDescriptionError,
   AIFilteringError,
   ActivityError,
-  GreetError,
+  GreetError, GoldHunterError,
 } from "@/types/deliverError";
 
 import { useStore } from "../useStore";
@@ -65,6 +65,14 @@ export const jobTitle: handleCFn = (h) =>
       throw new JobTitleError(e.message);
     }
   });
+
+export const goldHunterFilter: handleCFn = (h) =>
+    h.push(async ({data}, ctx) => {
+      if (data?.goldHunter === 1) {
+        todayData.goldHunterFilter++;
+        throw new GoldHunterError("猎头过滤");
+      }
+    });
 
 export const company: handleCFn = (h) =>
   h.push(async ({ data }, ctx) => {

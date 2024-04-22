@@ -17,6 +17,7 @@ const todayData = reactiveComputed<Statistics>(() => {
     salaryRange: 0,
     companySizeRange: 0,
     activityFilter: 0,
+    goldHunterFilter: 0,
     repeat: 0,
   };
   const g = GM_getValue(todayKey, current);
