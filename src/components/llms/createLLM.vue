@@ -10,13 +10,13 @@ import { llms } from "@/hooks/useModel";
 import { reactiveComputed } from "@vueuse/core";
 import { ElMessage } from "element-plus";
 import deepmerge from "@/utils/deepmerge";
+import { logger } from "@/utils/logger";
 const props = defineProps<{
   model?: modelData;
 }>();
 const show = defineModel<boolean>({ required: true });
 const createName = ref(props.model?.name || "");
-console.log(createName.value, props.model);
-
+const { getGpt } = useModel();
 const llmsOptions = computed(() =>
   llms.map((v) => {
     const m = v.mode;
@@ -61,10 +61,50 @@ const updateFormLLM = (v: string) => {
   deepmerge(llmFormData, props.model?.data, { clone: false });
 };
 const emit = defineEmits<{ (e: "create", data: modelData): void }>();
+
+async function test() {
+  const data: modelData = JSON.parse(
+    JSON.stringify(props.model || { name: "", key: "" })
+  );
+  data.name = createName.value;
+  data.data = JSON.parse(JSON.stringify(llmFormData)) as modelData["data"] & {};
+  data.data.mode = selectLLM.value;
+  logger.debug(data);
+  const gpt = getGpt(
+    data,
+    `你叫做“妙妙”，是一款叫做“妙语笔记”的智能助手，接下来你会分析下面用户的输入：
+"""
+我的称呼是吴楷鹏，可以叫我大帅哥，出生于香港回归的那一年，生日是 3 月 13 号，喜欢上班
+"""
+设定：
+1. 现在是 2025.10.01 21:21，时区是 Asia/Shanghai
+2. 提取昵称、性别、出生日期，剩余全部信息整理成个人介绍
+3. 要求输出结构化 JSON 对象，符合下面 TypeScript：
+interface UserInfo {
+  nickname?: string;
+  gender?: 'male'  | 'female';
+  dataOfBirth?: string;
+  bio?: string;
+}
+4. 这是例子：const userInfo = {
+    "nickname":"董小姐",
+    "gender": "female",
+    "dateOfBirth":"2001-03-07",
+    "bio": "家住在长沙，喜欢做饭"
+}
+
+接下来开始分析：const userInfo=`
+  );
+  const msg = await gpt.message({}, (d) => {
+    console.log("gptTest", d);
+  });
+  console.log("TestRes", msg);
+}
 function create() {
   const data: modelData = props.model || { name: "", key: "" };
   data.name = createName.value;
-  data.data = JSON.parse(JSON.stringify(llmFormData));
+  data.data = JSON.parse(JSON.stringify(llmFormData)) as modelData["data"] & {};
+  data.data.mode = selectLLM.value;
   emit("create", data);
 }
 </script>
@@ -102,6 +142,7 @@ function create() {
     <template #footer>
       <div>
         <el-button @click="show = false">取消</el-button>
+        <el-button type="info" @click="test">测试</el-button>
         <el-button type="primary" @click="create">保存</el-button>
       </div>
     </template>

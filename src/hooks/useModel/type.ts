@@ -25,8 +25,11 @@ export abstract class llm<C = any, T extends Array<any> = Array<any>> {
     }
   }
 
-  abstract chat(message: string, fn: (s: string) => void): Promise<string>;
-  abstract message(data: object): Promise<messageReps>;
+  abstract chat(message: string): Promise<string>;
+  abstract message(
+    data: object,
+    fn?: (s: string) => void
+  ): Promise<messageReps>;
 }
 
 export type messageReps<T = string> = {

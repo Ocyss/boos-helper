@@ -2,6 +2,8 @@ import axios from "axios";
 import { llm, llmConf, llmInfo, messageReps, prompt } from "../type";
 import { desc, other } from "../common";
 import { GM_xmlhttpRequest } from "$";
+import { OnStream, request } from "@/utils/request";
+import { logger } from "@/utils/logger";
 
 export type openaiLLMConf = llmConf<
   "openai",
@@ -151,23 +153,54 @@ class gpt extends llm<openaiLLMConf> {
   }
   async chat(message: string) {
     const res = await this.post(this.buildPrompt(message));
-    return res.data?.choices.pop()?.message?.content;
+    return res.data?.choices.pop()?.message?.content || "";
   }
   async message(data: object, fn = (s: string) => {}): Promise<messageReps> {
     const prompt = this.buildPrompt(data);
-    const res = await this.post(prompt);
-    if (this.conf.advanced.stream) {
-      res.data.on("data", (chunk) => {});
+    const decoder = new TextDecoder("utf-8");
+    let stream = "";
+    const ans: messageReps = { prompt: prompt[prompt.length - 1].content };
+    const res = await this.post(prompt, (reader) => {
+      reader.read().then(function processText({ value }): any {
+        const s = decoder.decode(value);
+        const sl = s.split("\n");
+        for (let i = 0; i < sl.length; i++) {
+          const line = sl[i];
+          if (line.startsWith("data: ")) {
+            const data = line.slice(6);
+            if (data === "[DONE]") {
+              return;
+            }
+            const json = JSON.parse(data).choices[0];
+            const content = json.delta.content;
+            if (content) {
+              fn(content);
+              stream += content;
+            } else if (json.finish_reason === "stop") {
+              console.log(json.usage);
+
+              ans.usage = {
+                input_tokens: json.usage?.prompt_tokens,
+                output_tokens: json.usage?.completion_tokens,
+                total_tokens: json.usage?.total_tokens,
+              };
+            }
+          }
+        }
+        return reader.read().then(processText);
+      });
+    });
+    if (!this.conf.advanced.stream) {
+      ans.content = res?.choices.pop()?.message?.content;
+      ans.usage = {
+        input_tokens: res?.usage?.prompt_tokens,
+        output_tokens: res?.usage?.completion_tokens,
+        total_tokens: res?.usage?.total_tokens,
+      };
+    } else {
+      ans.content = stream;
     }
-    return {
-      content: res.data?.choices.pop()?.message?.content,
-      prompt: prompt[prompt.length - 1].content,
-      usage: {
-        input_tokens: res.data?.usage.prompt_tokens,
-        output_tokens: res.data?.usage.completion_tokens,
-        total_tokens: res.data?.usage.total_tokens,
-      },
-    };
+    return ans;
   }
   private buildPrompt(data: object | string): prompt {
     if (typeof data === "string") {
@@ -190,47 +223,32 @@ class gpt extends llm<openaiLLMConf> {
       ];
     }
   }
-  private async post(prompt: prompt) {
-    GM_xmlhttpRequest({
-      method: "POST",
+  private async post(prompt: prompt, onStream?: OnStream): Promise<any> {
+    const res = await request.post({
       url: this.conf.url + "/v1/chat/completions",
-      data: {
+      data: JSON.stringify({
         messages: prompt,
         model: this.conf.model,
         stream: this.conf.advanced.stream,
-        temperature: this.conf.advanced?.temperature,
-        top_p: this.conf.advanced?.top_p,
-        max_tokens: this.conf.advanced?.max_tokens,
+        temperature: this.conf.advanced.temperature,
+        top_p: this.conf.advanced.top_p,
+        max_tokens: this.conf.advanced.max_tokens,
+        presence_penalty: this.conf.advanced.presence_penalty,
+        frequency_penalty: this.conf.advanced.frequency_penalty,
+        response_format: this.conf.advanced.json
+          ? { type: "json_object" }
+          : undefined,
+      }),
+      headers: {
+        Authorization: `Bearer ${this.conf.api_key}`,
+        "Content-Type": "application/json",
       },
-    };
-    // const res = await axios.post(
-    //   this.conf.url + "/v1/chat/completions",
-    //   {
-    //     messages: prompt,
-    //     model: this.conf.model,
-    //     stream: this.conf.advanced.stream,
-    //     temperature: this.conf.advanced?.temperature,
-    //     top_p: this.conf.advanced?.top_p,
-    //     max_tokens: this.conf.advanced?.max_tokens,
-    //     presence_penalty: this.conf.advanced?.presence_penalty,
-    //     frequency_penalty: this.conf.advanced?.frequency_penalty,
-    //     response_format: this.conf.advanced?.json
-    //       ? { type: "json_object" }
-    //       : undefined,
-    //   },
-    //   {
-    //     headers: {
-    //       Authorization: `Bearer ${this.conf.api_key}`,
-    //       "Content-Type": "application/json",
-    //     },
-    //     timeout: this.conf.other.timeout,
-    //     responseType: this.conf.advanced.stream ? "stream" : "json",
-    //   }
-    // );
-    // if (!this.conf.advanced.stream && res.data?.error) {
-    //   throw new Error(res.data.error.message);
-    // }
-    // return res;
+      timeout: this.conf.other.timeout,
+      responseType: this.conf.advanced.stream ? "stream" : "json",
+      onStream,
+    });
+
+    return res;
   }
 }
 
