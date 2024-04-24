@@ -12,7 +12,6 @@ const options = defineModel<string[]>("options", { required: true });
     allow-create
     default-first-option
     :reserve-keyword="false"
-    style="width: 240px"
     placeholder=""
   >
     <el-option

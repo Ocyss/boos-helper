@@ -1,6 +1,4 @@
-import { delay } from "@/utils";
 import elmGetter from "@/utils/elmGetter";
-import { ElMessage } from "element-plus";
 import { ref, Ref } from "vue";
 
 const rootVue = ref();

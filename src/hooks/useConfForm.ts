@@ -212,6 +212,24 @@ interface aiFiltering {
     label: "内容记录",
     help: "拿这些数据去训练个Ai岂不是美滋滋咯？",
   },
+  delay: {
+    deliveryStarts: {
+      label: "投递开始",
+      help: "点击投递按钮会等待一段时间,默认值10s",
+    },
+    deliveryInterval: {
+      label: "投递间隔",
+      help: "每个投递的间隔,太快易风控,默认值2s",
+    },
+    deliveryPageNext: {
+      label: "投递翻页",
+      help: "投递完下一页之后等待的间隔,太快易风控,默认值60s",
+    },
+    messageSending: {
+      label: "消息发送",
+      help: "在发送消息前允许等待一定的时间让用户来修改或手动发送,默认值5s",
+    },
+  },
 };
 
 export const defaultFormData: FormData = {
@@ -271,6 +289,12 @@ export const defaultFormData: FormData = {
   },
   record: {
     enable: false,
+  },
+  delay: {
+    deliveryStarts: 10,
+    deliveryInterval: 2,
+    deliveryPageNext: 60,
+    messageSending: 5,
   },
 };
 

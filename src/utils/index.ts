@@ -53,9 +53,9 @@ export function animate({
 }
 let delayLoadId: number | undefined = undefined;
 // 延迟
-export function delay(ms: number) {
-  loader({ ms });
-  return new Promise((resolve) => setTimeout(resolve, ms));
+export function delay(s: number) {
+  loader({ ms: s * 1000 });
+  return new Promise((resolve) => setTimeout(resolve, s * 1000));
 }
 
 // 加载进度条

@@ -2,17 +2,19 @@ import { delay } from "@/utils";
 import { logData, useLog } from "@/hooks/useLog";
 import { useCommon } from "@/hooks/useCommon";
 import { useStatistics } from "@/hooks/useStatistics";
-const { todayData } = useStatistics();
-const { deliverStop } = useCommon();
+
 import { ref } from "vue";
 import { createHandle, sendPublishReq } from "@/hooks/useApplying";
 import { Actions } from "@/hooks/useMap";
 import { logger } from "@/utils/logger";
+import { useConfFormData } from "@/hooks/useConfForm";
 
 const total = ref(0);
 const current = ref(0);
 const log = useLog();
-
+const { todayData } = useStatistics();
+const { deliverStop } = useCommon();
+const { formData } = useConfFormData();
 async function jobListHandle(
   jobList: JobList,
   jobMap: Actions<
@@ -79,7 +81,7 @@ async function jobListHandle(
       logger.error("未知报错", e, data);
     } finally {
       todayData.total++;
-      await delay(2000);
+      await delay(formData.delay.deliveryInterval);
     }
   }
 }

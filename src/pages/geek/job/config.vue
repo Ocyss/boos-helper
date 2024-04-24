@@ -1,5 +1,4 @@
 <script lang="ts" setup>
-import { reactive, toRaw } from "vue";
 import {
   ElButton,
   ElForm,
@@ -9,19 +8,14 @@ import {
   ElSelect,
   ElOption,
 } from "element-plus";
-
-import { GM_getValue, GM_setValue } from "$";
-
-import { watchThrottled } from "@vueuse/core";
-
 import formItem from "@/components/form/formItem.vue";
 import formSelect from "@/components/form/formSelect.vue";
-import deepmerge from "@/utils/deepmerge";
-import { FormData } from "@/types/formData";
 import { useConfFormData, formInfoData } from "@/hooks/useConfForm";
 import { useCommon } from "@/hooks/useCommon";
+
 const { formData, confDelete, confExport, confImport, confReload, confSaving } =
   useConfFormData();
+
 const { deliverLock } = useCommon();
 </script>
 
@@ -34,80 +28,98 @@ const { deliverLock } = useCommon();
     :model="formData"
     :disabled="deliverLock"
   >
-    <form-item
-      v-bind="formInfoData.company"
-      v-model:enable="formData.company.enable"
-      v-model:include="formData.company.include"
-      :disabled="deliverLock"
-    >
-      <formSelect
-        v-model:value="formData.company.value"
-        v-model:options="formData.company.options"
-      />
-    </form-item>
-    <form-item
-      v-bind="formInfoData.jobTitle"
-      v-model:enable="formData.jobTitle.enable"
-      v-model:include="formData.jobTitle.include"
-      :disabled="deliverLock"
-    >
-      <form-select
-        v-model:value="formData.jobTitle.value"
-        v-model:options="formData.jobTitle.options"
-      />
-    </form-item>
-    <form-item
-      v-bind="formInfoData.jobContent"
-      v-model:enable="formData.jobContent.enable"
-      v-model:include="formData.jobContent.include"
-      :disabled="deliverLock"
-    >
-      <form-select
-        v-model:value="formData.jobContent.value"
-        v-model:options="formData.jobContent.options"
-      />
-    </form-item>
-    <form-item
-      v-bind="formInfoData.salaryRange"
-      v-model:enable="formData.salaryRange.enable"
-    >
-      <el-input v-model="formData.salaryRange.value" style="width: 240px" />
-    </form-item>
-    <form-item
-      v-bind="formInfoData.companySizeRange"
-      v-model:enable="formData.companySizeRange.enable"
-    >
-      <el-input
-        v-model.lazy="formData.companySizeRange.value"
-        style="width: 240px"
-      />
-    </form-item>
+    <el-collapse accordion>
+      <el-collapse-item title="筛选配置" name="1">
+        <el-space wrap style="width: 100%">
+          <form-item
+            v-bind="formInfoData.company"
+            v-model:enable="formData.company.enable"
+            v-model:include="formData.company.include"
+            :disabled="deliverLock"
+          >
+            <formSelect
+              v-model:value="formData.company.value"
+              v-model:options="formData.company.options"
+            />
+          </form-item>
+          <form-item
+            v-bind="formInfoData.jobTitle"
+            v-model:enable="formData.jobTitle.enable"
+            v-model:include="formData.jobTitle.include"
+            :disabled="deliverLock"
+          >
+            <form-select
+              v-model:value="formData.jobTitle.value"
+              v-model:options="formData.jobTitle.options"
+            />
+          </form-item>
+          <form-item
+            v-bind="formInfoData.jobContent"
+            v-model:enable="formData.jobContent.enable"
+            v-model:include="formData.jobContent.include"
+            :disabled="deliverLock"
+          >
+            <form-select
+              v-model:value="formData.jobContent.value"
+              v-model:options="formData.jobContent.options"
+            />
+          </form-item>
+          <form-item
+            v-bind="formInfoData.salaryRange"
+            v-model:enable="formData.salaryRange.enable"
+          >
+            <el-input v-model="formData.salaryRange.value" />
+          </form-item>
+          <form-item
+            v-bind="formInfoData.companySizeRange"
+            v-model:enable="formData.companySizeRange.enable"
+          >
+            <el-input v-model.lazy="formData.companySizeRange.value" />
+          </form-item>
 
-    <form-item
-      v-bind="formInfoData.customGreeting"
-      v-model:enable="formData.customGreeting.enable"
-    >
-      <el-input
-        v-model.lazy="formData.customGreeting.value"
-        style="width: 240px"
-      />
-    </form-item>
-    <div>
+          <form-item
+            v-bind="formInfoData.customGreeting"
+            v-model:enable="formData.customGreeting.enable"
+          >
+            <el-input v-model.lazy="formData.customGreeting.value" />
+          </form-item>
+        </el-space>
+        <div>
+          <el-checkbox
+            v-bind="formInfoData.activityFilter"
+            v-model="formData.activityFilter.value"
+            border
+          />
+          <el-checkbox
+            v-bind="formInfoData.goldHunterFilter"
+            v-model="formData.goldHunterFilter.value"
+            border
+          />
+        </div>
+      </el-collapse-item>
+      <el-collapse-item title="延迟配置" name="2">
+        <el-form-item
+          v-for="(item, key) in formInfoData.delay"
+          :key
+          :label="item.label"
+          :help="item.help"
+        >
+          <el-input-number
+            v-model="formData.delay[key]"
+            :min="1"
+            :max="99999"
+          />
+        </el-form-item>
+      </el-collapse-item>
+    </el-collapse>
+
+    <div style="margin-top: 20px">
       <el-checkbox
         v-bind="formInfoData.greetingVariable"
         v-model="formData.greetingVariable.value"
         border
       />
-      <el-checkbox
-        v-bind="formInfoData.activityFilter"
-        v-model="formData.activityFilter.value"
-        border
-      />
-      <el-checkbox
-        v-bind="formInfoData.goldHunterFilter"
-        v-model="formData.goldHunterFilter.value"
-        border
-      />
+
       <el-checkbox
         v-bind="formInfoData.notification"
         v-model="formData.notification.value"
@@ -142,5 +154,8 @@ const { deliverLock } = useCommon();
   </div>
 </template>
 
-<style lang="scss" scoped></style>
-./hooks/useForm
+<style lang="scss" scoped>
+.el-space :deep(.el-space__item) {
+  width: 48%;
+}
+</style>

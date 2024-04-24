@@ -9,8 +9,9 @@ export type other = {
 export const other: llmInfo<other>["other"] = {
   value: {
     timeout: {
-      value: 120000,
+      value: 120,
       type: "inputNumber",
+      desc: "GPT请求的超时时间,超时后不会进行重试将跳过岗位,默认120s",
     },
   },
   alert: "warning",

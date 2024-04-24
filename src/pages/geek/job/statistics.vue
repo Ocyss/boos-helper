@@ -74,12 +74,12 @@ async function startBatch() {
   try {
     logger.debug("start batch", page);
     while (page.value.page <= 10 && !deliverStop.value) {
-      await delay(10000);
+      await delay(formData.delay.deliveryStarts);
       await jobListHandle(jobList.value, jobMap.actions);
       if (deliverStop.value) {
         break;
       }
-      await delay(120000);
+      await delay(formData.delay.deliveryPageNext);
       next();
       jobMap.actions.clear();
     }

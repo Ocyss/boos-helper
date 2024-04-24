@@ -30,17 +30,20 @@ export interface FormData {
   aiReply: FormDataAi;
   record: { model?: string[]; enable: boolean };
   // animation?: "frame" | "card" | "together";
+  delay: ConfDelay;
 }
 
 export type FormInfoData = {
-  [key in keyof FormData]: {
+  [key in keyof Omit<FormData, "aiGreeting" | "aiFiltering" | "delay">]: {
     label: string;
     help?: string;
   };
 } & {
   aiGreeting: FormInfoAi;
   aiFiltering: FormInfoAi;
+  delay: ConfInfoDelay;
 };
+
 export type FormInfoAi = {
   label: string;
   help?: string;
@@ -65,3 +68,17 @@ export interface FormDataAi {
   prompt: string | prompt;
   enable: boolean;
 }
+
+type ConfDelay = {
+  deliveryStarts: number;
+  deliveryInterval: number;
+  deliveryPageNext: number;
+  messageSending: number;
+};
+
+type ConfInfoDelay = {
+  [Key in keyof ConfDelay]: {
+    label: string;
+    help?: string;
+  };
+};

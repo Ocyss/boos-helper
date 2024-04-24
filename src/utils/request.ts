@@ -32,7 +32,7 @@ export function request<TContext, TResponseType extends ResponseType = "json">({
   url = "",
   data = "",
   headers = {},
-  timeout = 5000,
+  timeout = 5,
   responseType = "json" as TResponseType,
   onStream = () => {},
 }: RequestArgs<TContext, TResponseType>) {
@@ -42,7 +42,7 @@ export function request<TContext, TResponseType extends ResponseType = "json">({
       url,
       data,
       headers,
-      timeout,
+      timeout: timeout * 1000,
       responseType,
       ontimeout() {
         if (axiosLoad) axiosLoad();
