@@ -44,6 +44,7 @@ export function request<TContext, TResponseType extends ResponseType = "json">({
       headers,
       timeout: timeout * 1000,
       responseType,
+
       ontimeout() {
         if (axiosLoad) axiosLoad();
         reject(new RequestError(`超时 ${Math.round(timeout / 1000)}s`));

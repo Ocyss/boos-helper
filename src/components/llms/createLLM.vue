@@ -146,7 +146,7 @@ async function test() {
   });
   testOut.value = msg.content || "";
   logger.debug("TestRes", msg);
-  logger.groupEnd("LLMTest");
+  logger.groupEnd();
 }
 
 function create() {
@@ -199,7 +199,7 @@ function create() {
         </template>
       </el-segmented>
       <el-form label-width="auto" size="large" label-position="left">
-        <lForm :data="llms[formLLM]" v-model="llmFormData" />
+        <lForm :key="formLLM" :data="llms[formLLM]" v-model="llmFormData" />
       </el-form>
     </el-scrollbar>
     <template #footer>

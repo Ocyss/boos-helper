@@ -42,6 +42,10 @@ function getGpt(model: modelData, template: string | prompt): llm {
         return new openai.gpt(model.data, template);
       case "moonshot":
         return new moonshot.gpt(model.data, template);
+      case "aliyun":
+        return new aliyun.gpt(model.data, template);
+      case "baidu":
+        return new baidu.gpt(model.data, template);
       case "user":
         break;
     }

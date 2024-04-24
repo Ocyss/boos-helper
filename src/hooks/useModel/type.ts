@@ -24,7 +24,27 @@ export abstract class llm<C = any, T extends Array<any> = Array<any>> {
       this.tem = miTem.compile(template[template.length - 1].content);
     }
   }
-
+  buildPrompt(data: object | string): prompt {
+    if (typeof data === "string") {
+      return [
+        {
+          content: data,
+          role: "user",
+        },
+      ];
+    } else if (Array.isArray(this.template)) {
+      const temp = this.template;
+      temp[temp.length - 1].content = this.tem(data);
+      return temp;
+    } else {
+      return [
+        {
+          content: this.tem(data),
+          role: "user",
+        },
+      ];
+    }
+  }
   abstract chat(message: string): Promise<string>;
   abstract message({}: {
     data: object;

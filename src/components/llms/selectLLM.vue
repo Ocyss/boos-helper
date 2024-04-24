@@ -103,6 +103,17 @@ function addMessage() {
         mitem
       </el-link>
       来渲染模板。在多对话模式下，只有最后的消息会使用模板。
+      <el-link type="primary" href="#" target="_blank">变量表</el-link>
+      <br />
+      推荐阅读
+      <el-link
+        type="primary"
+        href="https://langgptai.feishu.cn/wiki/RXdbwRyASiShtDky381ciwFEnpe"
+        target="_blank"
+      >
+        《LangGPT》
+      </el-link>
+      的提示词文档学习 ( 示例提示词写的并不好,欢迎AI大佬来提pr )
     </el-text>
 
     <el-input

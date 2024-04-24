@@ -65,6 +65,12 @@ export default defineConfig(() => {
           author: "Ocyss",
           grant: ["unsafeWindow"],
           "run-at": "document-start",
+          connect: [
+            "api.chatanywhere.com.cn",
+            "api.moonshot.cn",
+            "aliyuncs.com",
+            "baidubce.com",
+          ],
         },
         build: {
           externalGlobals: {

@@ -28,5 +28,5 @@ export const logger = {
     `color:${Color.error}; padding-left:1.2em; line-height:1.5em;`
   ),
   group: console.groupCollapsed,
-  groupEnd: console.groupCollapsed,
+  groupEnd: console.groupEnd,
 };

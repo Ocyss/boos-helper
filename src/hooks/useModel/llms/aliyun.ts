@@ -1,6 +1,6 @@
-import axios from "axios";
-import { llm, llmConf, llmInfo, messageReps } from "../type";
+import { llm, llmConf, llmInfo, messageReps, prompt } from "../type";
 import { desc, other } from "../common";
+import { OnStream, request } from "@/utils/request";
 
 export type aliyunLLMConf = llmConf<
   "aliyun",
@@ -25,19 +25,18 @@ const info: llmInfo<aliyunLLMConf> = {
   mode: {
     mode: "aliyun",
     label: "通义千问",
-    disabled: true,
     icon: `<svg t="1713627186974" class="icon" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="15358" width="200" height="200"><path d="M918.60992 591.872l-104.67328-183.1936 44.8512-85.99552a23.92064 23.92064 0 0 0 5.24288-29.9008L806.44096 188.8256a24.6784 24.6784 0 0 0-20.1728-11.22304H572.416l-47.86176-83.74272a22.44608 22.44608 0 0 0-17.2032-11.96032h-112.88576a23.92064 23.92064 0 0 0-20.19328 11.96032v4.5056l-106.9056 183.17312H164.88448a23.94112 23.94112 0 0 0-20.93056 11.22304l-59.06432 104.6528a26.9312 26.9312 0 0 0 0 23.9616l106.16832 184.66816-47.84128 83.7632a26.9312 26.9312 0 0 0 0 23.90016l54.5792 95.72352a24.6784 24.6784 0 0 0 20.93056 11.96032h213.85216l51.58912 89.7024a24.6784 24.6784 0 0 0 18.69824 11.9808h121.11872a23.92064 23.92064 0 0 0 20.19328-11.96032l105.43104-184.68864h94.208a26.19392 26.19392 0 0 0 20.19328-12.6976l54.5792-96.4608a23.18336 23.18336 0 0 0 0-25.43616z m-132.34176 11.96032l-54.5792-100.9664-224.31744 395.55072-61.31712-100.92544H221.73696l53.84192-97.95584h114.40128L165.66272 305.50016h117.39136l111.4112-198.90176 56.07424 97.95584-57.56928 100.92544h448.6144L784.7936 405.7088l112.90624 198.12352h-111.4112z" fill="#605BEC" p-id="15359"></path><path d="M502.12864 641.9456l139.83744-224.29696H361.55392l140.57472 224.29696z" fill="#605BEC" p-id="15360"></path></svg>`,
-    desc: `https://help.aliyun.com/zh/dashscope/developer-reference/api-details#602895ef3dtl1`,
+    desc: `阿里巴巴旗下的大模型,开通就送价值千元的tokens,可用去尝试尝试 <a href="https://help.aliyun.com/zh/dashscope/developer-reference/activate-dashscope-and-create-an-api-key" target="_blank">开通文档</a>`,
   },
   model: {
     required: true,
     type: "select",
+    value: "qwen-plus",
     config: {
       placeholder: "qwen-plus",
       options: [
         "qwen-plus",
         "qwen-turbo",
-        "qwen-plus",
         "qwen-max",
         "qwen-max-0403",
         "qwen-max-0107",
@@ -128,6 +127,115 @@ const info: llmInfo<aliyunLLMConf> = {
   },
   other,
 };
+
+class gpt extends llm<aliyunLLMConf> {
+  constructor(conf: aliyunLLMConf, template: string | prompt) {
+    super(conf, template);
+  }
+  async chat(message: string) {
+    const res = await this.post({ prompt: this.buildPrompt(message) });
+    return res?.output?.text || "";
+  }
+  async message({
+    data = {},
+    onPrompt = (s: string) => {},
+    onStream = (s: string) => {},
+    json = false,
+  }): Promise<messageReps> {
+    const prompts = this.buildPrompt(data);
+    const prompt = prompts[prompts.length - 1].content;
+    onPrompt(prompt);
+    const decoder = new TextDecoder("utf-8");
+    let stream = "";
+    const ans: messageReps = { prompt };
+    const res = await this.post({
+      prompt: prompts,
+      json,
+      onStream: (reader) => {
+        reader.read().then(function processText({ value }): any {
+          const s = decoder.decode(value);
+          const sl = s.split("\n");
+          for (let i = 0; i < sl.length; i++) {
+            const line = sl[i];
+            if (line.startsWith("data:")) {
+              const data = line.slice(5);
+              const json = JSON.parse(data);
+              const content = json.output?.text;
+              if (json.output.finish_reason === "stop") {
+                ans.usage = {
+                  input_tokens: json.usage?.input_tokens,
+                  output_tokens: json.usage?.output_tokens,
+                  total_tokens: json.usage?.total_tokens,
+                };
+                return;
+              } else if (content) {
+                onStream(content);
+                stream += content;
+              }
+            }
+          }
+          return reader.read().then(processText);
+        });
+      },
+    });
+    if (!this.conf.advanced.stream) {
+      ans.content = res?.output?.text;
+      ans.usage = {
+        input_tokens: res?.usage?.input_tokens,
+        output_tokens: res?.usage?.output_tokens,
+        total_tokens:
+          res?.usage?.total_tokens ||
+          res?.usage?.input_tokens + res?.usage?.output_tokens,
+      };
+    } else {
+      ans.content = stream;
+    }
+    return ans;
+  }
+  private async post({
+    prompt,
+    onStream,
+    json = false,
+  }: {
+    prompt: prompt;
+    onStream?: OnStream;
+    json?: boolean;
+  }): Promise<any> {
+    const headers: Record<string, string> = {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${this.conf.api_key}`,
+    };
+    if (this.conf.advanced.stream) {
+      headers["Accept"] = "text/event-stream";
+      headers["X-DashScope-SSE"] = "enable";
+    }
+    const res = await request.post({
+      url: this.conf.advanced.url,
+      data: JSON.stringify({
+        model: this.conf.model,
+        input: { messages: prompt },
+        parameters: {
+          result_format: "text",
+          max_tokens: this.conf.advanced.max_tokens,
+          temperature: this.conf.advanced.temperature,
+          top_p: this.conf.advanced.top_p,
+          top_k: this.conf.advanced.top_k,
+          repetition_penalty: this.conf.advanced.repetition_penalty,
+          enable_search: this.conf.advanced.enable_search,
+          incremental_output: true,
+        },
+      }),
+      headers,
+      timeout: this.conf.other.timeout,
+      responseType: this.conf.advanced.stream ? "stream" : "json",
+      onStream,
+    });
+
+    return res;
+  }
+}
+
 export const aliyun = {
   info,
+  gpt,
 };
