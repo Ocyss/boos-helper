@@ -173,7 +173,7 @@ interface aiFiltering {
 2. 不能把用户想要的福利当成扣分项
 
 ## Workflow
-1. 岗位初始有70分,输入岗位信息结合下面的求职者需求来进行打分,并写出为什么扣分和加分最后输出符合下面定义的Json格式字符串
+1. 岗位初始有70分,输入岗位信息结合下面的求职者需求来进行打分,最终返回下面格式的JSON字符串,不要有任何其他字符
 interface aiFiltering {
   rating: number; // 分数, 低于40的我会筛选掉
   negative: string[] | string; // 扣分项
