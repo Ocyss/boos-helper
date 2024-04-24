@@ -13,12 +13,17 @@ import { llm, prompt } from "./type";
 export const confModelKey = "conf-model";
 export const llms = [openai.info, moonshot.info, aliyun.info, baidu.info];
 
+export const llmsIcons = llms.reduce((acc, cur) => {
+  if (cur.mode.icon) acc[cur.mode.mode] = cur.mode.icon;
+  return acc;
+}, {} as Record<string, string>);
 const modelData = ref(GM_getValue<modelData[]>(confModelKey, []));
 logger.debug("ai模型数据", toRaw(modelData.value));
 
 export type modelData = {
   key: string;
   name: string;
+  color?: string;
   data?:
     | moonshotLLMConf
     | userLLMConf

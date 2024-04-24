@@ -2,10 +2,9 @@
 import { onMounted, ref } from "vue";
 import { ElTabPane, ElTabs, ElCheckbox, ElTooltip } from "element-plus";
 import cardVue from "./card.vue";
-import chatVue from "./chat.vue";
 import { computed } from "vue";
 import { useMouse, useMouseInElement } from "@vueuse/core";
-
+import chatVue from "@/components/chat/chat.vue";
 import aboutVue from "./about.vue";
 import aiVue from "./ai.vue";
 import configVue from "./config.vue";
@@ -146,7 +145,18 @@ onMounted(() => {
     <cardVue></cardVue>
   </Teleport>
   <Teleport to=".page-job-wrapper">
-    <chatVue></chatVue>
+    <chatVue
+      style="
+        position: fixed;
+        top: 70px;
+        left: 20px;
+        height: calc(100vh - 80px);
+        display: flex;
+        flex-direction: column;
+        width: 28%;
+        max-width: 540px;
+      "
+    ></chatVue>
   </Teleport>
 </template>
 

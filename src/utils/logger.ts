@@ -27,4 +27,6 @@ export const logger = {
     `%c${icons.error} error > `,
     `color:${Color.error}; padding-left:1.2em; line-height:1.5em;`
   ),
+  group: console.groupCollapsed,
+  groupEnd: console.groupCollapsed,
 };

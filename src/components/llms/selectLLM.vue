@@ -12,7 +12,7 @@ import {
 import { useModel } from "@/hooks/useModel";
 import { useConfFormData, formInfoData } from "@/hooks/useConfForm";
 import { onMounted, ref } from "vue";
-import { FormDataAi, FormData } from "@/types/formData";
+import { FormDataAi, FormData, FormInfoAi } from "@/types/formData";
 import { prompt } from "@/hooks/useModel/type";
 const { formData, confSaving, defaultFormData } = useConfFormData();
 const { modelData } = useModel();
@@ -30,6 +30,12 @@ const role = ["system", "user", "assistant"].map((item) => {
   };
 });
 const message = ref<string | prompt>(formData[props.data].prompt);
+
+function inputExample() {
+  message.value = (formInfoData[props.data] as FormInfoAi).example[
+    singleMode.value ? 0 : 1
+  ];
+}
 function changeMode(v: boolean) {
   if (v) {
     message.value = "";
@@ -68,24 +74,26 @@ function addMessage() {
       type="info"
       :closable="false"
     />
-    <el-radio-group
-      v-model="singleMode"
-      size="large"
-      @update:modelValue="changeMode"
-    >
-      <el-radio-button label="单对话模式" :value="true" />
-      <el-radio-button label="多对话模式" :value="false" />
-    </el-radio-group>
-    <el-button>填入示例值</el-button>
-    <el-select-v2
-      v-model="model"
-      :options="modelData"
-      :props="{ label: 'name', value: 'key' }"
-      placeholder="选择模型"
-      multiple
-      style="width: 45%; margin-bottom: 8px"
-    />
-    <el-text>
+    <div class="select-form-box">
+      <el-radio-group
+        v-model="singleMode"
+        size="large"
+        @update:modelValue="changeMode"
+      >
+        <el-radio-button label="单对话模式" :value="true" />
+        <el-radio-button label="多对话模式" :value="false" />
+      </el-radio-group>
+      <el-button @click="inputExample">填入示例值</el-button>
+      <el-select-v2
+        v-model="model"
+        :options="modelData"
+        :props="{ label: 'name', value: 'key' }"
+        placeholder="选择模型"
+        style="width: 35%"
+      />
+    </div>
+
+    <el-text style="margin: 20px 0" tag="div">
       使用
       <el-link
         type="primary"
@@ -107,8 +115,6 @@ function addMessage() {
     <el-form
       v-else
       v-model="message as string"
-      ref="formRef"
-      style="max-width: 600px"
       label-width="auto"
       class="demo-dynamic"
     >
@@ -117,14 +123,25 @@ function addMessage() {
           <el-select-v2
             v-model="item.role"
             :options="role"
-            size="large"
-            style="width: 240px"
+            style="width: 140px"
           />
         </template>
-        <el-input v-model="item.content" />
-        <el-button class="mt-2" @click.prevent="removeMessage(item)">
-          Delete
-        </el-button>
+        <div
+          class="select-form-box"
+          style="width: 100%; align-items: flex-start"
+        >
+          <el-input
+            v-model="item.content"
+            type="textarea"
+            :autosize="{ minRows: 2, maxRows: 8 }"
+          />
+          <el-button
+            style="margin-left: 10px"
+            @click.prevent="removeMessage(item)"
+          >
+            删除
+          </el-button>
+        </div>
       </el-form-item>
       <el-form-item>
         <el-button @click="addMessage">添加消息</el-button>
@@ -156,5 +173,10 @@ function addMessage() {
 .el-alert--info.is-light,
 .el-alert--info.is-light .el-alert__description {
   white-space: pre-line;
+}
+.select-form-box {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
 }
 </style>

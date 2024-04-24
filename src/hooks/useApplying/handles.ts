@@ -4,7 +4,7 @@ import { useConfFormData } from "../useConfForm";
 import { ElMessage } from "element-plus";
 import { Message } from "../useWebSocket";
 import { miTem } from "mitem";
-import { useModel } from "../useModel";
+import { llmsIcons, useModel } from "../useModel";
 import { requestBossData } from "./api";
 import {
   RepeatError,
@@ -15,7 +15,8 @@ import {
   JobDescriptionError,
   AIFilteringError,
   ActivityError,
-  GreetError, GoldHunterError,
+  GreetError,
+  GoldHunterError,
 } from "@/types/deliverError";
 
 import { useStore } from "../useStore";
@@ -24,7 +25,10 @@ import { logData } from "../useLog";
 import { logger } from "@/utils/logger";
 import { parseGptJson } from "@/utils/parse";
 import { rangeMatch } from "./utils";
-
+import { useChat } from "../useChat";
+import { ChatMessage } from "../useChat/type";
+import { getCurDay, getCurTime } from "@/utils";
+const { chatInputInit, chatMessages } = useChat();
 const { modelData, getGpt } = useModel();
 const { formData } = useConfFormData();
 const { todayData } = useStatistics();
@@ -67,12 +71,12 @@ export const jobTitle: handleCFn = (h) =>
   });
 
 export const goldHunterFilter: handleCFn = (h) =>
-    h.push(async ({data}, ctx) => {
-      if (data?.goldHunter === 1) {
-        todayData.goldHunterFilter++;
-        throw new GoldHunterError("猎头过滤");
-      }
-    });
+  h.push(async ({ data }, ctx) => {
+    if (data?.goldHunter === 1) {
+      todayData.goldHunterFilter++;
+      throw new GoldHunterError("猎头过滤");
+    }
+  });
 
 export const company: handleCFn = (h) =>
   h.push(async ({ data }, ctx) => {
@@ -126,6 +130,7 @@ export const companySizeRange: handleCFn = (h) =>
       throw new CompanySizeError(e.message);
     }
   });
+
 export const jobContent: handleCFn = (h) =>
   h.push(async (_, { card }) => {
     try {
@@ -161,10 +166,15 @@ export const aiFiltering: handleCFn = (h) => {
   }
   const gpt = getGpt(model, formData.aiFiltering.prompt);
   h.push(async (_, ctx) => {
+    const chatInput = chatInputInit(model);
     try {
       const { content, prompt } = await gpt.message({
-        data: ctx,
-        card: ctx.card,
+        data: {
+          data: ctx,
+          card: ctx.card,
+        },
+        onStream: chatInput.handle,
+        onPrompt: (s) => chatBoosMessage(ctx, s),
       });
       ctx.aiFilteringQ = prompt;
       if (!content) {
@@ -179,13 +189,15 @@ export const aiFiltering: handleCFn = (h) => {
       ctx.aiFilteringAjson = data || {};
       const mg = `分数${data?.rating}\n消极：${data?.negative}\n积极：${data?.positive}`;
       ctx.aiFilteringAtext = content;
-
+      chatInput.end(mg);
       if (!data || !data.rating || data.rating < 40) {
         throw new AIFilteringError(mg);
       }
     } catch (e: any) {
       todayData.jobContent++;
       throw new AIFilteringError(e.message);
+    } finally {
+      chatInput.end("Err~");
     }
   });
 };
@@ -231,8 +243,18 @@ export const customGreeting: handleCFn = (h) => {
     }
   });
 };
+const chatBoosMessage = (ctx: logData, msg: string) => {
+  const d = new Date();
+  chatMessages.value.push({
+    id: d.getTime(),
+    role: "boos",
+    content: msg,
+    date: [getCurDay(d), getCurTime(d)],
+    name: ctx.brandName,
+    avatar: ctx.brandLogo,
+  });
+};
 export const aiGreeting: handleCFn = (h) => {
-  // const template = miTem.compile(formData.aiGreeting.prompt);
   const model = modelData.value.find(
     (v) => formData.aiGreeting.model === v.key
   );
@@ -250,11 +272,16 @@ export const aiGreeting: handleCFn = (h) => {
     throw new GreetError("没有获取到uid");
   }
   h.push(async (args, ctx) => {
+    const chatInput = chatInputInit(model);
     try {
       const boosData = await requestBossData(ctx.card!);
       const { content, prompt } = await gpt.message({
-        data: ctx,
-        card: ctx.card,
+        data: {
+          data: ctx,
+          card: ctx.card,
+        },
+        onStream: chatInput.handle,
+        onPrompt: (s) => chatBoosMessage(ctx, s),
       });
       ctx.aiGreetingQ = prompt;
       if (!content) {
@@ -262,6 +289,7 @@ export const aiGreeting: handleCFn = (h) => {
       }
       ctx.message = content;
       ctx.aiGreetingA = content;
+      chatInput.end(content);
       const buf = new Message({
         form_uid: uid.toString(),
         to_uid: boosData.data.bossId.toString(),
@@ -271,6 +299,8 @@ export const aiGreeting: handleCFn = (h) => {
       buf.send();
     } catch (e: any) {
       throw new GreetError(e?.message);
+    } finally {
+      chatInput.end("Err~");
     }
   });
 };

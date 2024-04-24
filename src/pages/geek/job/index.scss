@@ -5,13 +5,15 @@
   }
   .page-job-wrapper {
     padding-top: 0 !important;
+    width: 100%;
+    position: relative;
+
     .page-job-inner,
     .job-search-wrapper {
       width: 65%;
       max-width: 870px;
       min-width: 320px;
-
-      margin: 20px auto;
+      margin: 20px auto 20px 30%;
       &.fix-top {
         position: unset;
         margin-top: unset;
@@ -123,15 +125,23 @@
   }
 }
 
+html {
+  --body-bg-color: #f6f6f8;
+  body {
+    background-color: var(--body-bg-color);
+  }
+  .page-job:before {
+    background: unset;
+  }
+}
+
 .el-input .el-input__inner {
   background-color: unset !important;
   border: unset !important;
 }
 html.dark {
   --el-bg-color: #212020;
-  body {
-    background-color: #212121;
-  }
+  --body-bg-color: #212121;
 
   #header .inner:before,
   .page-job:before {

@@ -155,12 +155,18 @@ class gpt extends llm<openaiLLMConf> {
     const res = await this.post(this.buildPrompt(message));
     return res.data?.choices.pop()?.message?.content || "";
   }
-  async message(data: object, fn = (s: string) => {}): Promise<messageReps> {
-    const prompt = this.buildPrompt(data);
+  async message({
+    data = {},
+    onPrompt = (s: string) => {},
+    onStream = (s: string) => {},
+  }): Promise<messageReps> {
+    const prompts = this.buildPrompt(data);
+    const prompt = prompts[prompts.length - 1].content;
+    onPrompt(prompt);
     const decoder = new TextDecoder("utf-8");
     let stream = "";
-    const ans: messageReps = { prompt: prompt[prompt.length - 1].content };
-    const res = await this.post(prompt, (reader) => {
+    const ans: messageReps = { prompt };
+    const res = await this.post(prompts, (reader) => {
       reader.read().then(function processText({ value }): any {
         const s = decoder.decode(value);
         const sl = s.split("\n");
@@ -174,11 +180,9 @@ class gpt extends llm<openaiLLMConf> {
             const json = JSON.parse(data).choices[0];
             const content = json.delta.content;
             if (content) {
-              fn(content);
+              onStream(content);
               stream += content;
             } else if (json.finish_reason === "stop") {
-              console.log(json.usage);
-
               ans.usage = {
                 input_tokens: json.usage?.prompt_tokens,
                 output_tokens: json.usage?.completion_tokens,

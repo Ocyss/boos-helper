@@ -23,13 +23,13 @@ export interface FormData {
   customGreeting: FormDataInput;
   greetingVariable: FormDataCheckbox;
   activityFilter: FormDataCheckbox;
-  goldHunterFilter:FormDataCheckbox;
+  goldHunterFilter: FormDataCheckbox;
   notification: FormDataCheckbox;
   aiGreeting: FormDataAi;
   aiFiltering: FormDataAi;
   aiReply: FormDataAi;
   record: { model?: string[]; enable: boolean };
-  animation?: "frame" | "card" | "together";
+  // animation?: "frame" | "card" | "together";
 }
 
 export type FormInfoData = {
@@ -37,8 +37,15 @@ export type FormInfoData = {
     label: string;
     help?: string;
   };
+} & {
+  aiGreeting: FormInfoAi;
+  aiFiltering: FormInfoAi;
 };
-
+export type FormInfoAi = {
+  label: string;
+  help?: string;
+  example: [string, prompt];
+};
 export interface FormDataSelect {
   include: boolean;
   value: string[];

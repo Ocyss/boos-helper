@@ -97,10 +97,16 @@ export function loader({ ms = 10000, color = "#54f98d", onDone = () => {} }) {
   };
 }
 // 获取当前日期
-export function getCurDay() {
-  const currentDate = new Date();
+export function getCurDay(currentDate = new Date()) {
   const year = currentDate.getFullYear();
   const month = String(currentDate.getMonth() + 1).padStart(2, "0");
   const day = String(currentDate.getDate()).padStart(2, "0");
   return `${year}-${month}-${day}`;
+}
+// 获取当前时间
+export function getCurTime(currentDate = new Date()) {
+  const hours = String(currentDate.getHours() + 1).padStart(2, "0");
+  const minutes = String(currentDate.getMinutes() + 1).padStart(2, "0");
+  const seconds = String(currentDate.getSeconds()).padStart(2, "0");
+  return `${hours}:${minutes}:${seconds}`;
 }

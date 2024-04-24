@@ -75,16 +75,14 @@ const recordModel = ref(Array.isArray(m) ? m : [m]);
       模型配置
     </el-button>
   </div>
-  <createLLM v-model="aiBoxShow"></createLLM>
-  <Teleport to="body">
-    <configLLM v-model="aiConfBoxShow" />
-    <!-- <configVue
-      v-if="aiBoxShow && aiBox !== 'record'"
-      v-key="aiBox"
-      :data="aiBox"
-      v-model="aiBoxShow"
-    /> -->
-  </Teleport>
+
+  <configLLM v-model="aiConfBoxShow" />
+  <selectLLM
+    v-if="aiBoxShow && aiBox !== 'record'"
+    v-key="aiBox"
+    :data="aiBox"
+    v-model="aiBoxShow"
+  ></selectLLM>
 </template>
 
 <style lang="scss">

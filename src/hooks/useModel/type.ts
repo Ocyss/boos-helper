@@ -26,10 +26,11 @@ export abstract class llm<C = any, T extends Array<any> = Array<any>> {
   }
 
   abstract chat(message: string): Promise<string>;
-  abstract message(
-    data: object,
-    fn?: (s: string) => void
-  ): Promise<messageReps>;
+  abstract message({}: {
+    data: object;
+    onPrompt?: (s: string) => void;
+    onStream?: (s: string) => void;
+  }): Promise<messageReps>;
 }
 
 export type messageReps<T = string> = {

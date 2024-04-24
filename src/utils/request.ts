@@ -1,4 +1,5 @@
 import { GM_xmlhttpRequest, GmXhrRequest } from "$";
+import { loader } from ".";
 
 export class RequestError extends Error {
   constructor(message: string) {
@@ -24,6 +25,7 @@ export type RequestArgs<TContext, TResponseType extends ResponseType> = Partial<
     onStream: OnStream;
   }
 >;
+let axiosLoad: () => void;
 
 export function request<TContext, TResponseType extends ResponseType = "json">({
   method = "POST",
@@ -43,19 +45,25 @@ export function request<TContext, TResponseType extends ResponseType = "json">({
       timeout,
       responseType,
       ontimeout() {
+        if (axiosLoad) axiosLoad();
         reject(new RequestError(`超时 ${Math.round(timeout / 1000)}s`));
       },
       onabort() {
+        if (axiosLoad) axiosLoad();
         reject(new RequestError("用户中止"));
       },
       onerror(e) {
         const msg = `${e.responseText} | ${e.error}`;
+        if (axiosLoad) axiosLoad();
         reject(new RequestError(msg));
       },
       onloadend(e) {
+        if (axiosLoad) axiosLoad();
         resolve(e.response);
       },
       onloadstart(e) {
+        axiosLoad = loader({ ms: timeout, color: "#F79E63" });
+
         if (responseType === "stream") {
           const reader = (e.response as ReadableStream<Uint8Array>).getReader();
           onStream(reader);

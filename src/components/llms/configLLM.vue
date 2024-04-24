@@ -1,6 +1,6 @@
 <script lang="ts" setup>
 import { ref, toRaw } from "vue";
-import { useModel, type modelData } from "@/hooks/useModel";
+import { useModel, type modelData, llmsIcons } from "@/hooks/useModel";
 import { ElMessage } from "element-plus";
 import deepmerge from "@/utils/deepmerge";
 const show = defineModel<boolean>({ required: true });
@@ -56,7 +56,20 @@ function create(d: modelData) {
     :z-index="20"
   >
     <el-table :data="modelData" style="width: 100%" table-layout="auto">
-      <el-table-column prop="name" label="名称" />
+      <el-table-column label="模型">
+        <template #default="scope">
+          <div style="align-items: center; display: flex">
+            <el-avatar
+              :size="30"
+              :style="{ '--el-avatar-bg-color': scope.row.color }"
+            >
+              <el-icon v-html="llmsIcons[scope.row.data.mode]" />
+            </el-avatar>
+
+            <span style="margin-left: 8px">{{ scope.row.name }}</span>
+          </div>
+        </template>
+      </el-table-column>
       <el-table-column prop="data.mode" label="类型" />
       <el-table-column prop="data.url" label="url" />
       <el-table-column label="管理">

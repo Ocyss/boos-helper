@@ -25,6 +25,8 @@ function removeAd() {
   elmGetter.rm(".side-bar-box");
   // 搜索栏登录框
   elmGetter.rm(".go-login-btn");
+  // 底部页脚
+  // elmGetter.rm("#footer-wrapper");
 }
 
 export async function run() {
