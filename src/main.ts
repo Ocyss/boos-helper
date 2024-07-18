@@ -131,7 +131,7 @@ declare global {
     };
     _PAGE: {
       isGeekChat: boolean;
-      zp_token: string;
+      // zp_token: string; 7.18 寄！
       userId: number;
       identity: number;
       encryptUserId: string;
@@ -156,6 +156,9 @@ declare global {
       complete: boolean;
       multiExpect: boolean;
       uid: number;
+    };
+    Cookie: {
+      get(key: string): string;
     };
     parseGptJson: (json: any) => any;
   }

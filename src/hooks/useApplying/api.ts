@@ -37,7 +37,7 @@ export async function sendPublishReq(
     jobId: data.encryptJobId,
     lid: data.lid,
   };
-  const token = unsafeWindow?._PAGE?.zp_token;
+  const token = unsafeWindow?.Cookie.get("bst");
   if (!token) {
     ElMessage.error("没有获取到token,请刷新重试");
     throw new PublishError("没有获取到token");
@@ -79,7 +79,7 @@ export async function requestBossData(
   }
   const url = "https://www.zhipin.com/wapi/zpchat/geek/getBossData";
   // userInfo.value?.token 不相等！
-  const token = unsafeWindow?._PAGE?.zp_token;
+  const token = unsafeWindow?.Cookie.get("bst");
   if (!token) {
     ElMessage.error("没有获取到token,请刷新重试");
     throw new GreetError("没有获取到token");
