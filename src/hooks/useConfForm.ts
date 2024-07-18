@@ -49,6 +49,10 @@ export const formInfoData: FormInfoData = {
     label: "猎头过滤",
     help: "Boss中有一些猎头发布的工作，但是一般而言这种工作不太行，点击可以过滤猎头发布的职位",
   },
+  friendStatus: {
+    label: "好友过滤(未测试)",
+    help: "通过检测card中的friendStatus字段来筛选是否回复，理论上能过滤的同boos不同岗位",
+  },
   notification: {
     label: "发送通知",
     help: "可以在网站管理中打开通知权限,当停止时会自动发送桌面端通知提醒。",
@@ -267,6 +271,9 @@ export const defaultFormData: FormData = {
     value: false,
   },
   activityFilter: {
+    value: false,
+  },
+  friendStatus: {
     value: false,
   },
   goldHunterFilter: {

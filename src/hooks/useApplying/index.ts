@@ -30,12 +30,14 @@ export function createHandle(): {
   if (formData.companySizeRange.enable) h.companySizeRange(handles);
   // 猎头过滤
   if (formData.goldHunterFilter.value) h.goldHunterFilter(handles);
+  // 好友状态过滤
+  if (formData.friendStatus.value) h.jobFriendStatus(handlesRes);
   // 工作内容筛选
   if (formData.jobContent.enable) h.jobContent(handlesRes);
-  // AI过滤
-  if (formData.aiFiltering.enable) h.aiFiltering(handlesRes);
   // 活跃度过滤
   if (formData.activityFilter.value) h.activityFilter(handlesRes);
+  // AI过滤
+  if (formData.aiFiltering.enable) h.aiFiltering(handlesRes);
   // 自定义招呼语
   if (formData.customGreeting.enable && !formData.aiGreeting.enable)
     h.customGreeting(handlesAfter);

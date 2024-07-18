@@ -23,6 +23,7 @@ export interface FormData {
   customGreeting: FormDataInput;
   greetingVariable: FormDataCheckbox;
   activityFilter: FormDataCheckbox;
+  friendStatus: FormDataCheckbox;
   goldHunterFilter: FormDataCheckbox;
   notification: FormDataCheckbox;
   aiGreeting: FormDataAi;

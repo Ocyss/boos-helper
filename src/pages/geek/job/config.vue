@@ -95,6 +95,11 @@ const { deliverLock } = useCommon();
             v-model="formData.goldHunterFilter.value"
             border
           />
+          <el-checkbox
+            v-bind="formInfoData.friendStatus"
+            v-model="formData.friendStatus.value"
+            border
+          />
         </div>
       </el-collapse-item>
       <el-collapse-item title="延迟配置" name="2">

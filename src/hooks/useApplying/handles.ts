@@ -17,6 +17,7 @@ import {
   ActivityError,
   GreetError,
   GoldHunterError,
+  FriendStatusError,
 } from "@/types/deliverError";
 
 import { useStore } from "../useStore";
@@ -155,6 +156,14 @@ export const jobContent: handleCFn = (h) =>
     } catch (e: any) {
       todayData.jobContent++;
       throw new JobDescriptionError(e.message);
+    }
+  });
+
+export const jobFriendStatus: handleCFn = (h) =>
+  h.push(async (_, { card }) => {
+    const content = card?.friendStatus;
+    if (content && content != 0) {
+      throw new FriendStatusError("已经是好友了");
     }
   });
 export const aiFiltering: handleCFn = (h) => {
