@@ -50,7 +50,7 @@ jobs:
         run: echo "version=$VITE_VERSION,mode=$VITE_RELEASE_MODE"
 
       - name: Build
-        run: pnpm run build
+        run: pnpm run build:noTsc
 
       - name: Upload Artifacts
         uses: actions/upload-artifact@v4

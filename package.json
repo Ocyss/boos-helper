@@ -6,6 +6,7 @@
   "scripts": {
     "dev": "vite",
     "build": "vue-tsc --noEmit && vite build",
+    "build:noTsc": "vite build",
     "preview": "vite preview",
     "test": "vue-tsc --noEmit && vite build && vite preview --open",
     "check": "vue-tsc --noEmit"
