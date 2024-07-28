@@ -1,0 +1,17 @@
+{
+  "version": "0.2.2",
+  "notification": [
+    {
+      "key": "",
+      "type": "notification",
+      "data": {
+        "title": "点我反馈",
+        "message": "来自云端的通知测试，脚本完全开源无后台请放心，本通知为被动触发，请求固定配置文件触发",
+        "type": "info",
+        "duration": 9999999999,
+        "url": "https://gai06vrtbc0.feishu.cn/share/base/form/shrcnmEq2fxH9hM44hqEnoeaj8g"
+      }
+    }
+  ],
+  "feedback": "https://gai06vrtbc0.feishu.cn/share/base/form/shrcnmEq2fxH9hM44hqEnoeaj8g"
+}

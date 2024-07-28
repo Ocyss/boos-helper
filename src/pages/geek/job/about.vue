@@ -44,6 +44,15 @@ import { ElLink, ElImage } from "element-plus";
         </div>
       </div>
     </div>
+    <div style="margin-top: 10px">
+      本插件完全免费开源且无广告, 如果有问题请反馈
+      <br />
+      Github开源地址:
+      <el-link>https://github.com/ocyss/boos-helper</el-link>
+      <br />
+      greasyfork地址:
+      <el-link>https://greasyfork.org/zh-CN/scripts/491340</el-link>
+    </div>
     <div
       style="width: 60%; margin-top: 20px; user-select: text; color: #292929"
     >
@@ -54,7 +63,7 @@ import { ElLink, ElImage } from "element-plus";
   <el-image
     help="可能并没什么用,只是不让页面空荡荡"
     style="width: 200px; height: 200px"
-    src="https://s21.ax1x.com/2024/07/18/pkoI6bt.png"
+    src="https://qiu-config.oss-cn-beijing.aliyuncs.com/reward.png"
     fit="cover"
     loading="lazy"
   />

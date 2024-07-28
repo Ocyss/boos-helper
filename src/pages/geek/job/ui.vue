@@ -14,6 +14,9 @@ import { useDeliver } from "./hooks/useDeliver";
 import { useJobList } from "./hooks/useJobList";
 import { usePager } from "./hooks/usePager";
 import elmGetter from "@/utils/elmGetter";
+import { netConf } from "@/utils/conf";
+import { GM_getValue, GM_setValue } from "$";
+
 const { initPager } = usePager();
 const { initJobList } = useJobList();
 const { x, y } = useMouse({ type: "client" });
@@ -86,11 +89,26 @@ onMounted(() => {
       elmGetter.rm(".job-search-scan", searchEl);
     });
 });
+
+function tagOpen(url: string) {
+  window.open(url);
+}
+const VITE_VERSION = import.meta.env.VITE_VERSION;
+const now = new Date().getTime();
 </script>
 
 <template>
   <h2>
     Boos-Helper
+    <el-badge
+      :is-dot="(netConf?.version ?? '6') > VITE_VERSION"
+      :offset="[-2, 7]"
+      @click="tagOpen('https://greasyfork.org/zh-CN/scripts/491340')"
+      style="cursor: pointer"
+    >
+      <el-tag type="primary">v{{ VITE_VERSION }}</el-tag>
+    </el-badge>
+
     <span v-if="total > 0">{{ current + 1 }}/{{ total }}</span>
   </h2>
   <div
@@ -102,6 +120,20 @@ onMounted(() => {
     "
     :style="boxStyles"
   />
+  <div class="netAlerts" v-if="netConf && netConf.notification">
+    <template
+      v-for="item in netConf.notification.filter(
+        (item) => item.type === 'alert'
+      )"
+      :key="item.key ?? item.data.title"
+    >
+      <el-alert
+        v-if="now > GM_getValue(`netConf-${item.key}`, 0)"
+        v-bind="item.data"
+        @close="GM_setValue(`netConf-${item.key}`, now + 259200000)"
+      />
+    </template>
+  </div>
   <el-tooltip :visible="helpVisible && !isOutside" :virtual-ref="triggerRef">
     <template #content>
       <div :style="`width: auto;max-width:${helpElWidth}px;font-size:17px;`">
@@ -129,6 +161,17 @@ onMounted(() => {
       help="项目是写不完美的,但总要去追求完美"
     >
       <aboutVue></aboutVue>
+    </el-tab-pane>
+    <el-tab-pane v-if="netConf && netConf.feedback">
+      <template #label>
+        <el-link
+          size="large"
+          @click.stop="tagOpen(netConf.feedback)"
+          style="height: 100%"
+        >
+          反馈
+        </el-link>
+      </template>
     </el-tab-pane>
     <el-tab-pane>
       <template #label>
