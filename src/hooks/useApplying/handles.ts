@@ -4,10 +4,9 @@ import { useConfFormData } from "../useConfForm";
 import { ElMessage } from "element-plus";
 import { Message } from "../useWebSocket";
 import { miTem } from "mitem";
-import { llmsIcons, useModel } from "../useModel";
+import { useModel } from "../useModel";
 import { requestBossData } from "./api";
 import {
-  RepeatError,
   JobTitleError,
   CompanyNameError,
   SalaryError,
@@ -20,20 +19,19 @@ import {
   FriendStatusError,
 } from "@/types/deliverError";
 
-import { useStore } from "../useStore";
-import { unsafeWindow } from "$";
+import { useUserId } from "../useStore";
+
 import { logData } from "../useLog";
-import { logger } from "@/utils/logger";
+
 import { parseGptJson } from "@/utils/parse";
 import { rangeMatch } from "./utils";
 import { useChat } from "../useChat";
-import { ChatMessage } from "../useChat/type";
+
 import { getCurDay, getCurTime } from "@/utils";
 const { chatInputInit, chatMessages } = useChat();
 const { modelData, getGpt } = useModel();
 const { formData } = useConfFormData();
 const { todayData } = useStatistics();
-const { userInfo } = useStore();
 
 export const communicated: handleCFn = (h) => {
   //   h.push(async ({ data }) => {
@@ -224,10 +222,7 @@ export const activityFilter: handleCFn = (h) =>
 
 export const customGreeting: handleCFn = (h) => {
   const template = miTem.compile(formData.customGreeting.value);
-  const uid =
-    userInfo.value?.userId ||
-    unsafeWindow?._PAGE?.uid ||
-    unsafeWindow?._PAGE?.userId;
+  const uid = useUserId();
   if (!uid) {
     ElMessage.error("没有获取到uid,请刷新重试");
     throw new GreetError("没有获取到uid");
@@ -272,10 +267,7 @@ export const aiGreeting: handleCFn = (h) => {
     return;
   }
   const gpt = getGpt(model, formData.aiGreeting.prompt);
-  const uid =
-    userInfo.value?.userId ||
-    unsafeWindow?._PAGE?.uid ||
-    unsafeWindow?._PAGE?.userId;
+  const uid = useUserId();
   if (!uid) {
     ElMessage.error("没有获取到uid,请刷新重试");
     throw new GreetError("没有获取到uid");

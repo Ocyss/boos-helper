@@ -27,9 +27,9 @@ ElMessage("BoosHelper挂载成功!");
 const { storeInit } = useStore();
 const confBox = ref(false);
 const confs = {
-  store: { name: "存储配置", component: storeVue },
-  user: { name: "账号配置", component: userVue },
-  log: { name: "日志配置", component: logVue },
+  store: { name: "存储配置", component: storeVue, disabled: false },
+  user: { name: "账号配置", component: userVue, disabled: true },
+  log: { name: "日志配置", component: logVue, disabled: false },
 };
 const confKey = ref<keyof typeof confs>("store");
 const dark = ref(GM_getValue("theme-dark", false));
@@ -86,6 +86,7 @@ onMounted(async () => {
             confKey = k;
             confBox = true;
           "
+          :disabled="v.disabled"
         >
           {{ v.name }}
         </el-dropdown-item>

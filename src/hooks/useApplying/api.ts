@@ -5,6 +5,7 @@ import { ElMessage } from "element-plus";
 import { unsafeWindow } from "$";
 
 const { userInfo } = useStore();
+
 export function requestCard(params: { securityId: string; lid: string }) {
   return axios.get<{
     code: number;

@@ -15,7 +15,7 @@ import {
 import { FormData, Statistics } from "@/types/formData";
 import { useStatistics } from "@/hooks/useStatistics";
 import { computed, reactive, ref, toRaw } from "vue";
-import { useStore } from "@/hooks/useStore";
+import { useStore, useUserId } from "@/hooks/useStore";
 import { logger } from "@/utils/logger";
 const confUserKey = "conf-user";
 const { formData } = useConfFormData();
@@ -46,6 +46,7 @@ const handleCurrentChange = (val: Data | undefined) => {
 };
 
 async function create(flag = true) {
+  logger.debug("开始创建账户");
   try {
     const list = await new Promise<any[]>((resolve, reject) => {
       GM_cookie.list({}, (cookies, error) => {
@@ -56,10 +57,11 @@ async function create(flag = true) {
         }
       });
     });
+    logger.debug(list);
 
-    let uid: string | number | undefined = userInfo.value?.userId;
+    let uid: number | string = useUserId();
     if (!uid) {
-      return;
+      throw new Error("找不到uid");
     }
     uid = String(uid);
     data[uid] = {
