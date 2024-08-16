@@ -328,10 +328,46 @@ function confReload() {
   logger.debug("formData已重置");
 }
 function confExport() {
-  alert("请你吃大饼啦...");
+  const data = deepmerge<FormData>(defaultFormData, GM_getValue(formDataKey, {}));
+
+  const blob = new Blob([JSON.stringify(data)], {
+      type: 'application/json',
+  });
+  const link = document.createElement('a');
+  link.href = URL.createObjectURL(blob);
+  link.download = '打招呼配置.json';
+  link.click();
 }
 function confImport() {
-  alert("请你吃大饼啦...");
+  const fileInput = document.createElement("input");
+  fileInput.type = "file";
+
+  fileInput.addEventListener("change", function (e) {
+    const file = (e!.target as HTMLInputElement)!.files?.[0];
+    if (!file || !file.name.endsWith(".json")) {
+      return alert("不是 JSON 文件");
+    }
+
+    const reader = new FileReader();
+    reader.onload = function (e) {
+      try {
+        const jsonData = JSON.parse(e!.target!.result as string);
+
+        let type = Object.prototype.toString.call(jsonData).slice(8, -1);
+        if (!["Array", "Object"].includes(type)) {
+          return alert("内容非合法 JSON");
+        }
+
+        GM_setValue(formDataKey, jsonData);
+        deepmerge(formData, jsonData, { clone: false });
+      } catch (error) {
+        return alert("内容非合法 JSON");
+      }
+    };
+    reader.readAsText(file);
+  });
+
+  fileInput.click();
 }
 function confDelete() {
   deepmerge(formData, defaultFormData, { clone: false });
