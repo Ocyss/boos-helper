@@ -1,29 +1,29 @@
+## 免责声明
+
+本项目仅供学习交流，禁止用于商业用途
+
+使用该脚本有一定风险(如黑号,封号,权重降低等)，本项目不承担任何责任
 
 # 项目介绍
 
-Boos直聘助手, 皆在减少投递简历的麻烦, 和提高投递简历的效率,技术栈使用VIte + Vue3 + element-plus, 代码由 Vite 打包无加密混淆最小化,开源在 Github 欢迎前来Pr
+Boos直聘助手, 皆在减少投递简历的麻烦, 和提高投递简历的效率,技术栈使用VIte + Vue3 + element-plus, 代码由 Vite 打包无加密混淆最小化, 开源在 Github 欢迎前来Pr
 
-[1+.x.x] 为正式版本,同步github的release版本,不保证稳定性只是功能相对完善
+## 相关链接
 
-[202x.x.x.alpha]/[0.x.x] 为测试版本,同步github的master分支,自动构建
+Github开源地址: <https://github.com/ocyss/boos-helper>
 
-> 24.04.11 后续会加上各个版本的更新内容，并且进行认真测试。最近在优化过程中，不慎将GPT内容发送给了老板而导致了严重的尴尬局面。以此为戒
-> 24.04.15 为了项目简洁，以后版本更新将不会向下兼任，如果有配置文件的格式更改会提示，需要用户自己重新配置
+greasyfork地址: <https://greasyfork.org/zh-CN/scripts/491340>
 
-## 项目预览
+飞书反馈问卷(匿名): <https://langgptai.feishu.cn/wiki/RXdbwRyASiShtDky381ciwFEnpe>
 
-[![卡片状态](https://s21.ax1x.com/2024/04/14/pFvtxGF.png)](https://imgse.com/i/pFvtxGF)
-[![账户配置](https://s21.ax1x.com/2024/04/14/pFvtvPU.png)](https://imgse.com/i/pFvtvPU)
-[![统计界面](https://s21.ax1x.com/2024/04/02/pFHa3ZD.png)](https://imgse.com/i/pFHa3ZD)
-[![配置界面](https://s21.ax1x.com/2024/04/02/pFHa8de.png)](https://imgse.com/i/pFHa8de)
-[![日志界面](https://s21.ax1x.com/2024/04/02/pFHalqO.png)](https://imgse.com/i/pFHalqO)
+飞书问卷结果: <https://gai06vrtbc0.feishu.cn/share/base/view/shrcnrg8D0cbLQc89d7Jj7AZgMc>
+
+飞书交流群: <https://applink.feishu.cn/client/chat/chatter/add_by_link?link_token=0f0n9f29-41bb-4bc4-9deb-68b518a3e356>
 
 ### 问题解答/已知问题
 
-- GPT给出非JSON格式的消息，导致报错
-  - 花钱用GPT4，或者使用支持json的模型，等待下次更新
-- 暗黑模式不完整啊，有些白的突然出来，要瞎掉了
-  - 找boos反馈去，让他们适配暗黑，或者直接Pr，我技术菜手动适配太累了
+- 暗黑模式不完整，有些地方还是白的
+  - 最好还是让官方去适配，一个个适配有点麻烦，后续会更加专注默认主题、删除暗黑模式
 
 ## 未来计划
 
@@ -48,17 +48,17 @@ Boos直聘助手, 皆在减少投递简历的麻烦, 和提高投递简历的效
   - [ ] 聊天屏蔽已读消息
   - [ ] boos消息弹窗
 
-## 免责声明
 
-本项目仅供学习交流，禁止用于商业用途
 
-使用该脚本有一定风险(如黑号,封号,权重降低等)，本项目不承担任何责任
 
-## 相关链接
+## 项目预览
 
-Github开源地址: <https://github.com/ocyss/boos-helper>
+[![卡片状态](https://s21.ax1x.com/2024/04/14/pFvtxGF.png)](https://imgse.com/i/pFvtxGF)
+[![账户配置](https://s21.ax1x.com/2024/04/14/pFvtvPU.png)](https://imgse.com/i/pFvtvPU)
+[![统计界面](https://s21.ax1x.com/2024/04/02/pFHa3ZD.png)](https://imgse.com/i/pFHa3ZD)
+[![配置界面](https://s21.ax1x.com/2024/04/02/pFHa8de.png)](https://imgse.com/i/pFHa8de)
+[![日志界面](https://s21.ax1x.com/2024/04/02/pFHalqO.png)](https://imgse.com/i/pFHalqO)
 
-greasyfork地址: <https://greasyfork.org/zh-CN/scripts/491340>
 
 # 鸣谢
 

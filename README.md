@@ -1,15 +1,26 @@
-# 免责声明
-
-本项目仅供学习交流，禁止用于商业用途
-
-使用该脚本有一定风险(如黑号,封号,权重降低等)，本项目不承担任何责任
+> [!CAUTION] 免责声明
+> 本项目仅供学习交流，禁止用于商业用途
+> 
+> 使用该脚本有一定风险(如黑号,封号,权重降低等)，本项目不承担任何责任
 
 ## 项目介绍
 
 Boos直聘助手, 皆在减少投递简历的麻烦, 和提高投递简历的效率,技术栈使用VIte + Vue3 + element-plus, 代码由 Vite 打包无加密混淆最小化,开源在 Github 欢迎前来Pr
 
 > 本项目处于积极维护状态
-> 24.04.11 后续会加上各个版本的更新内容，并且进行认真测试。最近在优化过程中，不慎将GPT内容发送给了老板而导致了严重的尴尬局面。以此为戒
+
+## 相关链接
+
+Github开源地址: <https://github.com/ocyss/boos-helper>
+
+greasyfork地址: <https://greasyfork.org/zh-CN/scripts/491340>
+
+飞书反馈问卷(匿名): <https://langgptai.feishu.cn/wiki/RXdbwRyASiShtDky381ciwFEnpe>
+
+飞书问卷结果: <https://gai06vrtbc0.feishu.cn/share/base/view/shrcnrg8D0cbLQc89d7Jj7AZgMc>
+
+飞书交流群: <https://applink.feishu.cn/client/chat/chatter/add_by_link?link_token=0f0n9f29-41bb-4bc4-9deb-68b518a3e356>
+
 
 ## 项目预览
 
@@ -18,14 +29,6 @@ Boos直聘助手, 皆在减少投递简历的麻烦, 和提高投递简历的效
 [![统计界面](docs/img/shot_2024-04-02_22-25-25.png)](docs/img/shot_2024-04-02_22-25-25.png)
 [![配置界面](docs/img/shot_2024-04-02_22-26-54.png)](docs/img/shot_2024-04-02_22-26-54.png)
 [![日志界面](docs/img/shot_2024-04-02_22-32-25.png)](docs/img/shot_2024-04-02_22-32-25.png)
-
-## 版本说明
-
-[1+.x.x] 为正式版本,同步github的release版本,不保证稳定性只是功能相对完善
-
-[202x.x.x.alpha]/[0.x.x] 为测试版本,同步github的master分支,自动构建
-
-[README.user.md](README.user.md) 为用户使用说明，重要变更此处不再说明
 
 ## 未来计划
 
@@ -50,15 +53,8 @@ Boos直聘助手, 皆在减少投递简历的麻烦, 和提高投递简历的效
   - [ ] 聊天屏蔽已读消息
   - [ ] boos消息弹窗
 
-## 相关链接
-
-Github开源地址: <https://github.com/ocyss/boos-helper>
-
-greasyfork地址: <https://greasyfork.org/zh-CN/scripts/491340>
 
 ## 参与贡献
-
-> 本项目写的一托,包括文件名,变量名,不完整的注释,解释不到位的help...,如果有更好的命名,功能解释,文件结构优化方案,请直接提交pr,让你的名字出现到贡献者名单中。
 
 1. Fork 本仓库并克隆到本地。
 2. 在新分支上进行您的更改：`git checkout -b 您的分支名称`
@@ -94,7 +90,7 @@ greasyfork地址: <https://greasyfork.org/zh-CN/scripts/491340>
 
 ## 最后
 
-嗯...
+嗯... 
 
 ## Star 趋势
 
