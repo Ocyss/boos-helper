@@ -67,9 +67,8 @@ const info: llmInfo<openaiLLMConf> = {
         type: "switch",
         desc: "仅支持较新的模型,会强制gpt返回json格式,效果好一点,能有效减少响应解析错误",
       },
-
       stream: {
-        value: true,
+        value: false,
         type: "switch",
         desc: desc.stream,
       },
@@ -210,7 +209,8 @@ class gpt extends llm<openaiLLMConf> {
         "Content-Type": "application/json",
       },
       timeout: this.conf.other.timeout,
-      responseType: this.conf.advanced.stream ? "stream" : "json",
+      // TODO: 暂时禁用 stream 输出
+      responseType: false && this.conf.advanced.stream ? "stream" : "json",
       onStream,
       isFetch: true,
     });
