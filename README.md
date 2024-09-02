@@ -15,7 +15,7 @@ Github开源地址: <https://github.com/ocyss/boos-helper>
 
 greasyfork地址: <https://greasyfork.org/zh-CN/scripts/491340>
 
-飞书反馈问卷(匿名): <https://langgptai.feishu.cn/wiki/RXdbwRyASiShtDky381ciwFEnpe>
+飞书反馈问卷(匿名): <https://gai06vrtbc0.feishu.cn/share/base/form/shrcnmEq2fxH9hM44hqEnoeaj8g>
 
 飞书问卷结果: <https://gai06vrtbc0.feishu.cn/share/base/view/shrcnrg8D0cbLQc89d7Jj7AZgMc>
 
