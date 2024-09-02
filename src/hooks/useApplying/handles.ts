@@ -104,7 +104,11 @@ export const salaryRange: handleCFn = (h) =>
     try {
       const text = data.salaryDesc;
 
-      const [v, err] = rangeMatch(text, formData.salaryRange.value);
+      const [v, err] = rangeMatch(
+        text,
+        formData.salaryRange.value,
+        "intersection"
+      );
       if (!v)
         throw new SalaryError(
           `不匹配的薪资范围 [${err}],预期: ${formData.salaryRange.value}`

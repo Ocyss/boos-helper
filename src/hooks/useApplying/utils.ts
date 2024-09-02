@@ -2,7 +2,7 @@
 export function rangeMatch(
   rangeStr: string,
   input?: string,
-  by = 1
+  mode: "intersection" | "subset" = "subset" // 交集、子集，默认: 子集
 ): [boolean, string] {
   if (!rangeStr) {
     return [false, "无内容"];
@@ -15,8 +15,8 @@ export function rangeMatch(
     err = match[0];
   }
   if (match && input) {
-    let start = parseInt(match[1]) * by;
-    let end = parseInt(match[2] || match[1]) * by;
+    let start = parseInt(match[1]);
+    let end = parseInt(match[2] || match[1]);
 
     // 如果输入只有一个数字的情况
     if (/^\d+$/.test(input)) {
@@ -32,8 +32,13 @@ export function rangeMatch(
       let inputStart = parseInt(inputMatch[1]);
       let inputEnd = parseInt(inputMatch[2] || inputMatch[1]);
       return [
-        (start >= inputStart && start <= inputEnd) ||
-          (end >= inputStart && end <= inputEnd),
+        // start-end: 15-29 用户输入: inputStart-inputEnd 16-20
+        mode == "subset"
+          ? // 子集
+            (start >= inputStart && start <= inputEnd) ||
+            (end >= inputStart && end <= inputEnd)
+          : // 交集
+            !(end < inputStart || inputEnd < start),
         err,
       ];
     }
