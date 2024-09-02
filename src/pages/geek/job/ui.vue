@@ -145,8 +145,12 @@ const now = new Date().getTime();
     <el-tab-pane label="统计" help="失败是成功她妈">
       <statisticsVue></statisticsVue>
     </el-tab-pane>
-    <el-tab-pane label="筛选" ref="searchRef" help="可能真的需要?帮助?" />
-    <el-tab-pane label="配置" help="建议全文背诵">
+    <el-tab-pane
+      label="搜索"
+      ref="searchRef"
+      help="boos直聘原搜索, 可能出现空白bug"
+    />
+    <el-tab-pane label="筛选" help="好好看，好好学">
       <configVue></configVue>
     </el-tab-pane>
     <el-tab-pane label="AI" help="AI时代，脚本怎么能落伍!">

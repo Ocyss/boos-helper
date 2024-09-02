@@ -81,7 +81,10 @@ const { deliverLock } = useCommon();
             v-bind="formInfoData.customGreeting"
             v-model:enable="formData.customGreeting.enable"
           >
-            <el-input v-model.lazy="formData.customGreeting.value" />
+            <el-input
+              type="textarea"
+              v-model.lazy="formData.customGreeting.value"
+            />
           </form-item>
         </el-space>
         <div>
