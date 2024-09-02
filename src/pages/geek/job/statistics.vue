@@ -83,9 +83,9 @@ async function startBatch() {
       next();
       jobMap.actions.clear();
     }
-  } catch (e) {
+  } catch (e: any) {
     logger.error("获取失败", e);
-    ElMessage.error("获取失败!");
+    ElMessage.error("获取失败!" + e?.message);
   } finally {
     logger.debug(log.data);
     ElMessage.info("投递结束");

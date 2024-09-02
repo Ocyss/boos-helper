@@ -2,7 +2,6 @@ import { ElMessage, ElMessageBox } from "element-plus";
 import "element-plus/dist/index.css";
 import "element-plus/theme-chalk/dark/css-vars.css";
 import "./main.scss";
-import * as url from "url";
 import { logger } from "@/utils/logger";
 import App from "./App.vue";
 import { createApp, ref, watch } from "vue";
