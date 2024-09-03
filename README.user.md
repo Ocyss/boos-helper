@@ -18,7 +18,7 @@ greasyfork地址: <https://greasyfork.org/zh-CN/scripts/491340>
 
 飞书问卷结果: <https://gai06vrtbc0.feishu.cn/share/base/view/shrcnrg8D0cbLQc89d7Jj7AZgMc>
 
-飞书交流群: <https://applink.feishu.cn/client/chat/chatter/add_by_link?link_token=0f0n9f29-41bb-4bc4-9deb-68b518a3e356>
+飞书交流群: <https://applink.feishu.cn/client/chat/chatter/add_by_link?link_token=410v5499-7193-411f-8258-94ae0cac4fc0>
 
 ### 问题解答/已知问题
 
