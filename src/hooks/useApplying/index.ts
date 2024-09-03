@@ -34,6 +34,8 @@ export function createHandle(): {
   if (formData.friendStatus.value) h.jobFriendStatus(handlesRes);
   // 工作内容筛选
   if (formData.jobContent.enable) h.jobContent(handlesRes);
+  // Hr职位筛选
+  if (formData.hrPosition.enable) h.hrPosition(handlesRes);
   // 活跃度过滤
   if (formData.activityFilter.value) h.activityFilter(handlesRes);
   // AI过滤

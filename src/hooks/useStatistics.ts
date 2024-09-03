@@ -14,6 +14,7 @@ const todayData = reactiveComputed<Statistics>(() => {
     company: 0,
     jobTitle: 0,
     jobContent: 0,
+    hrPosition: 0,
     salaryRange: 0,
     companySizeRange: 0,
     activityFilter: 0,

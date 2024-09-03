@@ -7,6 +7,7 @@ export interface Statistics {
   company: number;
   jobTitle: number;
   jobContent: number;
+  hrPosition: number;
   salaryRange: number;
   companySizeRange: number;
   activityFilter: number;
@@ -18,6 +19,7 @@ export interface FormData {
   company: FormDataSelect;
   jobTitle: FormDataSelect;
   jobContent: FormDataSelect;
+  hrPosition: FormDataSelect;
   salaryRange: FormDataInput;
   companySizeRange: FormDataInput;
   customGreeting: FormDataInput;

@@ -26,6 +26,10 @@ export const formInfoData: FormInfoData = {
     label: "工作内容",
     help: "会自动检测上文(不是,不,无需),下文(系统,工具),例子：[外包,上门,销售,驾照], 排除: '外包岗位', 不排除: '不是外包'|'销售系统'",
   },
+  hrPosition: {
+    label: "Hr职位",
+    help: "Hr职位一定包含/排除在集合中，精确匹配, 不在内置中可手动输入,能实现只向经理等进行投递，毕竟人事干的不一定是人事",
+  },
   salaryRange: {
     label: "薪资范围",
     help: "投递工作的薪资范围, 交集匹配, 使用-连接范围, 单位: k。例如：【12-20】",
@@ -246,7 +250,7 @@ export const defaultFormData: FormData = {
     enable: false,
   },
   jobTitle: {
-    include: false,
+    include: true,
     value: [],
     options: [],
     enable: false,
@@ -255,6 +259,12 @@ export const defaultFormData: FormData = {
     include: false,
     value: [],
     options: [],
+    enable: false,
+  },
+  hrPosition: {
+    include: true,
+    value: [],
+    options: ["经理", "主管", "法人", "人力资源主管", "hr", "招聘专员"],
     enable: false,
   },
   salaryRange: {

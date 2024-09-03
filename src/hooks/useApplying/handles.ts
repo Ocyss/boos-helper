@@ -17,6 +17,7 @@ import {
   GreetError,
   GoldHunterError,
   FriendStatusError,
+  HrPositionError,
 } from "@/types/deliverError";
 
 import { useUserId } from "../useStore";
@@ -158,6 +159,29 @@ export const jobContent: handleCFn = (h) =>
     } catch (e: any) {
       todayData.jobContent++;
       throw new JobDescriptionError(e.message);
+    }
+  });
+export const hrPosition: handleCFn = (h) =>
+  h.push(async (_, { card }) => {
+    try {
+      const content = card?.bossTitle;
+      for (const x of formData.hrPosition.value) {
+        if (!x) {
+          continue;
+        }
+        if (content && content.trim() === x) {
+          if (formData.hrPosition.include) {
+            return;
+          }
+          throw new HrPositionError(`Hr职位在黑名单中 ${content}`);
+        }
+      }
+      if (formData.hrPosition.include) {
+        throw new HrPositionError(`Hr职位不在白名单中: ${content}`);
+      }
+    } catch (e: any) {
+      todayData.hrPosition++;
+      throw new HrPositionError(e.message);
     }
   });
 

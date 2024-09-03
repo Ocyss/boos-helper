@@ -65,6 +65,17 @@ const { deliverLock } = useCommon();
             />
           </form-item>
           <form-item
+            v-bind="formInfoData.hrPosition"
+            v-model:enable="formData.hrPosition.enable"
+            v-model:include="formData.hrPosition.include"
+            :disabled="deliverLock"
+          >
+            <form-select
+              v-model:value="formData.hrPosition.value"
+              v-model:options="formData.hrPosition.options"
+            />
+          </form-item>
+          <form-item
             v-bind="formInfoData.salaryRange"
             v-model:enable="formData.salaryRange.enable"
           >
