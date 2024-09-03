@@ -116,6 +116,7 @@ const { deliverLock } = useCommon();
             v-model="formData.delay[key]"
             :min="1"
             :max="99999"
+            :disabled="item.disable"
           />
         </el-form-item>
       </el-collapse-item>

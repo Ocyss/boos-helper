@@ -1,4 +1,4 @@
-import { compile, reactive, toRaw, computed, ref } from "vue";
+import { compile, reactive, toRaw, computed, ref, CSSProperties } from "vue";
 
 import { GM_getValue, GM_listValues, GM_setValue } from "$";
 
@@ -8,6 +8,7 @@ import deepmerge from "@/utils/deepmerge";
 import { FormData, FormInfoData, Statistics } from "@/types/formData";
 import { getCurDay } from "@/utils";
 import { logger } from "@/utils/logger";
+import { Action, ElMessage, ElMessageBox } from "element-plus";
 
 export const formDataKey = "web-geek-job-FormData";
 export const todayKey = "web-geek-job-Today";
@@ -15,27 +16,27 @@ export const statisticsKey = "web-geek-job-Statistics";
 export const formInfoData: FormInfoData = {
   company: {
     label: "公司名",
-    help: "投递工作的公司名一定包含或不包含在当前集合中，模糊匹配，可用于只投或不投某个公司/子公司。",
+    help: "公司名排除或包含在集合中，模糊匹配，可用于只投或不投某个公司/子公司。",
   },
   jobTitle: {
-    label: "工作名",
-    help: "投递工作的岗位名一定包含或不包含在当前集合中，模糊匹配，可用于只投或不投某个岗位名。",
+    label: "岗位名",
+    help: "岗位名排除或包含在集合中，模糊匹配，可用于只投或不投某个岗位名。",
   },
   jobContent: {
     label: "工作内容",
-    help: "会自动检测上文(不是,不,无需等关键字),下文(系统,工具),例子：【外包,上门,销售,驾照】，如果写着是'不是外包''销售系统'那也不会被排除",
+    help: "会自动检测上文(不是,不,无需),下文(系统,工具),例子：[外包,上门,销售,驾照], 排除: '外包岗位', 不排除: '不是外包'|'销售系统'",
   },
   salaryRange: {
     label: "薪资范围",
-    help: "投递工作的薪资范围一定在当前区间中，一定是区间，使用-连接范围。例如：【12-20】",
+    help: "投递工作的薪资范围, 交集匹配, 使用-连接范围, 单位: k。例如：【12-20】",
   },
   companySizeRange: {
     label: "公司规模范围",
-    help: "投递工作的公司人员范围一定在当前区间中，一定是区间，使用-连接范围。例如：【500-20000000】",
+    help: "投递工作的公司规模, 子集匹配, 使用-连接范围。例如：【500-20000000】",
   },
   customGreeting: {
     label: "自定义招呼语",
-    help: "因为boss不支持将自定义的招呼语设置为默认招呼语。开启表示发送boss默认的招呼语后还会发送自定义招呼语, 使用&lt;br&gt;\\n 换行；例子：【你好\\n我...】",
+    help: "因为boss不支持将自定义的招呼语设置为默认招呼语。开启表示发送boss默认的招呼语后还会发送自定义招呼语",
   },
   greetingVariable: {
     label: "招呼语变量",
@@ -50,8 +51,8 @@ export const formInfoData: FormInfoData = {
     help: "Boss中有一些猎头发布的工作，但是一般而言这种工作不太行，点击可以过滤猎头发布的职位",
   },
   friendStatus: {
-    label: "好友过滤(未测试)",
-    help: "通过检测card中的friendStatus字段来筛选是否回复，理论上能过滤的同boos不同岗位",
+    label: "好友过滤(已聊)",
+    help: "判断和hr是否建立过聊天，理论上能过滤的同hr，但是不同岗位的工作",
   },
   notification: {
     label: "发送通知",
@@ -231,7 +232,8 @@ interface aiFiltering {
     },
     messageSending: {
       label: "消息发送",
-      help: "在发送消息前允许等待一定的时间让用户来修改或手动发送,默认值5s",
+      help: "暂未实现 ,在发送消息前允许等待一定的时间让用户来修改或手动发送,默认值5s",
+      disable: true,
     },
   },
 };
@@ -256,7 +258,7 @@ export const defaultFormData: FormData = {
     enable: false,
   },
   salaryRange: {
-    value: "",
+    value: "8-13",
     enable: false,
   },
   companySizeRange: {
@@ -268,19 +270,19 @@ export const defaultFormData: FormData = {
     enable: false,
   },
   greetingVariable: {
-    value: false,
+    value: true,
   },
   activityFilter: {
-    value: false,
+    value: true,
   },
   friendStatus: {
-    value: false,
+    value: true,
   },
   goldHunterFilter: {
     value: false,
   },
   notification: {
-    value: false,
+    value: true,
   },
   aiGreeting: {
     enable: false,
@@ -305,9 +307,36 @@ export const defaultFormData: FormData = {
   },
 };
 
-const formData: FormData = reactive(
-  deepmerge<FormData>(defaultFormData, GM_getValue(formDataKey, {}))
-);
+const formData: FormData = reactiveComputed(() => {
+  let val = GM_getValue(formDataKey);
+  if (!val) {
+    ElMessageBox.alert(
+      `1. 遇到bug即时反馈，不会使用请加群，使用前先好好了解项目，阅读每一个标签和帮助
+2. 帮助复选框能随时进入和退出帮助模式, 配置内容较多
+3. 配置了别忘了打钩启用上规则
+4. 包含/排除能点击切换模式
+
+本项目仅供学习交流，禁止用于商业用途
+使用该脚本有一定风险(如黑号,封号,权重降低等)，本项目不承担任何责任
+
+Github开源地址: https://github.com/ocyss/boos-helper
+greasyfork地址: https://greasyfork.org/zh-CN/scripts/491340
+飞书反馈问卷(匿名): https://gai06vrtbc0.feishu.cn/share/base/form/shrcnmEq2fxH9hM44hqEnoeaj8g
+飞书问卷结果: https://gai06vrtbc0.feishu.cn/share/base/view/shrcnrg8D0cbLQc89d7Jj7AZgMc
+飞书交流群: https://applink.feishu.cn/client/chat/chatter/add_by_link?link_token=410v5499-7193-411f-8258-94ae0cac4fc0`,
+      "注意事项",
+      {
+        autofocus: true,
+        confirmButtonText: "了解并同意!",
+        customStyle:
+          "--el-messagebox-width: unset; white-space: pre-wrap; width: unset;" as unknown as CSSProperties,
+      }
+    );
+    val = {};
+    GM_setValue(formDataKey, val);
+  }
+  return deepmerge<FormData>(defaultFormData, val);
+});
 
 watchThrottled(
   formData,
@@ -328,14 +357,17 @@ function confReload() {
   logger.debug("formData已重置");
 }
 function confExport() {
-  const data = deepmerge<FormData>(defaultFormData, GM_getValue(formDataKey, {}));
+  const data = deepmerge<FormData>(
+    defaultFormData,
+    GM_getValue(formDataKey, {})
+  );
 
   const blob = new Blob([JSON.stringify(data)], {
-      type: 'application/json',
+    type: "application/json",
   });
-  const link = document.createElement('a');
+  const link = document.createElement("a");
   link.href = URL.createObjectURL(blob);
-  link.download = '打招呼配置.json';
+  link.download = "打招呼配置.json";
   link.click();
 }
 function confImport() {

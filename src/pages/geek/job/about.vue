@@ -44,17 +44,49 @@ import { ElLink, ElImage } from "element-plus";
         </div>
       </div>
     </div>
-    <div style="margin-top: 10px">
+    <div help="记得来个Star或者好评吧" style="margin-top: 10px">
       本插件完全免费开源且无广告, 如果有问题请反馈
       <br />
       Github开源地址:
-      <el-link>https://github.com/ocyss/boos-helper</el-link>
+      <el-link href="https://github.com/ocyss/boos-helper" target="_blank">
+        https://github.com/ocyss/boos-helper
+      </el-link>
       <br />
       greasyfork地址:
-      <el-link>https://greasyfork.org/zh-CN/scripts/491340</el-link>
+      <el-link
+        href="https://greasyfork.org/zh-CN/scripts/491340"
+        target="_blank"
+      >
+        https://greasyfork.org/zh-CN/scripts/491340
+      </el-link>
+      <br />
+      <br />
+      <el-space wrap>
+        <el-link
+          href="https://gai06vrtbc0.feishu.cn/share/base/form/shrcnmEq2fxH9hM44hqEnoeaj8g"
+          target="_blank"
+        >
+          飞书反馈问卷(匿名)
+        </el-link>
+
+        <el-link
+          href="https://gai06vrtbc0.feishu.cn/share/base/view/shrcnrg8D0cbLQc89d7Jj7AZgMc"
+          target="_blank"
+        >
+          飞书问卷结果
+        </el-link>
+
+        <el-link
+          href="https://applink.feishu.cn/client/chat/chatter/add_by_link?link_token=410v5499-7193-411f-8258-94ae0cac4fc0"
+          target="_blank"
+        >
+          飞书交流群
+        </el-link>
+      </el-space>
     </div>
     <div
-      style="width: 60%; margin-top: 20px; user-select: text; color: #292929"
+      help=" "
+      style="width: 60%; margin-top: 20px; user-select: text; color: #fff"
     >
       除非不可抗因素，一般情况下不会停更，这个项目不止是帮助你们，也能帮到我
       <br />
@@ -65,6 +97,9 @@ import { ElLink, ElImage } from "element-plus";
     style="width: 200px; height: 200px"
     src="https://qiu-config.oss-cn-beijing.aliyuncs.com/reward.png"
     fit="cover"
+    :preview-src-list="[
+      'https://qiu-config.oss-cn-beijing.aliyuncs.com/reward.png',
+    ]"
     loading="lazy"
   />
 </template>

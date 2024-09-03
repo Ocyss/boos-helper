@@ -88,9 +88,11 @@ async function startBatch() {
     ElMessage.error(`获取失败! - ${e}`);
   } finally {
     logger.debug(log.data);
-    ElMessage.info("投递结束");
+
     if (formData.notification.value) {
       notification("投递结束");
+    } else {
+      ElMessage.info("投递结束");
     }
     deliverLock.value = false;
     deliverStop.value = false;

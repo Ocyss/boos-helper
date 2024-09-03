@@ -50,12 +50,14 @@ export type FormInfoAi = {
   help?: string;
   example: [string, prompt];
 };
+
 export interface FormDataSelect {
   include: boolean;
   value: string[];
   options: string[];
   enable: boolean;
 }
+
 export interface FormDataInput {
   value: string;
   enable: boolean;
@@ -81,5 +83,6 @@ type ConfInfoDelay = {
   [Key in keyof ConfDelay]: {
     label: string;
     help?: string;
+    disable?: boolean;
   };
 };

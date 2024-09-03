@@ -98,13 +98,13 @@ const now = new Date().getTime();
 </script>
 
 <template>
-  <h2>
+  <h2 style="display: flex; align-items: center">
     Boos-Helper
     <el-badge
       :is-dot="(netConf?.version ?? '6') > VITE_VERSION"
       :offset="[-2, 7]"
       @click="tagOpen('https://greasyfork.org/zh-CN/scripts/491340')"
-      style="cursor: pointer"
+      style="cursor: pointer; display: inline-flex; margin: 0 4px"
     >
       <el-tag type="primary">v{{ VITE_VERSION }}</el-tag>
     </el-badge>

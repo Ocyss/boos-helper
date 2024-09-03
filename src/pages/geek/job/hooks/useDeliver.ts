@@ -1,4 +1,4 @@
-import { delay } from "@/utils";
+import { delay, notification } from "@/utils";
 import { logData, useLog } from "@/hooks/useLog";
 import { useCommon } from "@/hooks/useCommon";
 import { useStatistics } from "@/hooks/useStatistics";
@@ -8,6 +8,7 @@ import { createHandle, sendPublishReq } from "@/hooks/useApplying";
 import { Actions } from "@/hooks/useMap";
 import { logger } from "@/utils/logger";
 import { useConfFormData } from "@/hooks/useConfForm";
+import { ElMessage } from "element-plus";
 
 const total = ref(0);
 const current = ref(0);
@@ -79,8 +80,19 @@ async function jobListHandle(
         msg: "未知报错",
       });
       logger.error("未知报错", e, data);
+      if (formData.notification.value) {
+        notification("未知报错");
+      }
     } finally {
       todayData.total++;
+      if (todayData.total >= 100) {
+        if (formData.notification.value) {
+          notification("投递到达上限 100，已暂停投递");
+        } else {
+          ElMessage.info("投递到达上限 100，已暂停投递");
+        }
+        return;
+      }
       await delay(formData.delay.deliveryInterval);
     }
   }
