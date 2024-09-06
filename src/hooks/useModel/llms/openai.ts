@@ -9,6 +9,7 @@ export type openaiLLMConf = llmConf<
   "openai",
   {
     url: string;
+    raw_url?: boolean;
     model: string;
     api_key: string;
     advanced: {
@@ -37,6 +38,11 @@ const info: llmInfo<openaiLLMConf> = {
     },
     value: "https://api.openai.com",
     required: true,
+  },
+  raw_url: {
+    desc: "需要填写完整api地址使用：如: https://example.cn/v1/chat/completions",
+    type: "switch",
+    value: false,
   },
   model: {
     config: {
@@ -192,7 +198,8 @@ class gpt extends llm<openaiLLMConf> {
     json?: boolean;
   }): Promise<any> {
     const res = await request.post({
-      url: this.conf.url + "/v1/chat/completions",
+      // 兼容特殊的api中转站
+      url: this.conf.url + (this.conf.raw_url ? "" : "/v1/chat/completions"),
       data: JSON.stringify({
         messages: prompt,
         model: this.conf.model,
