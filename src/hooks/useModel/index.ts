@@ -36,6 +36,9 @@ function getGpt(model: modelData, template: string | prompt): llm {
   if (!model.data) {
     throw new Error("GPT数据不存在");
   }
+  if (Array.isArray(template)) {
+    template = [...template].map((v) => ({ ...v }));
+  }
   try {
     switch (model.data.mode) {
       case "openai":

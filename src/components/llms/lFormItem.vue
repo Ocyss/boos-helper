@@ -43,7 +43,7 @@ const { el, defaultConf } = getComponent(props.value.type);
 <template>
   <template v-if="value && 'alert' in value">
     <el-alert
-      :title="value.label || label"
+      :title="value.label || label.toString()"
       :description="value.desc"
       :type="value.alert"
       :closable="false"

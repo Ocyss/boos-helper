@@ -29,14 +29,21 @@ const role = ["system", "user", "assistant"].map((item) => {
     value: item,
   };
 });
-const message = ref<string | prompt>(formData[props.data].prompt);
+
+let _message = formData[props.data].prompt;
+
+if (Array.isArray(_message)) {
+  _message = [..._message].map((item) => ({ ...item }));
+}
+
+const message = ref<string | prompt>(_message);
 
 function inputExample() {
   message.value = (formInfoData[props.data] as FormInfoAi).example[
     singleMode.value ? 0 : 1
   ];
 }
-function changeMode(v: boolean) {
+function changeMode(v: boolean | string | number | undefined) {
   if (v) {
     message.value = "";
   } else {
@@ -53,6 +60,7 @@ function removeMessage(item: prompt[number]) {
     message.value = message.value.filter((v) => v !== item);
   }
 }
+
 function addMessage() {
   if (Array.isArray(message.value)) {
     message.value.push({ role: "user", content: "" });
