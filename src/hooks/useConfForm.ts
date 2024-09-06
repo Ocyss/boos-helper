@@ -317,36 +317,9 @@ export const defaultFormData: FormData = {
   },
 };
 
-const formData: FormData = reactiveComputed(() => {
-  let val = GM_getValue(formDataKey);
-  if (!val) {
-    ElMessageBox.alert(
-      `1. 遇到bug即时反馈，不会使用请加群，使用前先好好了解项目，阅读每一个标签和帮助
-2. 帮助复选框能随时进入和退出帮助模式, 配置内容较多
-3. 配置了别忘了打钩启用上规则
-4. 包含/排除能点击切换模式
-
-本项目仅供学习交流，禁止用于商业用途
-使用该脚本有一定风险(如黑号,封号,权重降低等)，本项目不承担任何责任
-
-Github开源地址: https://github.com/ocyss/boos-helper
-greasyfork地址: https://greasyfork.org/zh-CN/scripts/491340
-飞书反馈问卷(匿名): https://gai06vrtbc0.feishu.cn/share/base/form/shrcnmEq2fxH9hM44hqEnoeaj8g
-飞书问卷结果: https://gai06vrtbc0.feishu.cn/share/base/view/shrcnrg8D0cbLQc89d7Jj7AZgMc
-飞书交流群: https://applink.feishu.cn/client/chat/chatter/add_by_link?link_token=410v5499-7193-411f-8258-94ae0cac4fc0`,
-      "注意事项",
-      {
-        autofocus: true,
-        confirmButtonText: "了解并同意!",
-        customStyle:
-          "--el-messagebox-width: unset; white-space: pre-wrap; width: unset;" as unknown as CSSProperties,
-      }
-    );
-    val = {};
-    GM_setValue(formDataKey, val);
-  }
-  return deepmerge<FormData>(defaultFormData, val);
-});
+const formData: FormData = reactive(
+  deepmerge<FormData>(defaultFormData, GM_getValue(formDataKey, {}))
+);
 
 watchThrottled(
   formData,
