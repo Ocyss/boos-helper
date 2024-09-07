@@ -62,6 +62,15 @@ async function jobListHandle(
         });
         logger.warn("成功", ctx);
         ctx.state = "成功";
+        if (todayData.success >= 100) {
+          if (formData.notification.value) {
+            notification("投递到达上限 100，已暂停投递");
+          } else {
+            ElMessage.info("投递到达上限 100，已暂停投递");
+          }
+          deliverStop.value = true;
+          return;
+        }
       } catch (e: any) {
         jobMap.set(data.encryptJobId, {
           state: e.state === "warning" ? "warn" : "error",
@@ -85,14 +94,6 @@ async function jobListHandle(
       }
     } finally {
       todayData.total++;
-      if (todayData.total >= 100) {
-        if (formData.notification.value) {
-          notification("投递到达上限 100，已暂停投递");
-        } else {
-          ElMessage.info("投递到达上限 100，已暂停投递");
-        }
-        return;
-      }
       await delay(formData.delay.deliveryInterval);
     }
   }
