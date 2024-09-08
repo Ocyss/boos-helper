@@ -3,6 +3,7 @@ import { createApp } from "vue";
 import uiVue from "./ui.vue";
 import elmGetter from "@/utils/elmGetter";
 import "./index.scss";
+
 async function mountVue() {
   const jobSearchWrapper = await elmGetter.get(".job-search-wrapper");
   if (document.querySelector("#boos-helper-job")) {

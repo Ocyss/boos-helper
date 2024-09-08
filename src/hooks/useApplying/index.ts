@@ -16,6 +16,7 @@ export function createHandle(): {
   const handles: handleFn[] = [];
   // 需要调用接口
   const handlesRes: handleFn[] = [];
+  // 投递后调用
   const handlesAfter: handleFn[] = [];
 
   // 已沟通过滤
@@ -40,26 +41,32 @@ export function createHandle(): {
   if (formData.activityFilter.value) h.activityFilter(handlesRes);
   // AI过滤
   if (formData.aiFiltering.enable) h.aiFiltering(handlesRes);
-  // 自定义招呼语
-  if (formData.customGreeting.enable && !formData.aiGreeting.enable)
+
+  if (formData.aiGreeting.enable) {
+    // AI招呼语
+    h.aiGreeting(handlesAfter);
+  } else if (formData.customGreeting.enable) {
+    // 自定义招呼语
     h.customGreeting(handlesAfter);
-  // AI招呼语
-  if (formData.aiGreeting.enable) h.aiGreeting(handlesAfter);
+  }
+
   return {
     before: async (args, ctx) => {
       try {
+        // 异步运行 card 请求前的筛选
         await Promise.all(handles.map((handle) => handle(args, ctx)));
+
         if (handlesRes.length > 0) {
-          const res = await requestCard({
+          const cardResp = await requestCard({
             lid: args.data.lid,
             securityId: args.data.securityId,
           });
-          if (res.data.code == 0) {
-            ctx.card = res.data.zpData.jobCard;
-
+          if (cardResp.data.code == 0) {
+            ctx.card = cardResp.data.zpData.jobCard;
+            // 异步运行 card 请求后的筛选
             await Promise.all(handlesRes.map((handle) => handle(args, ctx)));
           } else {
-            throw new UnknownError("请求响应错误:" + res.data.message);
+            throw new UnknownError("请求响应错误:" + cardResp.data.message);
           }
         }
       } catch (e: any) {
@@ -73,14 +80,14 @@ export function createHandle(): {
       if (handlesAfter.length === 0) return;
       try {
         if (!ctx.card) {
-          const res = await requestCard({
+          const cardResp = await requestCard({
             lid: args.data.lid,
             securityId: args.data.securityId,
           });
-          if (res.data.code == 0) {
-            ctx.card = res.data.zpData.jobCard;
+          if (cardResp.data.code == 0) {
+            ctx.card = cardResp.data.zpData.jobCard;
           } else {
-            throw new UnknownError("请求响应错误:" + res.data.message);
+            throw new UnknownError("请求响应错误:" + cardResp.data.message);
           }
         }
         await Promise.all(handlesAfter.map((handle) => handle(args, ctx)));

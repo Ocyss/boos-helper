@@ -48,6 +48,7 @@ export const communicated: handleCFn = (h) => {
   //   }
   // )
 };
+
 export const jobTitle: handleCFn = (h) =>
   h.push(async ({ data }, ctx) => {
     try {
@@ -100,6 +101,7 @@ export const company: handleCFn = (h) =>
       throw new CompanyNameError(e.message);
     }
   });
+
 export const salaryRange: handleCFn = (h) =>
   h.push(async ({ data }, ctx) => {
     try {
@@ -119,6 +121,7 @@ export const salaryRange: handleCFn = (h) =>
       throw new SalaryError(e.message);
     }
   });
+
 export const companySizeRange: handleCFn = (h) =>
   h.push(async ({ data }, ctx) => {
     try {
@@ -161,6 +164,7 @@ export const jobContent: handleCFn = (h) =>
       throw new JobDescriptionError(e.message);
     }
   });
+
 export const hrPosition: handleCFn = (h) =>
   h.push(async (_, { card }) => {
     try {
@@ -186,12 +190,14 @@ export const hrPosition: handleCFn = (h) =>
   });
 
 export const jobFriendStatus: handleCFn = (h) =>
-  h.push(async (_, { card }) => {
-    const content = card?.friendStatus;
+  h.push(async (_, ctx) => {
+    const content = ctx.card?.friendStatus;
+
     if (content && content != 0) {
       throw new FriendStatusError("已经是好友了");
     }
   });
+
 export const aiFiltering: handleCFn = (h) => {
   const model = modelData.value.find(
     (v) => formData.aiFiltering.model === v.key
@@ -205,7 +211,8 @@ export const aiFiltering: handleCFn = (h) => {
     try {
       const { content, prompt } = await gpt.message({
         data: {
-          data: ctx,
+          data: ctx.listData,
+          boos: ctx.boosData,
           card: ctx.card,
         },
         onStream: chatInput.handle,
@@ -236,6 +243,7 @@ export const aiFiltering: handleCFn = (h) => {
     }
   });
 };
+
 export const activityFilter: handleCFn = (h) =>
   h.push(async (_, { card }) => {
     try {
@@ -258,6 +266,8 @@ export const customGreeting: handleCFn = (h) => {
   h.push(async (args, ctx) => {
     try {
       const boosData = await requestBossData(ctx.card!);
+      ctx.boosData = boosData;
+
       let msg = formData.customGreeting.value;
       if (formData.greetingVariable.value && ctx.card) {
         msg = template({ card: ctx.card });
@@ -275,6 +285,7 @@ export const customGreeting: handleCFn = (h) => {
     }
   });
 };
+
 const chatBoosMessage = (ctx: logData, msg: string) => {
   const d = new Date();
   chatMessages.value.push({
@@ -282,10 +293,11 @@ const chatBoosMessage = (ctx: logData, msg: string) => {
     role: "boos",
     content: msg,
     date: [getCurDay(d), getCurTime(d)],
-    name: ctx.brandName,
-    avatar: ctx.brandLogo,
+    name: ctx.listData.brandName,
+    avatar: ctx.listData.brandLogo,
   });
 };
+
 export const aiGreeting: handleCFn = (h) => {
   const model = modelData.value.find(
     (v) => formData.aiGreeting.model === v.key
@@ -306,7 +318,8 @@ export const aiGreeting: handleCFn = (h) => {
       const boosData = await requestBossData(ctx.card!);
       const { content, prompt } = await gpt.message({
         data: {
-          data: ctx,
+          data: ctx.listData,
+          boos: ctx.boosData,
           card: ctx.card,
         },
         onStream: chatInput.handle,
@@ -333,6 +346,7 @@ export const aiGreeting: handleCFn = (h) => {
     }
   });
 };
+
 export const record = async (ctx: logData) => {
   const model = modelData.value.filter((v) =>
     formData.record.model?.includes(v.key)

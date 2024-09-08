@@ -21,7 +21,9 @@ type logErr =
   | CompanySizeError
   | JobDescriptionError
   | UnknownError;
-export type logData = JobListData & {
+
+export type logData = {
+  listData: JobListData;
   el?: Element;
   card?: JobCard;
   boosData?: BoosData;
@@ -35,6 +37,7 @@ export type logData = JobListData & {
   aiGreetingQ?: string;
   aiGreetingA?: string;
 };
+
 type logState = "info" | "success" | "warning" | "danger";
 
 type log = {

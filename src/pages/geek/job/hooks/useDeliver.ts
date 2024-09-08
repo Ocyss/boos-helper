@@ -49,7 +49,7 @@ async function jobListHandle(
         state: "running",
         msg: "处理中",
       });
-      const ctx: logData = JSON.parse(JSON.stringify(data));
+      const ctx: logData = { listData: JSON.parse(JSON.stringify(data)) };
       try {
         await h.before({ data }, ctx);
         await sendPublishReq(data);
