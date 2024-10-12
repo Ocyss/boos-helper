@@ -9,6 +9,9 @@ Boos直聘助手, 皆在减少投递简历的麻烦, 和提高投递简历的效
 
 > 本项目处于积极维护状态
 
+## 使用教程：
+在linux环境： `deno install && deno run dev`  （ Windows会报：`TypeError: Relative import path "fs" not prefixed with / or ./ or ../` ） 
+
 ## 相关链接
 
 Github开源地址: <https://github.com/ocyss/boos-helper>
