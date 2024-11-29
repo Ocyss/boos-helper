@@ -62,11 +62,11 @@ async function jobListHandle(
         });
         logger.warn("成功", ctx);
         ctx.state = "成功";
-        if (todayData.success >= 100) {
+        if (todayData.success >= formData.deliveryLimit.value) {
           if (formData.notification.value) {
-            notification("投递到达上限 100，已暂停投递");
+            notification(`投递到达上限 ${formData.deliveryLimit.value}，已暂停投递`);
           } else {
-            ElMessage.info("投递到达上限 100，已暂停投递");
+            ElMessage.info(`投递到达上限 ${formData.deliveryLimit.value}，已暂停投递`);
           }
           deliverStop.value = true;
           return;

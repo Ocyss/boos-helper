@@ -133,7 +133,7 @@ const { deliverLock } = useCommon();
       </el-collapse-item>
     </el-collapse>
 
-    <div style="margin-top: 20px">
+    <div style="margin-top: 20px; display: flex">
       <el-checkbox
         v-bind="formInfoData.greetingVariable"
         v-model="formData.greetingVariable.value"
@@ -145,6 +145,19 @@ const { deliverLock } = useCommon();
         v-model="formData.notification.value"
         border
       />
+
+      <el-form-item
+        :label="formInfoData.deliveryLimit.label"
+        style="margin-left: 30px"
+      >
+        <el-input-number
+          v-bind="formInfoData.deliveryLimit"
+          v-model="formData.deliveryLimit.value"
+          :min="1"
+          :max="1000"
+          :step="10"
+        ></el-input-number>
+      </el-form-item>
     </div>
   </el-form>
   <div style="margin-top: 15px">

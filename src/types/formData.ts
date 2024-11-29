@@ -23,6 +23,7 @@ export interface FormData {
   salaryRange: FormDataInput;
   companySizeRange: FormDataInput;
   customGreeting: FormDataInput;
+  deliveryLimit: FormDataInputNumber;
   greetingVariable: FormDataCheckbox;
   activityFilter: FormDataCheckbox;
   friendStatus: FormDataCheckbox;
@@ -64,6 +65,11 @@ export interface FormDataInput {
   value: string;
   enable: boolean;
 }
+
+export interface FormDataInputNumber {
+  value: number;
+}
+
 export interface FormDataCheckbox {
   value: boolean;
 }

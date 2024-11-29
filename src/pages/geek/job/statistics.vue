@@ -68,6 +68,10 @@ const cycle = computed(() => {
   return ans;
 });
 
+const deliveryLimit = computed(() => {
+  return formData.deliveryLimit.value;
+});
+
 async function startBatch() {
   log.reset();
   deliverLock.value = true;
@@ -117,7 +121,7 @@ function stopBatch() {
     <el-col :span="5">
       <el-statistic
         help="统计当天岗位过滤的比例,被过滤/总数"
-        :value="((todayData.total - todayData.success) / todayData.total) * 100"
+        :value="((todayData.total - todayData.success) / todayData.total) * deliveryLimit"
         title="过滤比例："
         suffix="%"
       ></el-statistic>
@@ -125,7 +129,7 @@ function stopBatch() {
     <el-col :span="5">
       <el-statistic
         help="统计当天岗位中已沟通的比例,已沟通/总数"
-        :value="(todayData.repeat / todayData.total) * 100"
+        :value="(todayData.repeat / todayData.total) * deliveryLimit"
         title="沟通比例："
         suffix="%"
       ></el-statistic>
@@ -133,7 +137,7 @@ function stopBatch() {
     <el-col :span="5">
       <el-statistic
         help="统计当天岗位中的活跃情况,不活跃/总数"
-        :value="(todayData.activityFilter / todayData.total) * 100"
+        :value="(todayData.activityFilter / todayData.total) * deliveryLimit"
         title="活跃比例："
         suffix="%"
       ></el-statistic>
@@ -207,9 +211,9 @@ function stopBatch() {
       </el-button>
     </el-button-group>
     <el-progress
-      help="我会统计当天脚本投递的数量,boos直聘限制100,该记录并不准确倒车的噢"
+      help="我会统计当天脚本投递的数量,该记录并不准确"
       style="flex: 1"
-      :percentage="todayData.success"
+      :percentage="todayData.success / deliveryLimit"
     />
   </div>
 </template>

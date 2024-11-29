@@ -62,6 +62,10 @@ export const formInfoData: FormInfoData = {
     label: "发送通知",
     help: "可以在网站管理中打开通知权限,当停止时会自动发送桌面端通知提醒。",
   },
+  deliveryLimit: {
+    label: "投递上限",
+    help: "达到上限后会自动暂停，默认100次",
+  },
   aiGreeting: {
     label: "AI招呼语",
     help: "即使前面招呼语开了也不会发送，只会发送AI生成的招呼语，让gpt来打招呼真是太棒了，毕竟开场白很重要。",
@@ -278,6 +282,9 @@ export const defaultFormData: FormData = {
   customGreeting: {
     value: "",
     enable: false,
+  },
+  deliveryLimit: {
+    value: 100,
   },
   greetingVariable: {
     value: true,
