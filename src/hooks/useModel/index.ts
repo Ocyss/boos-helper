@@ -1,17 +1,15 @@
 import { GM_getValue, GM_setValue } from "$";
 import { logger } from "@/utils/logger";
-import axios from "axios";
 import { ElMessage } from "element-plus";
 import { ref, toRaw } from "vue";
 import { openai, openaiLLMConf } from "./llms/openai";
 import { user, userLLMConf } from "./llms/user";
 import { moonshot, moonshotLLMConf } from "./llms/moonshot";
-import { baidu, baiduLLMConf } from "./llms/baidu";
-import { aliyun, aliyunLLMConf } from "./llms/aliyun";
+import { coze, cozeLLMConf } from "./llms/coze";
 import { llm, prompt } from "./type";
 
 export const confModelKey = "conf-model";
-export const llms = [openai.info, moonshot.info, aliyun.info, baidu.info];
+export const llms = [openai.info, moonshot.info, coze.info];
 
 export const llmsIcons = llms.reduce((acc, cur) => {
   if (cur.mode.icon) acc[cur.mode.mode] = cur.mode.icon;
@@ -24,12 +22,7 @@ export type modelData = {
   key: string;
   name: string;
   color?: string;
-  data?:
-    | moonshotLLMConf
-    | userLLMConf
-    | openaiLLMConf
-    | baiduLLMConf
-    | aliyunLLMConf;
+  data?: moonshotLLMConf | userLLMConf | openaiLLMConf | cozeLLMConf;
 };
 
 function getGpt(model: modelData, template: string | prompt): llm {
@@ -45,17 +38,15 @@ function getGpt(model: modelData, template: string | prompt): llm {
         return new openai.gpt(model.data, template);
       case "moonshot":
         return new moonshot.gpt(model.data, template);
-      case "aliyun":
-        return new aliyun.gpt(model.data, template);
-      case "baidu":
-        return new baidu.gpt(model.data, template);
+      case "coze":
+        return new coze.gpt(model.data, template);
       case "user":
         break;
     }
   } catch (e) {
     throw new Error("GPT构建错误");
   }
-  throw new Error("GPT不存在");
+  throw new Error(`GPT不存在, 可能已删除停止维护, ${model.data.mode}`);
 }
 
 function save() {

@@ -101,7 +101,13 @@ export default defineConfig(() => {
     build: {
       minify: false,
     },
-    css: {},
+    css: {
+	    preprocessorOptions: {
+		    scss: {
+			    api: "modern-compiler" // or 'modern'
+		    }
+	    }
+    },
     // server: {
     //   host: "logapi.zhipin.com",
     //   port: 80,

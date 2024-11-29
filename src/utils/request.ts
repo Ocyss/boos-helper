@@ -1,5 +1,6 @@
 import { GM_xmlhttpRequest, GmXhrRequest } from "$";
 import { loader } from ".";
+import { events, stream } from "fetch-event-stream";
 
 export class RequestError extends Error {
   constructor(message: string) {
@@ -14,9 +15,9 @@ export type ResponseType =
   | "blob"
   | "document"
   | "stream";
-export type OnStream = (
-  reader: ReadableStreamDefaultReader<Uint8Array>
-) => void;
+
+export type OnStream = (reader: ReturnType<typeof events>) => Promise<void>;
+
 export type RequestArgs<TContext, TResponseType extends ResponseType> = Partial<
   Pick<
     GmXhrRequest<TContext, TResponseType>,
@@ -35,7 +36,7 @@ export function request<TContext, TResponseType extends ResponseType = "json">({
   headers = {},
   timeout = 5,
   responseType = "json" as TResponseType,
-  onStream = () => {},
+  onStream = async () => {},
   isFetch = false,
 }: RequestArgs<TContext, TResponseType>) {
   if (!isFetch)
@@ -72,17 +73,14 @@ export function request<TContext, TResponseType extends ResponseType = "json">({
         onloadstart(e) {
           axiosLoad = loader({ ms: timeout * 1000, color: "#F79E63" });
           if (responseType === "stream") {
-            const reader = (
-              e.response as ReadableStream<Uint8Array>
-            ).getReader();
-            onStream(reader);
+            const stream = events(e.response);
+            onStream(stream);
           }
         },
       });
     });
   else {
     const abortController = new AbortController();
-    const signal = abortController.signal;
 
     return new Promise((resolve, reject) => {
       // Start loading indication
@@ -91,9 +89,13 @@ export function request<TContext, TResponseType extends ResponseType = "json">({
         method,
         headers,
         body: data,
-        signal,
+        signal: abortController.signal,
       })
         .then(async (response) => {
+          if (!response.body) {
+            reject(new RequestError("没有响应体"));
+            return;
+          }
           if (!response.ok) {
             const errorText = await response.text();
             if (axiosLoad) axiosLoad();
@@ -101,8 +103,10 @@ export function request<TContext, TResponseType extends ResponseType = "json">({
             return;
           }
           if (responseType === "stream") {
-            const reader = response.body?.getReader();
-            if (reader) onStream(reader);
+            // const reader = response.body.getReader();
+            const stream = events(response, abortController.signal);
+            await onStream(stream);
+            return;
           } else {
             const result =
               responseType === "json"

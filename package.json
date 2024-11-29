@@ -15,6 +15,7 @@
     "@types/nanoassert": "^2.0.3",
     "axios": "^1.7.7",
     "element-plus": "^2.8.1",
+    "fetch-event-stream": "^0.1.5",
     "mitem": "^1.0.9",
     "nanoassert": "^2.0.0",
     "partial-json": "^0.1.7",

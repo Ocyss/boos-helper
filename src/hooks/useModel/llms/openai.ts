@@ -146,34 +146,8 @@ class gpt extends llm<openaiLLMConf> {
     const res = await this.post({
       prompt: prompts,
       json,
-      onStream: (reader) => {
-        reader.read().then(function processText({ value }): any {
-          const s = decoder.decode(value);
-          const sl = s.split("\n");
-          for (let i = 0; i < sl.length; i++) {
-            const line = sl[i];
-            if (line.startsWith("data: ")) {
-              const data = line.slice(6);
-              if (data === "[DONE]") {
-                return;
-              }
-              const json = JSON.parse(data).choices[0];
-              const content = json.delta.content;
-              if (content) {
-                onStream(content);
-                stream += content;
-              } else if (json.finish_reason === "stop") {
-                ans.usage = {
-                  input_tokens: json.usage?.prompt_tokens,
-                  output_tokens: json.usage?.completion_tokens,
-                  total_tokens: json.usage?.total_tokens,
-                };
-                return;
-              }
-            }
-          }
-          return reader.read().then(processText);
-        });
+      onStream: async (reader) => {
+        // TODO: 处理 stream 输出
       },
     });
     if (!this.conf.advanced.stream) {

@@ -7,6 +7,19 @@ import {
   ElSwitch,
 } from "element-plus";
 
+export type llmMessageData = {
+  data?: JobListData;
+  boos?: BoosData;
+  card?: JobCard;
+};
+
+export type llmMessageArgs = {
+  data: llmMessageData;
+  onPrompt?: (s: string) => void;
+  onStream?: (s: string) => void;
+  json?: boolean;
+};
+
 export abstract class llm<C = any, T extends Array<any> = Array<any>> {
   conf: C;
   tem: (object: any) => string;
@@ -46,11 +59,7 @@ export abstract class llm<C = any, T extends Array<any> = Array<any>> {
     }
   }
   abstract chat(message: string): Promise<string>;
-  abstract message({}: {
-    data: object;
-    onPrompt?: (s: string) => void;
-    onStream?: (s: string) => void;
-  }): Promise<messageReps>;
+  abstract message(args: llmMessageArgs): Promise<messageReps>;
 }
 
 export type messageReps<T = string> = {

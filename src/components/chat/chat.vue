@@ -86,7 +86,7 @@ function inputMsgUpdate(v: string) {
         </DynamicScrollerItem>
       </template>
     </DynamicScroller>
-    <div class="chat-footer">
+    <div class="chat-footer" v-if="false">
       <el-input
         ref="messageInput"
         :model-value="chatInput.content"
