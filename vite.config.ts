@@ -71,6 +71,10 @@ export default defineConfig(() => {
             "aliyuncs.com",
             "baidubce.com",
           ],
+          downloadURL:
+            "https://update.greasyfork.org/scripts/491340/Boss%E7%9B%B4%E8%81%98%E5%8A%A9%E6%89%8B.user.js",
+          updateURL:
+            "https://update.greasyfork.org/scripts/491340/Boss%E7%9B%B4%E8%81%98%E5%8A%A9%E6%89%8B.user.js",
         },
         build: {
           externalGlobals: {
@@ -102,11 +106,11 @@ export default defineConfig(() => {
       minify: false,
     },
     css: {
-	    preprocessorOptions: {
-		    scss: {
-			    api: "modern-compiler" // or 'modern'
-		    }
-	    }
+      preprocessorOptions: {
+        scss: {
+          api: "modern-compiler", // or 'modern'
+        },
+      },
     },
     // server: {
     //   host: "logapi.zhipin.com",
