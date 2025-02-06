@@ -1,10 +1,11 @@
 <script lang="ts" setup>
-import { ElDialog, ElButton } from "element-plus";
-const show = defineModel<boolean>({ required: true });
+import { ElButton, ElDialog } from 'element-plus'
+
+const show = defineModel<boolean>({ required: true })
 </script>
 
 <template>
-  <el-dialog
+  <ElDialog
     v-model="show"
     title="存储配置"
     width="500"
@@ -17,11 +18,15 @@ const show = defineModel<boolean>({ required: true });
     </span>
     <template #footer>
       <div>
-        <el-button @click="show = false">Cancel</el-button>
-        <el-button type="primary" @click="show = false">Confirm</el-button>
+        <ElButton @click="show = false">
+          Cancel
+        </ElButton>
+        <ElButton type="primary" @click="show = false">
+          Confirm
+        </ElButton>
       </div>
     </template>
-  </el-dialog>
+  </ElDialog>
 </template>
 
 <style lang="scss" scoped></style>

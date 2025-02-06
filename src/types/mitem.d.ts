@@ -1,5 +1,5 @@
-declare module "mitem" {
+declare module 'mitem' {
   class miTem {
-    static compile(s: string): (object) => string;
+    static compile(s: string): (object) => string
   }
 }

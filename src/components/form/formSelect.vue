@@ -1,11 +1,12 @@
 <script lang="ts" setup>
-import { ElSelect, ElOption } from "element-plus";
-const value = defineModel<string[]>("value", { required: true });
-const options = defineModel<string[]>("options", { required: true });
+import { ElOption, ElSelect } from 'element-plus'
+
+const value = defineModel<string[]>('value', { required: true })
+const options = defineModel<string[]>('options', { required: true })
 </script>
 
 <template>
-  <el-select
+  <ElSelect
     v-model="value"
     multiple
     filterable
@@ -14,13 +15,13 @@ const options = defineModel<string[]>("options", { required: true });
     :reserve-keyword="false"
     placeholder=""
   >
-    <el-option
+    <ElOption
       v-for="item in options"
       :key="item"
       :label="item"
       :value="item"
     />
-  </el-select>
+  </ElSelect>
 </template>
 
 <style lang="scss" scoped></style>

@@ -1,109 +1,117 @@
-import { delay, notification } from "@/utils";
-import { logData, useLog } from "@/hooks/useLog";
-import { useCommon } from "@/hooks/useCommon";
-import { useStatistics } from "@/hooks/useStatistics";
+import type { logData } from '@/hooks/useLog'
+import type { Actions } from '@/hooks/useMap'
+import { createHandle, sendPublishReq } from '@/hooks/useApplying'
+import { useCommon } from '@/hooks/useCommon'
+import { useConfFormData } from '@/hooks/useConfForm'
 
-import { ref } from "vue";
-import { createHandle, sendPublishReq } from "@/hooks/useApplying";
-import { Actions } from "@/hooks/useMap";
-import { logger } from "@/utils/logger";
-import { useConfFormData } from "@/hooks/useConfForm";
-import { ElMessage } from "element-plus";
+import { useLog } from '@/hooks/useLog'
+import { useStatistics } from '@/hooks/useStatistics'
+import { delay, notification } from '@/utils'
+import { logger } from '@/utils/logger'
+import { ElMessage } from 'element-plus'
+import { ref } from 'vue'
 
-const total = ref(0);
-const current = ref(0);
-const log = useLog();
-const { todayData } = useStatistics();
-const { deliverStop } = useCommon();
-const { formData } = useConfFormData();
+const total = ref(0)
+const current = ref(0)
+const log = useLog()
+const { todayData } = useStatistics()
+const { deliverStop } = useCommon()
+const { formData } = useConfFormData()
 async function jobListHandle(
   jobList: JobList,
   jobMap: Actions<
     string,
     {
-      state: string;
-      msg: string;
+      state: string
+      msg: string
     }
-  >
+  >,
 ) {
-  log.info("获取岗位", `本次获取到 ${jobList.length} 个`);
-  total.value = jobList.length;
-  const h = createHandle();
+  log.info('获取岗位', `本次获取到 ${jobList.length} 个`)
+  total.value = jobList.length
+  const h = createHandle()
   jobList.forEach((v) => {
-    if (!jobMap.has(v.encryptJobId))
+    if (!jobMap.has(v.encryptJobId)) {
       jobMap.set(v.encryptJobId, {
-        state: "wait",
-        msg: "等待中",
-      });
-  });
-  for (const [index, data] of jobList.entries()) {
-    current.value = index;
-    if (deliverStop.value) {
-      log.info("暂停投递", `剩余 ${jobList.length - index} 个未处理`);
-      return;
+        state: 'wait',
+        msg: '等待中',
+      })
     }
-    if (jobMap.get(data.encryptJobId)?.state !== "wait") continue;
+  })
+  for (const [index, data] of jobList.entries()) {
+    current.value = index
+    if (deliverStop.value) {
+      log.info('暂停投递', `剩余 ${jobList.length - index} 个未处理`)
+      return
+    }
+    if (jobMap.get(data.encryptJobId)?.state !== 'wait')
+      continue
 
     try {
       jobMap.set(data.encryptJobId, {
-        state: "running",
-        msg: "处理中",
-      });
-      const ctx: logData = { listData: JSON.parse(JSON.stringify(data)) };
+        state: 'running',
+        msg: '处理中',
+      })
+      const ctx: logData = { listData: JSON.parse(JSON.stringify(data)) }
       try {
-        await h.before({ data }, ctx);
-        await sendPublishReq(data);
-        await h.after({ data }, ctx);
-        log.add(data.jobName, null, ctx, ctx.message);
-        todayData.success++;
+        await h.before({ data }, ctx)
+        await sendPublishReq(data)
+        await h.after({ data }, ctx)
+        log.add(data.jobName, null, ctx, ctx.message)
+        todayData.success++
         jobMap.set(data.encryptJobId, {
-          state: "success",
-          msg: "投递成功",
-        });
-        logger.warn("成功", ctx);
-        ctx.state = "成功";
+          state: 'success',
+          msg: '投递成功',
+        })
+        logger.warn('成功', ctx)
+        ctx.state = '成功'
         if (todayData.success >= formData.deliveryLimit.value) {
           if (formData.notification.value) {
-            notification(`投递到达上限 ${formData.deliveryLimit.value}，已暂停投递`);
-          } else {
-            ElMessage.info(`投递到达上限 ${formData.deliveryLimit.value}，已暂停投递`);
+            notification(`投递到达上限 ${formData.deliveryLimit.value}，已暂停投递`)
           }
-          deliverStop.value = true;
-          return;
+          else {
+            ElMessage.info(`投递到达上限 ${formData.deliveryLimit.value}，已暂停投递`)
+          }
+          deliverStop.value = true
+          return
         }
-      } catch (e: any) {
+      }
+      catch (e: any) {
         jobMap.set(data.encryptJobId, {
-          state: e.state === "warning" ? "warn" : "error",
-          msg: e.name || "没有消息",
-        });
-        log.add(data.jobName, e, ctx);
-        logger.warn("过滤", ctx);
-        ctx.state = "过滤";
-        ctx.err = e.message || "";
-      } finally {
-        await h.record(ctx);
+          state: e.state === 'warning' ? 'warn' : 'error',
+          msg: e.name || '没有消息',
+        })
+        log.add(data.jobName, e, ctx)
+        logger.warn('过滤', ctx)
+        ctx.state = '过滤'
+        ctx.err = e.message || ''
       }
-    } catch (e) {
+      finally {
+        await h.record(ctx)
+      }
+    }
+    catch (e) {
       jobMap.set(data.encryptJobId, {
-        state: "error",
-        msg: "未知报错",
-      });
-      logger.error("未知报错", e, data);
+        state: 'error',
+        msg: '未知报错',
+      })
+      logger.error('未知报错', e, data)
       if (formData.notification.value) {
-        notification("未知报错");
+        notification('未知报错')
       }
-    } finally {
-      todayData.total++;
-      await delay(formData.delay.deliveryInterval);
+    }
+    finally {
+      todayData.total++
+      await delay(formData.delay.deliveryInterval)
     }
   }
 }
 
-export const useDeliver = () => {
+export function useDeliver() {
   return {
     createHandle,
     jobListHandle,
     total,
     current,
-  };
-};
+  }
+}

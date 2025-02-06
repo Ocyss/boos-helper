@@ -1,48 +1,52 @@
 <script lang="ts" setup>
-import { ref, toRaw } from "vue";
-import { useModel, type modelData, llmsIcons } from "@/hooks/useModel";
-import { ElMessage } from "element-plus";
-import deepmerge from "@/utils/deepmerge";
-const show = defineModel<boolean>({ required: true });
-const { modelData, save } = useModel();
+import type { modelData } from '@/hooks/useModel'
+import { llmsIcons, useModel } from '@/hooks/useModel'
+import deepmerge from '@/utils/deepmerge'
+import { ElMessage } from 'element-plus'
+import { ref } from 'vue'
 
-const createBoxShow = ref(false);
+const show = defineModel<boolean>({ required: true })
+const { modelData, save } = useModel()
+
+const createBoxShow = ref(false)
 
 function del(d: modelData) {
-  modelData.value = modelData.value.filter((v) => d.key !== v.key);
-  ElMessage.success("删除成功");
+  modelData.value = modelData.value.filter(v => d.key !== v.key)
+  ElMessage.success('删除成功')
 }
 
 function copy(d: modelData) {
-  d = JSON.parse(JSON.stringify(d));
-  d.key = new Date().getTime().toString();
-  d.name = d.name + " 副本";
-  modelData.value.push(d);
-  ElMessage.success("复制成功");
+  d = JSON.parse(JSON.stringify(d))
+  d.key = new Date().getTime().toString()
+  d.name = `${d.name} 副本`
+  modelData.value.push(d)
+  ElMessage.success('复制成功')
 }
-const createModelData = ref();
+const createModelData = ref()
 function edit(d: modelData) {
-  createModelData.value = d;
-  createBoxShow.value = true;
+  createModelData.value = d
+  createBoxShow.value = true
 }
 function newllm() {
-  createModelData.value = undefined;
-  createBoxShow.value = true;
+  createModelData.value = undefined
+  createBoxShow.value = true
 }
 function create(d: modelData) {
   if (d.key) {
-    const old = modelData.value.find((v) => v.key == d.key);
+    const old = modelData.value.find(v => v.key === d.key)
     if (old) {
-      deepmerge(old, d, { clone: false });
-    } else {
-      d.key = new Date().getTime().toString();
-      modelData.value.push(d);
+      deepmerge(old, d, { clone: false })
     }
-  } else {
-    d.key = new Date().getTime().toString();
-    modelData.value.push(d);
+    else {
+      d.key = new Date().getTime().toString()
+      modelData.value.push(d)
+    }
   }
-  createBoxShow.value = false;
+  else {
+    d.key = new Date().getTime().toString()
+    modelData.value.push(d)
+  }
+  createBoxShow.value = false
 }
 </script>
 
@@ -106,13 +110,19 @@ function create(d: modelData) {
       v-model="createBoxShow"
       :model="createModelData"
       @create="create"
-    ></createLLM>
+    />
 
     <template #footer>
       <div>
-        <el-button @click="show = false">取消</el-button>
-        <el-button type="primary" @click="newllm">新建</el-button>
-        <el-button type="primary" @click="save">保存</el-button>
+        <el-button @click="show = false">
+          取消
+        </el-button>
+        <el-button type="primary" @click="newllm">
+          新建
+        </el-button>
+        <el-button type="primary" @click="save">
+          保存
+        </el-button>
       </div>
     </template>
   </el-dialog>

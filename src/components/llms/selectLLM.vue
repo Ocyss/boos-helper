@@ -1,75 +1,75 @@
 <script lang="ts" setup>
+import type { prompt } from '@/hooks/useModel/type'
+import type { FormInfoAi } from '@/types/formData'
+import { formInfoData, useConfFormData } from '@/hooks/useConfForm'
+import { useModel } from '@/hooks/useModel'
 import {
-  ElDialog,
+  ElAlert,
   ElButton,
-  ElPopconfirm,
+  ElDialog,
   ElInput,
+  ElLink,
   ElSelectV2,
   ElText,
-  ElLink,
-  ElAlert,
-} from "element-plus";
-import { useModel } from "@/hooks/useModel";
-import { useConfFormData, formInfoData } from "@/hooks/useConfForm";
-import { onMounted, ref } from "vue";
-import { FormDataAi, FormData, FormInfoAi } from "@/types/formData";
-import { prompt } from "@/hooks/useModel/type";
-const { formData, confSaving, defaultFormData } = useConfFormData();
-const { modelData } = useModel();
-const props = defineProps<{
-  data: "aiGreeting" | "aiFiltering" | "aiReply";
-}>();
+} from 'element-plus'
+import { ref } from 'vue'
 
-const show = defineModel<boolean>({ required: true });
-const model = ref(formData[props.data].model);
-const singleMode = ref(!Array.isArray(formData[props.data].prompt));
-const role = ["system", "user", "assistant"].map((item) => {
+const props = defineProps<{
+  data: 'aiGreeting' | 'aiFiltering' | 'aiReply'
+}>()
+const { formData, confSaving } = useConfFormData()
+const { modelData } = useModel()
+const show = defineModel<boolean>({ required: true })
+const model = ref(formData[props.data].model)
+const singleMode = ref(!Array.isArray(formData[props.data].prompt))
+const role = ['system', 'user', 'assistant'].map((item) => {
   return {
     label: item,
     value: item,
-  };
-});
+  }
+})
 
-let _message = formData[props.data].prompt;
+let _message = formData[props.data].prompt
 
 if (Array.isArray(_message)) {
-  _message = [..._message].map((item) => ({ ...item }));
+  _message = [..._message].map(item => ({ ...item }))
 }
 
-const message = ref<string | prompt>(_message);
+const message = ref<string | prompt>(_message)
 
 function inputExample() {
   message.value = (formInfoData[props.data] as FormInfoAi).example[
     singleMode.value ? 0 : 1
-  ];
+  ]
 }
 function changeMode(v: boolean | string | number | undefined) {
   if (v) {
-    message.value = "";
-  } else {
+    message.value = ''
+  }
+  else {
     message.value = [
-      { role: "user", content: "" },
-      { role: "assistant", content: "" },
-      { role: "user", content: "" },
-    ];
+      { role: 'user', content: '' },
+      { role: 'assistant', content: '' },
+      { role: 'user', content: '' },
+    ]
   }
 }
 
 function removeMessage(item: prompt[number]) {
   if (Array.isArray(message.value)) {
-    message.value = message.value.filter((v) => v !== item);
+    message.value = message.value.filter(v => v !== item)
   }
 }
 
 function addMessage() {
   if (Array.isArray(message.value)) {
-    message.value.push({ role: "user", content: "" });
+    message.value.push({ role: 'user', content: '' })
   }
 }
 </script>
 
 <template>
-  <el-dialog
+  <ElDialog
     v-model="show"
     :title="formInfoData[data].label"
     width="70%"
@@ -77,7 +77,7 @@ function addMessage() {
     destroy-on-close
     :z-index="20"
   >
-    <el-alert
+    <ElAlert
       title="对于性能强的模型使用单对话在够用的同时也能减少tokens的使用。而性能稍弱的模型使用多对话来加强引导,但也会消耗更多的tokens"
       type="info"
       :closable="false"
@@ -86,13 +86,15 @@ function addMessage() {
       <el-radio-group
         v-model="singleMode"
         size="large"
-        @update:modelValue="changeMode"
+        @update:model-value="changeMode"
       >
         <el-radio-button label="单对话模式" :value="true" />
         <el-radio-button label="多对话模式" :value="false" />
       </el-radio-group>
-      <el-button @click="inputExample">填入示例值</el-button>
-      <el-select-v2
+      <ElButton @click="inputExample">
+        填入示例值
+      </ElButton>
+      <ElSelectV2
         v-model="model"
         :options="modelData"
         :props="{ label: 'name', value: 'key' }"
@@ -101,30 +103,32 @@ function addMessage() {
       />
     </div>
 
-    <el-text style="margin: 20px 0" tag="div">
+    <ElText style="margin: 20px 0" tag="div">
       使用
-      <el-link
+      <ElLink
         type="primary"
         href="https://ygorko.github.io/mitem/"
         target="_blank"
       >
         mitem
-      </el-link>
+      </ElLink>
       来渲染模板。在多对话模式下，只有最后的消息会使用模板。
-      <el-link type="primary" href="#" target="_blank">变量表</el-link>
-      <br />
+      <ElLink type="primary" href="#" target="_blank">
+        变量表
+      </ElLink>
+      <br>
       推荐阅读
-      <el-link
+      <ElLink
         type="primary"
         href="https://langgptai.feishu.cn/wiki/RXdbwRyASiShtDky381ciwFEnpe"
         target="_blank"
       >
         《LangGPT》
-      </el-link>
+      </ElLink>
       的提示词文档学习 ( 示例提示词写的并不好,欢迎AI大佬来提pr )
-    </el-text>
+    </ElText>
 
-    <el-input
+    <ElInput
       v-if="singleMode"
       v-model="message as string"
       style="width: 100%"
@@ -139,7 +143,7 @@ function addMessage() {
     >
       <el-form-item v-for="(item, index) in (message as prompt)" :key="index">
         <template #label>
-          <el-select-v2
+          <ElSelectV2
             v-model="item.role"
             :options="role"
             style="width: 140px"
@@ -149,28 +153,32 @@ function addMessage() {
           class="select-form-box"
           style="width: 100%; align-items: flex-start"
         >
-          <el-input
+          <ElInput
             v-model="item.content"
             type="textarea"
             :autosize="{ minRows: 2, maxRows: 8 }"
           />
-          <el-button
+          <ElButton
             style="margin-left: 10px"
             @click.prevent="removeMessage(item)"
           >
             删除
-          </el-button>
+          </ElButton>
         </div>
       </el-form-item>
       <el-form-item>
-        <el-button @click="addMessage">添加消息</el-button>
+        <ElButton @click="addMessage">
+          添加消息
+        </ElButton>
       </el-form-item>
     </el-form>
     <template #footer>
       <div>
-        <el-button @click="show = false">取消</el-button>
+        <ElButton @click="show = false">
+          取消
+        </ElButton>
 
-        <el-button
+        <ElButton
           type="primary"
           @click="
             () => {
@@ -182,10 +190,10 @@ function addMessage() {
           "
         >
           保存
-        </el-button>
+        </ElButton>
       </div>
     </template>
-  </el-dialog>
+  </ElDialog>
 </template>
 
 <style lang="scss">

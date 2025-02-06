@@ -1,15 +1,9 @@
+import type { MaybePromise } from './types'
 import { uid } from 'uid'
-import { MaybePromise } from './types'
 
 // 定义消息类型
 const REQUEST_TYPE = '@wxtreq-booshelper/messaging'
 const RESPONSE_TYPE = '@wxtres-booshelper/messaging'
-
-// 基础消息接口
-interface Message<T = unknown> {
-  type: string
-  data: T
-}
 
 // 消息配置接口
 interface WindowMessagingConfig {
@@ -25,7 +19,7 @@ type MessageHandler<T> = (data: T) => void | Promise<any>
 export function defineWindowMessaging<T extends ProtocolMap>(config: WindowMessagingConfig = {}) {
   const namespace = config.namespace ?? 'default'
   const instanceId = uid()
-  
+
   // 存储消息处理器
   const handlers = new Map<string, MessageHandler<any>>()
   const responseListeners = new Map<string, (response: any) => void>()
@@ -34,11 +28,11 @@ export function defineWindowMessaging<T extends ProtocolMap>(config: WindowMessa
   function sendMessage<K extends keyof T>(
     type: K,
     data: Parameters<T[K]>[0],
-    targetOrigin: string = '*'
+    targetOrigin: string = '*',
   ): Promise<ReturnType<T[K]>> {
     return new Promise((resolve) => {
       const messageId = uid()
-      
+
       // 设置响应监听器
       const handleResponse = (response: any) => {
         resolve(response)
@@ -58,7 +52,7 @@ export function defineWindowMessaging<T extends ProtocolMap>(config: WindowMessa
             data,
           },
         },
-        targetOrigin
+        targetOrigin,
       )
     })
   }
@@ -66,7 +60,7 @@ export function defineWindowMessaging<T extends ProtocolMap>(config: WindowMessa
   // 监听消息
   function onMessage<K extends keyof T>(
     type: K,
-    handler: (data: Parameters<T[K]>[0]) => MaybePromise<ReturnType<T[K]>>
+    handler: (data: Parameters<T[K]>[0]) => MaybePromise<ReturnType<T[K]>>,
   ) {
     handlers.set(type as string, handler)
     return () => handlers.delete(type as string)
@@ -75,10 +69,11 @@ export function defineWindowMessaging<T extends ProtocolMap>(config: WindowMessa
   // 设置消息监听器
   window.addEventListener('message', async (event) => {
     const { data } = event
-    
+
     // 处理请求消息
     if (data.type === REQUEST_TYPE && data.namespace === namespace) {
-      if (data.instanceId === instanceId) return
+      if (data.instanceId === instanceId)
+        return
       const handler = handlers.get(data.message.type)
       if (handler) {
         const response = await handler(data.message.data)
@@ -89,11 +84,11 @@ export function defineWindowMessaging<T extends ProtocolMap>(config: WindowMessa
             messageId: data.messageId,
             response,
           },
-          event.origin
+          event.origin,
         )
       }
     }
-    
+
     // 处理响应消息
     if (data.type === RESPONSE_TYPE && data.namespace === namespace) {
       const listener = responseListeners.get(data.messageId)

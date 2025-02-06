@@ -1,10 +1,11 @@
 <script lang="ts" setup>
-import { ElDialog } from "element-plus";
-const show = defineModel<boolean>({ required: true });
+import { ElDialog } from 'element-plus'
+
+const show = defineModel<boolean>({ required: true })
 </script>
 
 <template>
-  <el-dialog
+  <ElDialog
     v-model="show"
     title="日志查看"
     width="500"
@@ -15,11 +16,15 @@ const show = defineModel<boolean>({ required: true });
     <span>Log</span>
     <template #footer>
       <div>
-        <el-button @click="show = false">Cancel</el-button>
-        <el-button type="primary" @click="show = false">Confirm</el-button>
+        <el-button @click="show = false">
+          Cancel
+        </el-button>
+        <el-button type="primary" @click="show = false">
+          Confirm
+        </el-button>
       </div>
     </template>
-  </el-dialog>
+  </ElDialog>
 </template>
 
 <style lang="scss" scoped></style>

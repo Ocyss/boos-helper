@@ -1,51 +1,47 @@
 <script lang="ts" setup>
-import { useConfFormData, formDataKey, todayKey } from "@/hooks/useConfForm";
+import type { FormData, Statistics } from '@/types/formData'
+import { logger } from '@/utils/logger'
+import { getStorage } from '@/utils/storage'
 import {
-  ElDialog,
-  ElButton,
-  ElTableColumn,
-  ElTable,
   ElAlert,
-  ElMessage,
-  ElTag,
   ElAvatar,
+  ElButton,
+  ElDialog,
+  ElMessage,
   ElPopconfirm,
-} from "element-plus";
-import { FormData, Statistics } from "@/types/formData";
-import { useStatistics } from "@/hooks/useStatistics";
-import { computed, reactive, ref, toRaw } from "vue";
-import { useStore, useUserId } from "@/hooks/useStore";
-import { logger } from "@/utils/logger";
-import { getStorage } from "@/utils/storage";
-const confUserKey = "sync:conf-user";
-const { formData } = useConfFormData();
-const { todayData } = useStatistics();
-const { userInfo } = useStore();
-const show = defineModel<boolean>({ required: true });
-type Data = {
-  uid: string;
-  user: string;
-  avatar: string;
-  remark: string;
-  gender: "man" | "woman";
-  flag: "student" | "staff";
-  date: string;
-  cookie: string;
-  form?: FormData;
-  statistics?: Statistics;
-};
+  ElTable,
+  ElTableColumn,
+  ElTag,
+} from 'element-plus'
+import { computed, reactive, ref, toRaw } from 'vue'
 
-const data = reactive(await getStorage<{ [keys: string]: Data }>(confUserKey,{}));
-const tableData = computed<Data[]>(() => Object.values(data));
-logger.debug("账户数据", toRaw(data));
+const confUserKey = 'sync:conf-user'
 
-const currentRow = ref<Data | undefined>();
+const show = defineModel<boolean>({ required: true })
+interface Data {
+  uid: string
+  user: string
+  avatar: string
+  remark: string
+  gender: 'man' | 'woman'
+  flag: 'student' | 'staff'
+  date: string
+  cookie: string
+  form?: FormData
+  statistics?: Statistics
+}
 
-const handleCurrentChange = (val: Data | undefined) => {
-  currentRow.value = val;
-};
+const data = reactive(await getStorage<{ [keys: string]: Data }>(confUserKey, {}))
+const tableData = computed<Data[]>(() => Object.values(data))
+logger.debug('账户数据', toRaw(data))
 
-async function create(flag = true) {
+const currentRow = ref<Data | undefined>()
+
+function handleCurrentChange(val: Data | undefined) {
+  currentRow.value = val
+}
+
+async function create(_flag = true) {
 //   logger.debug("开始创建账户");
 //   try {
 //     const list = await new Promise<any[]>((resolve, reject) => {
@@ -112,16 +108,16 @@ async function change() {
 //   }
 }
 function del(d: Data) {
-  delete data[d.uid];
-  logger.debug(data);
+  delete data[d.uid]
+  logger.debug(data)
 
   // GM_setValue(confUserKey, toRaw(data));
-  ElMessage.success("删除成功");
+  ElMessage.success('删除成功')
 }
 </script>
 
 <template>
-  <el-dialog
+  <ElDialog
     v-model="show"
     title="账户配置"
     width="70%"
@@ -129,88 +125,94 @@ function del(d: Data) {
     destroy-on-close
     :z-index="20"
   >
-    <el-alert
+    <ElAlert
       title="使用该功能将会明文存储cookie信息,可能包含隐私信息"
       type="warning"
       style="margin: 6px 0"
     />
-    <el-alert
+    <ElAlert
       title="每个用户都有自己的相关配置但历史投递等信息将全局共享,如果切换后是未登陆状态可能ck不完整或过期再次登陆即可(不要删除,不然配置会丢失)"
       type="info"
       style="margin: 6px 0"
     />
-    <el-table
+    <ElTable
       :data="tableData"
       style="width: 100%"
       highlight-current-row
       table-layout="auto"
       @current-change="handleCurrentChange"
     >
-      <el-table-column type="index" width="40" />
-      <el-table-column label="账户">
+      <ElTableColumn type="index" width="40" />
+      <ElTableColumn label="账户">
         <template #default="scope">
           <div style="align-items: center; display: flex">
-            <el-avatar :src="scope.row.avatar" :size="30" />
+            <ElAvatar :src="scope.row.avatar" :size="30" />
             <span style="margin-left: 8px">{{ scope.row.user }}</span>
           </div>
         </template>
-      </el-table-column>
-      <el-table-column label="性别" align="center">
+      </ElTableColumn>
+      <ElTableColumn label="性别" align="center">
         <template #default="scope">
-          <el-tag
+          <ElTag
             round
             effect="dark"
             style="border-style: none"
             :color="scope.row.gender === 'man' ? '#9BC1FE' : '#FFBDEB'"
           >
             {{ scope.row.gender === "man" ? "可爱男孩" : "温柔女孩" }}
-          </el-tag>
+          </ElTag>
         </template>
-      </el-table-column>
-      <el-table-column label="身份" align="center">
+      </ElTableColumn>
+      <ElTableColumn label="身份" align="center">
         <template #default="scope">
-          <el-tag
+          <ElTag
             effect="dark"
             round
             style="border-style: none"
             :type="scope.row.flag === 'student' ? 'success' : 'warning'"
           >
             {{ scope.row.flag === "student" ? "哈巴学生" : "无情社畜" }}
-          </el-tag>
+          </ElTag>
         </template>
-      </el-table-column>
-      <el-table-column prop="date" label="上次登录" />
-      <el-table-column fixed="right" label="操作">
+      </ElTableColumn>
+      <ElTableColumn prop="date" label="上次登录" />
+      <ElTableColumn fixed="right" label="操作">
         <template #default="scope">
-          <el-button link type="primary" size="small" disabled>导出</el-button>
-          <el-button
+          <ElButton link type="primary" size="small" disabled>
+            导出
+          </ElButton>
+          <ElButton
             link
             type="primary"
             size="small"
             @click="() => del(scope.row)"
           >
             删除
-          </el-button>
+          </ElButton>
         </template>
-      </el-table-column>
-    </el-table>
+      </ElTableColumn>
+    </ElTable>
     <template #footer>
       <div>
-        <el-button @click="show = false">取消</el-button>
-        <el-popconfirm
+        <ElButton @click="show = false">
+          取消
+        </ElButton>
+        <ElPopconfirm
           title="确认后将保存数据退出账户并自动刷新"
           @confirm="() => create()"
         >
           <template #reference>
-            <el-button type="primary">新建&登出</el-button>
+            <ElButton type="primary">
+              新建&登出
+            </ElButton>
           </template>
-        </el-popconfirm>
-        <el-button type="primary" @click="change" :disabled="!currentRow">
+        </ElPopconfirm>
+        <ElButton type="primary" :disabled="!currentRow" @click="change">
           切换
-        </el-button>
+        </ElButton>
       </div>
     </template>
-  </el-dialog>
+  </ElDialog>
 </template>
 
 <style lang="scss" scoped></style>

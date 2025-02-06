@@ -1,31 +1,30 @@
 <script lang="ts" setup>
-import { ElButton, ElSpace, ElDialog, ElSelectV2, ElAlert } from "element-plus";
-import { useConfFormData, formInfoData } from "@/hooks/useConfForm";
-import { ref } from "vue";
-import { FormDataAi } from "@/types/formData";
-import formSwitch from "@/components/form/formSwitch.vue";
-import { useCommon } from "@/hooks/useCommon";
-import { useModel } from "@/hooks/useModel";
+import type { FormDataAi } from '@/types/formData'
+import formSwitch from '@/components/form/formSwitch.vue'
+import { useCommon } from '@/hooks/useCommon'
+import { formInfoData, useConfFormData } from '@/hooks/useConfForm'
+import { ElButton, ElSpace } from 'element-plus'
+import { ref } from 'vue'
 
-const { formData, confSaving } = useConfFormData();
-const { deliverLock } = useCommon();
-const useModelData = useModel();
-const aiBoxShow = ref(false);
-const aiConfBoxShow = ref(false);
-const aiBox = ref<"aiGreeting" | "aiFiltering" | "aiReply" | "record">(
-  "aiGreeting"
-);
+const { formData, confSaving } = useConfFormData()
+const { deliverLock } = useCommon()
+// const useModelData = useModel()
+const aiBoxShow = ref(false)
+const aiConfBoxShow = ref(false)
+const aiBox = ref<'aiGreeting' | 'aiFiltering' | 'aiReply' | 'record'>(
+  'aiGreeting',
+)
 function change(v: Partial<FormDataAi>) {
-  v.enable = !v.enable;
-  confSaving();
+  v.enable = !v.enable
+  confSaving()
 }
 // 写的依托
-const m = formData.record.model || [];
-const recordModel = ref(Array.isArray(m) ? m : [m]);
+// const m = formData.record.model || []
+// const recordModel = ref(Array.isArray(m) ? m : [m])
 </script>
 
 <template>
-  <el-space wrap fill :fill-ratio="32" style="width: 100%">
+  <ElSpace wrap fill :fill-ratio="32" style="width: 100%">
     <formSwitch
       v-bind="formInfoData.aiGreeting"
       :data="formData.aiGreeting"
@@ -49,12 +48,12 @@ const recordModel = ref(Array.isArray(m) ? m : [m]);
     <formSwitch
       v-bind="formInfoData.aiReply"
       :data="formData.aiReply"
+      disabled
       @show="
         aiBox = 'aiReply';
         aiBoxShow = true;
       "
       @change="change"
-      disabled
     />
     <!-- <formSwitch
       v-bind="formInfoData.record"
@@ -65,24 +64,24 @@ const recordModel = ref(Array.isArray(m) ? m : [m]);
       "
       @change="change"
     /> -->
-  </el-space>
+  </ElSpace>
   <div style="margin-top: 15px">
-    <el-button
+    <ElButton
       type="primary"
       data-help="有那么多功能，当然要分等级了，不然岂不是浪费了这么多的模型（主要缺钱）"
       @click="aiConfBoxShow = true"
     >
       模型配置
-    </el-button>
+    </ElButton>
   </div>
 
   <configLLM v-model="aiConfBoxShow" />
   <selectLLM
     v-if="aiBoxShow && aiBox !== 'record'"
+    v-model="aiBoxShow"
     v-key="aiBox"
     :data="aiBox"
-    v-model="aiBoxShow"
-  ></selectLLM>
+  />
 </template>
 
 <style lang="scss">

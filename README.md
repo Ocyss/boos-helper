@@ -1,6 +1,6 @@
 > [!CAUTION] 免责声明
 > 本项目仅供学习交流，禁止用于商业用途
-> 
+>
 > 使用该脚本有一定风险(如黑号,封号,权重降低等)，本项目不承担任何责任
 
 ## 项目介绍
@@ -20,7 +20,6 @@ greasyfork地址: <https://greasyfork.org/zh-CN/scripts/491340>
 飞书问卷结果: <https://gai06vrtbc0.feishu.cn/share/base/view/shrcnrg8D0cbLQc89d7Jj7AZgMc>
 
 飞书交流群: <https://applink.feishu.cn/client/chat/chatter/add_by_link?link_token=410v5499-7193-411f-8258-94ae0cac4fc0>
-
 
 ## 项目预览
 
@@ -53,7 +52,6 @@ greasyfork地址: <https://greasyfork.org/zh-CN/scripts/491340>
   - [ ] 聊天屏蔽已读消息
   - [ ] boos消息弹窗
 
-
 ## 参与贡献
 
 1. Fork 本仓库并克隆到本地。
@@ -63,7 +61,7 @@ greasyfork地址: <https://greasyfork.org/zh-CN/scripts/491340>
 5. 提交 Pull 请求。
 
 - 在开发时server模式会注入脚本,也可能导致跨域问题请禁用以下两个策略
-  
+
   chrome 用户:
 
   - chrome://flags/#block-insecure-private-network-requests
@@ -79,10 +77,10 @@ greasyfork地址: <https://greasyfork.org/zh-CN/scripts/491340>
 - <https://github.com/yangfeng20/boss_batch_push>
 - <https://github.com/lisonge/vite-plugin-monkey>
 - <https://github.com/chatanywhere/GPT_API_free>
-  
+
 - <https://uiverse.io/>
 - <https://www.runoob.com/manual/mqtt/protocol/MQTT-3.1.1-CN.pdf>
-  
+
 ## 类似项目
 
 - <https://github.com/Frrrrrrrrank/auto_job__find__chatgpt__rpa>
@@ -90,7 +88,7 @@ greasyfork地址: <https://greasyfork.org/zh-CN/scripts/491340>
 
 ## 最后
 
-嗯... 
+嗯...
 
 ## Star 趋势
 

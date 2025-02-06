@@ -1,10 +1,11 @@
 {
   "name": "boos-helper",
   "displayName": "BoosHelper",
-  "description": "Boos直聘助手, 皆在减少投递简历的麻烦, 和提高投递简历的效率,技术栈使用VIte + Vue3 + element-plus",
-  "private": true,
-  "version": "0.0.0",
   "type": "module",
+  "version": "0.0.0",
+  "private": true,
+  "packageManager": "pnpm@9.12.3+sha512.cce0f9de9c5a7c95bef944169cc5dfe8741abfb145078c0d508b868056848a87c81e626246cb60967cbd7fd29a6c062ef73ff840d96b3c86c40ac92cf4a813ee",
+  "description": "Boos直聘助手, 皆在减少投递简历的麻烦, 和提高投递简历的效率,技术栈使用VIte + Vue3 + element-plus",
   "scripts": {
     "dev": "wxt",
     "dev:firefox": "wxt -b firefox",
@@ -13,7 +14,9 @@
     "zip": "wxt zip",
     "zip:firefox": "wxt zip -b firefox",
     "postinstall": "wxt prepare",
-    "check": "vue-tsc --noEmit"
+    "check": "vue-tsc --noEmit",
+    "lint": "eslint .",
+    "lint:fix": "eslint --fix ."
   },
   "dependencies": {
     "@types/nanoassert": "^2.0.3",
@@ -27,11 +30,13 @@
     "vue-virtual-scroller": "2.0.0-beta.8"
   },
   "devDependencies": {
+    "@antfu/eslint-config": "^4.1.1",
     "@types/chrome": "^0.0.301",
     "@types/node": "^20.16.3",
     "@vue/tsconfig": "^0.5.1",
     "@vueuse/core": "^10.11.1",
     "@wxt-dev/module-vue": "^1.0.2",
+    "eslint": "^9.19.0",
     "proto2api": "^0.0.8",
     "protobufjs": "^7.4.0",
     "sass": "^1.77.8",
@@ -43,6 +48,5 @@
     "unplugin-vue-components": "^0.26.0",
     "vue-tsc": "^1.8.27",
     "wxt": "^0.19.26"
-  },
-  "packageManager": "pnpm@9.12.3+sha512.cce0f9de9c5a7c95bef944169cc5dfe8741abfb145078c0d508b868056848a87c81e626246cb60967cbd7fd29a6c062ef73ff840d96b3c86c40ac92cf4a813ee"
+  }
 }

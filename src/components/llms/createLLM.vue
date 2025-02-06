@@ -1,77 +1,77 @@
 <script lang="ts" setup>
-import { useConfFormData, formInfoData } from "@/hooks/useConfForm";
-import settingsVue from "@/components/icon/settings.vue";
-import { computed, ref } from "vue";
-import { FormDataAi } from "@/types/formData";
-import formSwitch from "@/components/form/formSwitch.vue";
-import { useCommon } from "@/hooks/useCommon";
-import { modelData, useModel } from "@/hooks/useModel";
-import { llms } from "@/hooks/useModel";
-import { reactiveComputed } from "@vueuse/core";
-import { ElMessage } from "element-plus";
-import deepmerge from "@/utils/deepmerge";
-import { logger } from "@/utils/logger";
+import type { modelData } from '@/hooks/useModel'
+import { formInfoData } from '@/hooks/useConfForm'
+import { llms, useModel } from '@/hooks/useModel'
+import deepmerge from '@/utils/deepmerge'
+import { logger } from '@/utils/logger'
+import { reactiveComputed } from '@vueuse/core'
+import { computed, ref } from 'vue'
+
 const props = defineProps<{
-  model?: modelData;
-}>();
+  model?: modelData
+}>()
+const emit = defineEmits<{ (e: 'create', data: modelData): void }>()
 function color16() {
-  var r = Math.floor(Math.random() * 256);
-  var g = Math.floor(Math.random() * 256);
-  var b = Math.floor(Math.random() * 256);
-  var color = "#" + r.toString(16) + g.toString(16) + b.toString(16);
-  return color;
+  const r = Math.floor(Math.random() * 256)
+  const g = Math.floor(Math.random() * 256)
+  const b = Math.floor(Math.random() * 256)
+  const color = `#${r.toString(16)}${g.toString(16)}${b.toString(16)}`
+  return color
 }
-const show = defineModel<boolean>({ required: true });
-const createName = ref(props.model?.name || "");
-const createColor = ref(props.model?.color || color16());
-const testShow = ref(false);
-const { getGpt } = useModel();
+const show = defineModel<boolean>({ required: true })
+const createName = ref(props.model?.name || '')
+const createColor = ref(props.model?.color || color16())
+const testShow = ref(false)
+const { getGpt } = useModel()
 const llmsOptions = computed(() =>
   llms.map((v) => {
-    const m = v.mode;
-    return { ...m, value: m.mode };
-  })
-);
+    const m = v.mode
+    return { ...m, value: m.mode }
+  }),
+)
 
-const selectLLM = ref(props.model?.data?.mode || llms[0].mode.mode);
+const selectLLM = ref(props.model?.data?.mode || llms[0].mode.mode)
 const formLLM = computed(() =>
   Math.max(
-    llms.findIndex((l) => l.mode.mode === selectLLM.value),
-    0
-  )
-);
+    llms.findIndex(l => l.mode.mode === selectLLM.value),
+    0,
+  ),
+)
 
-type r = Record<string, any>;
+type r = Record<string, any>
 
 function dfs(res: r, data: r) {
   for (const key in data) {
-    const v = data[key];
-    if ("mode" in v) {
-      continue;
-    } else if ("alert" in v) {
-      res[key] = {};
-      dfs(res[key], v.value);
-    } else res[key] = v.value;
+    const v = data[key]
+    if ('mode' in v) {
+      continue
+    }
+    else if ('alert' in v) {
+      res[key] = {}
+      dfs(res[key], v.value)
+    }
+    else {
+      res[key] = v.value
+    }
   }
 }
 
 const llmFormData = reactiveComputed<r>(() => {
-  const res = {};
-  dfs(res, llms[formLLM.value]);
-  deepmerge(res, props.model?.data, { clone: false });
-  return res;
-});
+  const res = {}
+  dfs(res, llms[formLLM.value])
+  deepmerge(res, props.model?.data, { clone: false })
+  return res
+})
 
-const updateFormLLM = (v: string) => {
+function updateFormLLM(_v: string) {
   // for (const key in llmFormData) {
   //   delete llmFormData[key];
   // }
-  dfs(llmFormData, llms[formLLM.value]);
-  deepmerge(llmFormData, props.model?.data, { clone: false });
-};
-const emit = defineEmits<{ (e: "create", data: modelData): void }>();
-const testIn = ref("");
-const testOut = ref("");
+  dfs(llmFormData, llms[formLLM.value])
+  deepmerge(llmFormData, props.model?.data, { clone: false })
+}
+const testIn = ref('')
+const testOut = ref('')
 const testExample = {
   Json: [
     `我现在失业了,想找一个新工作,但岗位需求良莠不齐,我需要你对下面的岗位进行评分,我想要双休的,最好可以早九晚五,8小时的.不需要外出,不需要和客户聊天,不需要推销,最后给我Json格式的zifui
@@ -121,41 +121,41 @@ interface UserInfo {
 接下来开始分析：const userInfo=`,
   ],
   弱智: [
-    "请问你怎么看待鲁迅打周树人呢?",
-    "小于90度的是锐角，等于90度的是直角，大于90度的是钝角\n开水有100度，所以开水是钝角吗？",
+    '请问你怎么看待鲁迅打周树人呢?',
+    '小于90度的是锐角，等于90度的是直角，大于90度的是钝角\n开水有100度，所以开水是钝角吗？',
   ],
-};
+}
 async function test() {
   const data: modelData = JSON.parse(
-    JSON.stringify(props.model || { name: "", key: "" })
-  );
-  data.name = createName.value;
-  data.data = JSON.parse(JSON.stringify(llmFormData)) as modelData["data"] & {};
-  data.data.mode = selectLLM.value;
-  logger.debug(data);
+    JSON.stringify(props.model || { name: '', key: '' }),
+  )
+  data.name = createName.value
+  data.data = JSON.parse(JSON.stringify(llmFormData)) as modelData['data'] & {}
+  data.data.mode = selectLLM.value
+  logger.debug(data)
 
-  const gpt = getGpt(data, testIn.value);
-  testOut.value = "";
-  logger.group("LLMTest");
+  const gpt = getGpt(data, testIn.value)
+  testOut.value = ''
+  logger.group('LLMTest')
   const msg = await gpt.message({
     data: {},
     onStream: (d) => {
-      logger.debug("TestResStream", d);
-      testOut.value += d;
+      logger.debug('TestResStream', d)
+      testOut.value += d
     },
-  });
-  testOut.value = msg.content || "";
-  logger.debug("TestRes", msg);
-  logger.groupEnd();
+  })
+  testOut.value = msg.content || ''
+  logger.debug('TestRes', msg)
+  logger.groupEnd()
 }
 
 function create() {
-  const data: modelData = props.model || { name: "", key: "" };
-  data.name = createName.value;
-  data.data = JSON.parse(JSON.stringify(llmFormData)) as modelData["data"] & {};
-  data.data.mode = selectLLM.value;
-  data.color = createColor.value;
-  emit("create", data);
+  const data: modelData = props.model || { name: '', key: '' }
+  data.name = createName.value
+  data.data = JSON.parse(JSON.stringify(llmFormData)) as modelData['data'] & {}
+  data.data.mode = selectLLM.value
+  data.color = createColor.value
+  emit('create', data)
 }
 </script>
 
@@ -189,24 +189,30 @@ function create() {
         v-model="selectLLM"
         :options="llmsOptions"
         block
-        @update:modelValue="updateFormLLM"
+        @update:model-value="updateFormLLM"
       >
         <template #default="{ item }">
           <div class="llms-select">
-            <el-icon size="20" v-html="item.icon"></el-icon>
+            <el-icon size="20" v-html="item.icon" />
             <div>{{ item.label || item.mode }}</div>
           </div>
         </template>
       </el-segmented>
       <el-form label-width="auto" size="large" label-position="left">
-        <lForm :key="formLLM" :data="llms[formLLM]" v-model="llmFormData" />
+        <lForm :key="formLLM" v-model="llmFormData" :data="llms[formLLM]" />
       </el-form>
     </el-scrollbar>
     <template #footer>
       <div>
-        <el-button @click="show = false">取消</el-button>
-        <el-button type="info" @click="testShow = true">测试</el-button>
-        <el-button type="primary" @click="create">保存</el-button>
+        <el-button @click="show = false">
+          取消
+        </el-button>
+        <el-button type="info" @click="testShow = true">
+          测试
+        </el-button>
+        <el-button type="primary" @click="create">
+          保存
+        </el-button>
       </div>
     </template>
   </el-dialog>
@@ -225,10 +231,10 @@ function create() {
       <div class="mb-4">
         <template v-for="(example, key) in testExample" :key="key">
           <el-button
-            type="info"
-            plain
             v-for="(item, index) in example"
             :key="key + index"
+            type="info"
+            plain
             @click="testIn = item"
           >
             {{ key }}
@@ -251,8 +257,12 @@ function create() {
     </div>
     <template #footer>
       <div>
-        <el-button @click="testShow = false">返回</el-button>
-        <el-button type="primary" @click="test">请求</el-button>
+        <el-button @click="testShow = false">
+          返回
+        </el-button>
+        <el-button type="primary" @click="test">
+          请求
+        </el-button>
       </div>
     </template>
   </el-dialog>

@@ -1,19 +1,16 @@
 <script lang="ts" setup>
-import { ref, h, watchEffect } from "vue";
-import {
-  ElButton,
-  ElIcon,
-  ElTag,
-  ElTooltip,
-  TableV2FixedDir,
-  ElTableV2,
-  ElAutoResizer,
+import type {
   TableV2Instance,
-} from "element-plus";
-import { useLog } from "@/hooks/useLog";
-import { onRowRenderedParams } from "element-plus/es/components/table-v2/src/grid";
-const tableRef = ref<TableV2Instance>();
-const { data, columns, Row } = useLog();
+} from 'element-plus'
+import { useLog } from '@/hooks/useLog'
+import {
+  ElAutoResizer,
+  ElTableV2,
+} from 'element-plus'
+import { ref } from 'vue'
+
+const tableRef = ref<TableV2Instance>()
+const { data, columns } = useLog()
 
 // watchEffect(() => {
 //   tableRef.value?.scrollToRow(data.value.length - 1);
@@ -21,17 +18,17 @@ const { data, columns, Row } = useLog();
 </script>
 
 <template>
-  <el-auto-resizer :disableHeight="true">
+  <ElAutoResizer :disable-height="true">
     <template #default="{ width }">
-      <el-table-v2
+      <ElTableV2
         ref="tableRef"
         :columns="columns"
         :data="data"
         :height="360"
         :width
-      ></el-table-v2>
+      />
     </template>
-  </el-auto-resizer>
+  </ElAutoResizer>
 </template>
 
 <style lang="scss">

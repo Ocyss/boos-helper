@@ -1,53 +1,55 @@
-import { ref, reactive, toRaw } from "vue";
-import { ChatInput, ChatMessages } from "./type";
-import { llmsIcons, modelData } from "../useModel";
-import { getCurDay, getCurTime } from "@/utils";
+import type { modelData } from '../useModel'
+import type { ChatInput, ChatMessages } from './type'
+import { getCurDay, getCurTime } from '@/utils'
+import { reactive, ref, toRaw } from 'vue'
+import { llmsIcons } from '../useModel'
 
-const chatMessages = ref<ChatMessages>([]);
+const chatMessages = ref<ChatMessages>([])
 
 const chatInput = reactive<ChatInput>({
-  role: "user",
-  content: "",
+  role: 'user',
+  content: '',
   input: false,
-});
+})
 
-const chatInputInit = (model: modelData) => {
-  chatInput.content = "";
-  chatInput.input = true;
-  chatInput.role = "assistant";
-  chatInput.name = model.name;
+function chatInputInit(model: modelData) {
+  chatInput.content = ''
+  chatInput.input = true
+  chatInput.role = 'assistant'
+  chatInput.name = model.name
   chatInput.avatar = {
-    icon: llmsIcons[model.data?.mode || ""],
+    icon: llmsIcons[model.data?.mode || ''],
     color: model.color,
-  };
-  let end = false;
+  }
+  let end = false
   return {
     handle: (s: string) => {
-      chatInput.content += s;
+      chatInput.content += s
     },
     end: (s: string) => {
-      if (end) return;
-      end = true;
-      chatInput.input = false;
-      chatInput.content = s;
-      const d = new Date();
+      if (end)
+        return
+      end = true
+      chatInput.input = false
+      chatInput.content = s
+      const d = new Date()
       chatMessages.value.push({
         id: d.getTime(),
-        role: "assistant",
+        role: 'assistant',
         content: s,
         date: [getCurDay(d), getCurTime(d)],
         name: chatInput.name,
         avatar: toRaw(chatInput.avatar!),
-      });
-      chatInput.content = "";
+      })
+      chatInput.content = ''
     },
-  };
-};
+  }
+}
 
-export const useChat = () => {
+export function useChat() {
   return {
     chatMessages,
     chatInput,
     chatInputInit,
-  };
-};
+  }
+}

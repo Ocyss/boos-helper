@@ -1,41 +1,45 @@
 <script lang="ts" setup>
-import { useChat } from "@/hooks/useChat";
-import { useStore } from "@/hooks/useStore";
-import { watchIgnorable } from "@vueuse/core";
-import { ElInput } from "element-plus";
-import { onMounted, ref, watch } from "vue";
+import type {
+  RecycleScrollerInstance,
+} from 'vue-virtual-scroller'
+import { useChat } from '@/hooks/useChat'
+import { useStore } from '@/hooks/useStore'
+import { watchIgnorable } from '@vueuse/core'
+import { ElInput } from 'element-plus'
+import { ref, watch } from 'vue'
 import {
   DynamicScroller,
   DynamicScrollerItem,
-  RecycleScrollerInstance,
-} from "vue-virtual-scroller";
-import "vue-virtual-scroller/dist/vue-virtual-scroller.css";
-const { userInfo } = useStore();
-const { chatMessages, chatInput } = useChat();
+} from 'vue-virtual-scroller'
+import 'vue-virtual-scroller/dist/vue-virtual-scroller.css'
 
-const messageScroller = ref<RecycleScrollerInstance>();
-const messageInput = ref<InstanceType<typeof ElInput>>();
+const { userInfo } = useStore()
+const { chatMessages, chatInput } = useChat()
+
+const messageScroller = ref<RecycleScrollerInstance>()
+const messageInput = ref<InstanceType<typeof ElInput>>()
 
 watch(
   () => chatMessages.value.length,
   () => {
-    messageScroller.value?.scrollToBottom();
-  }
-);
+    messageScroller.value?.scrollToBottom()
+  },
+)
 
 // 创建可忽略的监听,在用户输入的时候不进行更改. TODO: 节流优化
 const { ignoreUpdates } = watchIgnorable(chatInput, () => {
   if (messageInput.value?.textarea?.scrollTop) {
-    messageInput.value.textarea.scrollTop =
-      messageInput.value?.textarea?.scrollHeight || 0;
+    messageInput.value.textarea.scrollTop
+      = messageInput.value?.textarea?.scrollHeight || 0
   }
-});
+})
 
 function inputMsgUpdate(v: string) {
-  if (chatInput.input) return;
+  if (chatInput.input)
+    return
   ignoreUpdates(() => {
-    chatInput.content = v;
-  });
+    chatInput.content = v
+  })
 }
 </script>
 
@@ -48,7 +52,7 @@ function inputMsgUpdate(v: string) {
       :min-item-size="100"
       class="chat-message"
     >
-      <template v-slot="{ item, index, active }">
+      <template #default="{ item, index, active }">
         <DynamicScrollerItem
           :item="item"
           :active="active"
@@ -59,7 +63,9 @@ function inputMsgUpdate(v: string) {
         >
           <div class="message-wrapper">
             <div class="message-content">
-              <h6 class="text-dark">{{ item.name }}</h6>
+              <h6 class="text-dark">
+                {{ item.name }}
+              </h6>
               <span>{{ item.content }}</span>
             </div>
           </div>
@@ -82,12 +88,12 @@ function inputMsgUpdate(v: string) {
               <span class="time">{{ item.date[1] }}</span>
             </span>
           </div>
-          <div style="height: 1.25rem"></div>
+          <div style="height: 1.25rem" />
         </DynamicScrollerItem>
       </template>
     </DynamicScroller>
-    <div class="chat-footer" v-if="false">
-      <el-input
+    <div v-if="false" class="chat-footer">
+      <ElInput
         ref="messageInput"
         :model-value="chatInput.content"
         :autosize="{ minRows: 5, maxRows: 10 }"
@@ -110,7 +116,9 @@ function inputMsgUpdate(v: string) {
             v-html="chatInput.avatar?.icon"
           />
         </el-avatar>
-        <el-button type="primary" plain round>发送</el-button>
+        <el-button type="primary" plain round>
+          发送
+        </el-button>
       </div>
     </div>
   </div>

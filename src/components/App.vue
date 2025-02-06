@@ -1,58 +1,60 @@
 <script lang="ts" setup>
-import { logger } from "@/utils/logger";
-import {
-  ElDropdown,
-  ElDropdownMenu,
-  ElDropdownItem,
-  ElAvatar,
-  ElMessageBox,
+import type {
   Action,
+} from 'element-plus'
+import logVue from '@/components/conf/log.vue'
+
+import storeVue from '@/components/conf/store.vue'
+import userVue from '@/components/conf/user.vue'
+import { useStore } from '@/hooks/useStore'
+import { logger } from '@/utils/logger'
+import { getStorage, setStorage } from '@/utils/storage'
+import {
+  ElAvatar,
+  ElDropdown,
+  ElDropdownItem,
+  ElDropdownMenu,
   ElMessage,
-} from "element-plus";
+  ElMessageBox,
+} from 'element-plus'
+import { onMounted, ref } from 'vue'
 
-import storeVue from "@/components/conf/store.vue";
-import userVue from "@/components/conf/user.vue";
-import logVue from "@/components/conf/log.vue";
-import { onMounted, ref } from "vue";
-import { useStore } from "@/hooks/useStore";
-import { getStorage, setStorage } from "@/utils/storage";
-
-logger.info("BoosHelper挂载成功");
-ElMessage("BoosHelper挂载成功!");
-const { storeInit } = useStore();
-const confBox = ref(false);
+logger.info('BoosHelper挂载成功')
+ElMessage('BoosHelper挂载成功!')
+const { storeInit } = useStore()
+const confBox = ref(false)
 const confs = {
-  store: { name: "存储配置", component: storeVue, disabled: false },
-  user: { name: "账号配置", component: userVue, disabled: true },
-  log: { name: "日志配置", component: logVue, disabled: false },
-};
-const confKey = ref<keyof typeof confs>("store");
-const dark = ref(false);
+  store: { name: '存储配置', component: storeVue, disabled: false },
+  user: { name: '账号配置', component: userVue, disabled: true },
+  log: { name: '日志配置', component: logVue, disabled: false },
+}
+const confKey = ref<keyof typeof confs>('store')
+const dark = ref(false)
 
-getStorage("theme-dark",false).then(res=>{
-  dark.value = res;
+getStorage('theme-dark', false).then((res) => {
+  dark.value = res
 })
 
 async function themeChange() {
-  dark.value = !dark.value;
+  dark.value = !dark.value
   if (dark.value) {
     ElMessage({
-      message: "已切换到暗黑模式，如有样式没适配且严重影响使用，请反馈",
+      message: '已切换到暗黑模式，如有样式没适配且严重影响使用，请反馈',
       duration: 5000,
       showClose: true,
-    });
+    })
   }
-  document.documentElement.classList.toggle("dark", dark.value);
-  await setStorage("theme-dark", dark.value);
+  document.documentElement.classList.toggle('dark', dark.value)
+  await setStorage('theme-dark', dark.value)
 }
 
 // console.log(monkeyWindow, window, unsafeWindow);
 
 onMounted(async () => {
-  await storeInit();
-  const protocol = "boos-protocol";
-  const protocol_val = "2024/09/06";
-  const protocol_date = await getStorage(protocol);
+  await storeInit()
+  const protocol = 'boos-protocol'
+  const protocol_val = '2024/09/06'
+  const protocol_date = await getStorage(protocol)
   if (protocol_date !== protocol_val) {
     ElMessageBox.alert(
       `1. 遇到bug即时反馈，不会使用请加群，使用前先好好了解项目，阅读每一个标签和帮助
@@ -68,52 +70,54 @@ greasyfork地址: https://greasyfork.org/zh-CN/scripts/491340
 飞书反馈问卷(匿名): https://gai06vrtbc0.feishu.cn/share/base/form/shrcnmEq2fxH9hM44hqEnoeaj8g
 飞书问卷结果: https://gai06vrtbc0.feishu.cn/share/base/view/shrcnrg8D0cbLQc89d7Jj7AZgMc
 飞书交流群: https://applink.feishu.cn/client/chat/chatter/add_by_link?link_token=410v5499-7193-411f-8258-94ae0cac4fc0`,
-      "注意事项",
+      '注意事项',
       {
         autofocus: true,
-        confirmButtonText: "了解并同意!",
+        confirmButtonText: '了解并同意!',
         customStyle:
-          "--el-messagebox-width: unset; white-space: pre-wrap; width: unset;" as any,
+          '--el-messagebox-width: unset; white-space: pre-wrap; width: unset;' as any,
         callback: (action: Action) => {
-          if (action === "confirm") {
-            setStorage(protocol, protocol_val);
+          if (action === 'confirm') {
+            setStorage(protocol, protocol_val)
           }
         },
-      }
-    );
+      },
+    )
   }
-});
+})
 </script>
 
 <template>
-  <el-dropdown trigger="click">
-    <el-avatar
+  <ElDropdown trigger="click">
+    <ElAvatar
       :size="30"
       src="https://avatars.githubusercontent.com/u/68412205?v=4"
     >
       H
-    </el-avatar>
+    </ElAvatar>
     <template #dropdown>
-      <el-dropdown-menu>
-        <el-dropdown-item disabled>BossHelp配置项</el-dropdown-item>
-        <el-dropdown-item divided disabled></el-dropdown-item>
-        <el-dropdown-item
+      <ElDropdownMenu>
+        <ElDropdownItem disabled>
+          BossHelp配置项
+        </ElDropdownItem>
+        <ElDropdownItem divided disabled />
+        <ElDropdownItem
           v-for="(v, k) in confs"
           :key="k"
+          :disabled="v.disabled"
           @click="
             confKey = k;
             confBox = true;
           "
-          :disabled="v.disabled"
         >
           {{ v.name }}
-        </el-dropdown-item>
-        <el-dropdown-item @click="themeChange">
+        </ElDropdownItem>
+        <ElDropdownItem @click="themeChange">
           暗黑模式（{{ dark ? "开" : "关" }}）
-        </el-dropdown-item>
-      </el-dropdown-menu>
+        </ElDropdownItem>
+      </ElDropdownMenu>
     </template>
-  </el-dropdown>
+  </ElDropdown>
   <Teleport to="body">
     <component :is="confs[confKey].component" v-model="confBox" />
   </Teleport>

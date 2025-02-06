@@ -1,26 +1,26 @@
-import { loader } from ".";
-import { events } from "fetch-event-stream";
+import { events } from 'fetch-event-stream'
+import { loader } from '.'
 
 export class RequestError extends Error {
   constructor(message: string) {
-    super(message);
-    this.name = "请求错误";
+    super(message)
+    this.name = '请求错误'
   }
 }
 export type ResponseType =
-  | "text"
-  | "json"
-  | "arraybuffer"
-  | "blob"
-  | "document"
-  | "stream";
+  | 'text'
+  | 'json'
+  | 'arraybuffer'
+  | 'blob'
+  | 'document'
+  | 'stream'
 
-export type OnStream = (reader: ReturnType<typeof events>) => Promise<void>;
+export type OnStream = (reader: ReturnType<typeof events>) => Promise<void>
 
-type GmXhrRequest<TContext, TResponseType extends ResponseType> = {
-  method?: string;
-  url: string;
-  headers?: Record<string, string>;
+interface GmXhrRequest<TContext, TResponseType extends ResponseType> {
+  method?: string
+  url: string
+  headers?: Record<string, string>
 
   data?:
     | string
@@ -29,36 +29,36 @@ type GmXhrRequest<TContext, TResponseType extends ResponseType> = {
     | ArrayBuffer
     | Blob
     | DataView
-    | ReadableStream;
+    | ReadableStream
 
   /**
    * @available tampermonkey
    */
-  redirect?: `follow` | `error` | `manual`;
+  redirect?: `follow` | `error` | `manual`
 
   /**
    * @available tampermonkey
    */
-  cookie?: string;
+  cookie?: string
 
-  binary?: boolean;
-
-  /**
-   * @available tampermonkey
-   */
-  nocache?: boolean;
+  binary?: boolean
 
   /**
    * @available tampermonkey
    */
-  revalidate?: boolean;
+  nocache?: boolean
 
-  timeout?: number;
+  /**
+   * @available tampermonkey
+   */
+  revalidate?: boolean
+
+  timeout?: number
 
   /**
    * Property which will be added to the response event object
    */
-  context?: TContext;
+  context?: TContext
 
   /**
    * @tampermonkey  text, json, arraybuffer, blob, document, stream
@@ -66,69 +66,66 @@ type GmXhrRequest<TContext, TResponseType extends ResponseType> = {
    * @default
    * 'text'
    */
-  responseType?: TResponseType;
+  responseType?: TResponseType
 
-  overrideMimeType?: string;
+  overrideMimeType?: string
 
-  anonymous?: boolean;
+  anonymous?: boolean
 
   /**
    * @available tampermonkey
    */
-  fetch?: boolean;
+  fetch?: boolean
 
-  user?: string;
+  user?: string
 
-  password?: string;
+  password?: string
 
-  onabort?: () => void;
+  onabort?: () => void
 
-  onerror?: any;
+  onerror?: any
 
   /**
    * @available violentmonkey
    */
-  onloadend?: any;
+  onloadend?: any
 
-  onloadstart?: any;
+  onloadstart?: any
 
-  onprogress?: any;
+  onprogress?: any
 
-  onreadystatechange?: any;
+  onreadystatechange?: any
 
-  ontimeout?: () => void;
+  ontimeout?: () => void
 
-  onload?: any;
-};
-
+  onload?: any
+}
 
 export type RequestArgs<TContext, TResponseType extends ResponseType> = Partial<
   Pick<
     GmXhrRequest<TContext, TResponseType>,
-    "method" | "url" | "data" | "headers" | "timeout" | "responseType"
+    'method' | 'url' | 'data' | 'headers' | 'timeout' | 'responseType'
   > & {
-    onStream: OnStream;
-    isFetch: boolean;
+    onStream: OnStream
+    isFetch: boolean
   }
->;
-let axiosLoad: () => void;
+>
+let axiosLoad: () => void
 
-export function request<TContext, TResponseType extends ResponseType = "json">({
-  method = "POST",
-  url = "",
-  data = "",
+export function request<TContext, TResponseType extends ResponseType = 'json'>({
+  method = 'POST',
+  url = '',
+  data = '',
   headers = {},
   timeout = 5,
-  responseType = "json" as TResponseType,
+  responseType = 'json' as TResponseType,
   onStream = async () => {},
-  isFetch = false,
 }: RequestArgs<TContext, TResponseType>) {
-
-  const abortController = new AbortController();
+  const abortController = new AbortController()
 
   return new Promise((resolve, reject) => {
     // Start loading indication
-    axiosLoad = loader({ ms: timeout * 1000, color: "#F79E63" });
+    axiosLoad = loader({ ms: timeout * 1000, color: '#F79E63' })
     fetch(url, {
       method,
       headers,
@@ -137,62 +134,67 @@ export function request<TContext, TResponseType extends ResponseType = "json">({
     })
       .then(async (response) => {
         if (!response.body) {
-          reject(new RequestError("没有响应体"));
-          return;
+          reject(new RequestError('没有响应体'))
+          return
         }
         if (!response.ok) {
-          const errorText = await response.text();
-          if (axiosLoad) axiosLoad();
-          reject(new RequestError(`${errorText} | ${response.statusText}`));
-          return;
+          const errorText = await response.text()
+          if (axiosLoad)
+            axiosLoad()
+          reject(new RequestError(`${errorText} | ${response.statusText}`))
+          return
         }
-        if (responseType === "stream") {
+        if (responseType === 'stream') {
           // const reader = response.body.getReader();
-          const stream = events(response, abortController.signal);
-          await onStream(stream);
-          return;
-        } else {
-          const result =
-            responseType === "json"
+          const stream = events(response, abortController.signal)
+          await onStream(stream)
+        }
+        else {
+          const result
+            = responseType === 'json'
               ? await response.json()
-              : await response.text();
-          if (axiosLoad) axiosLoad();
-          resolve(result);
+              : await response.text()
+          if (axiosLoad)
+            axiosLoad()
+          resolve(result)
         }
       })
       .catch((e) => {
-        if (axiosLoad) axiosLoad();
-        if (e.name === "AbortError") {
-          reject(new RequestError("用户中止"));
-        } else {
-          const msg = `${e.message}`;
-          reject(new RequestError(msg));
+        if (axiosLoad)
+          axiosLoad()
+        if (e.name === 'AbortError') {
+          reject(new RequestError('用户中止'))
         }
-      });
+        else {
+          const msg = `${e.message}`
+          reject(new RequestError(msg))
+        }
+      })
 
     // Set timeout
     setTimeout(() => {
-      abortController.abort();
-      if (axiosLoad) axiosLoad();
-      reject(new RequestError(`超时 ${Math.round(timeout / 1000)}s`));
-    }, timeout * 1000);
-  });
+      abortController.abort()
+      if (axiosLoad)
+        axiosLoad()
+      reject(new RequestError(`超时 ${Math.round(timeout / 1000)}s`))
+    }, timeout * 1000)
+  })
 }
 
-request.post = <TContext, TResponseType extends ResponseType = "json">(
-  args: Omit<RequestArgs<TContext, TResponseType>, "method">
+request.post = <TContext, TResponseType extends ResponseType = 'json'>(
+  args: Omit<RequestArgs<TContext, TResponseType>, 'method'>,
 ) => {
   return request<TContext, TResponseType>({
-    method: "POST",
+    method: 'POST',
     ...args,
-  });
-};
+  })
+}
 
-request.get = <TContext, TResponseType extends ResponseType = "json">(
-  args: Omit<RequestArgs<TContext, TResponseType>, "method">
+request.get = <TContext, TResponseType extends ResponseType = 'json'>(
+  args: Omit<RequestArgs<TContext, TResponseType>, 'method'>,
 ) => {
   return request<TContext, TResponseType>({
-    method: "GET",
+    method: 'GET',
     ...args,
-  });
-};
+  })
+}

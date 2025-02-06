@@ -1,6 +1,5 @@
-import { defineRunnerConfig } from 'wxt';
-
+import { defineRunnerConfig } from 'wxt'
 
 export default defineRunnerConfig({
-    disabled: true,
-  });   
+  disabled: true,
+})

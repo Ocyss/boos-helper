@@ -1,33 +1,34 @@
 <script lang="ts" setup>
-import { ElLink, ElFormItem, ElCheckbox } from "element-plus";
-const props = defineProps<{
-  label: string;
-  help?: string;
-  disabled?: boolean;
-}>();
+import { ElCheckbox, ElFormItem, ElLink } from 'element-plus'
 
-const include = defineModel<boolean | undefined>("include", {
+defineProps<{
+  label: string
+  help?: string
+  disabled?: boolean
+}>()
+
+const include = defineModel<boolean | undefined>('include', {
   default: undefined,
-});
-const enable = defineModel<boolean>("enable", { required: true });
+})
+const enable = defineModel<boolean>('enable', { required: true })
 </script>
 
 <template>
-  <el-form-item :help>
+  <ElFormItem :help>
     <template #label>
-      <el-checkbox v-model="enable" :label size="small" />
-      <el-link
+      <ElCheckbox v-model="enable" :label size="small" />
+      <ElLink
         v-if="include !== undefined"
-        @click.stop="include = !include"
         :type="include ? 'primary' : 'warning'"
         size="small"
         :disabled
+        @click.stop="include = !include"
       >
         {{ include ? "包含" : "排除" }}
-      </el-link>
+      </ElLink>
     </template>
-    <slot></slot>
-  </el-form-item>
+    <slot />
+  </ElFormItem>
 </template>
 
 <style lang="scss" scoped></style>

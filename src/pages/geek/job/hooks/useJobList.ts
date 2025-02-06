@@ -1,15 +1,15 @@
-import { useHookVueData } from "@/hooks/useVue";
-import { useMap } from "@/hooks/useMap";
-import { ref } from "vue";
+import { useMap } from '@/hooks/useMap'
+import { useHookVueData } from '@/hooks/useVue'
+import { ref } from 'vue'
 
-const jobList = ref<JobList>([]);
-const jobMap = useMap<string, { state: string; msg: string }>(); // encryptJobId
-const init = useHookVueData("#wrap .page-job-wrapper", "jobList", jobList);
+const jobList = ref<JobList>([])
+const jobMap = useMap<string, { state: string, msg: string }>() // encryptJobId
+const init = useHookVueData('#wrap .page-job-wrapper', 'jobList', jobList)
 
-export const useJobList = () => {
+export function useJobList() {
   return {
     jobList,
     jobMap,
     initJobList: init,
-  };
-};
+  }
+}

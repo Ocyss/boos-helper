@@ -1,1 +1,1 @@
-export * from "./protobuf";
+export * from './protobuf'

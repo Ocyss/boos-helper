@@ -1,61 +1,62 @@
 <script lang="ts" setup>
-import { reactive, ref, watchEffect } from "vue";
-import { ElTag, ElSpace } from "element-plus";
-import { useJobList } from "./hooks/useJobList";
-import { ElTabPane, ElTabs, ElSwitch } from "element-plus";
-import { useDeliver } from "./hooks/useDeliver";
+import { ElSpace, ElSwitch, ElTag } from 'element-plus'
+import { ref, watchEffect } from 'vue'
+import { useDeliver } from './hooks/useDeliver'
+import { useJobList } from './hooks/useJobList'
+
 const {
   jobList,
   jobMap: { actions: jobMap },
-} = useJobList();
-const { current } = useDeliver();
-const jobListRef = ref<HTMLElement[]>();
-const autoScroll = ref(true);
-const cards = ref<HTMLDivElement>();
+} = useJobList()
+const { current } = useDeliver()
+const jobListRef = ref<HTMLElement[]>()
+const autoScroll = ref(true)
+const cards = ref<HTMLDivElement>()
 function scroll(e: any) {
-  e.preventDefault();
+  e.preventDefault()
   if (!cards.value) {
-    return;
+    return
   }
-  let left = -e.wheelDelta || e.deltaY / 2;
-  cards.value.scrollLeft = cards.value.scrollLeft + left;
-  autoScroll.value = false;
+  const left = -e.wheelDelta || e.deltaY / 2
+  cards.value.scrollLeft = cards.value.scrollLeft + left
+  autoScroll.value = false
 }
 watchEffect(() => {
-  const d = jobListRef.value;
+  const d = jobListRef.value
   if (autoScroll.value && d && d.length > current.value) {
     d[current.value].scrollIntoView({
-      behavior: "smooth",
-      block: "nearest",
-      inline: "center",
-    });
+      behavior: 'smooth',
+      block: 'nearest',
+      inline: 'center',
+    })
   }
-});
+})
 
 function stateColor(state?: string): string {
   switch (state) {
-    case "wait":
-      return "#CECECE";
-    case "error":
-      return "#e74c3c";
-    case "warn":
-      return "#f39c12";
-    case "success":
-      return "#2ecc71";
-    case "running":
-      return "#98F5F9";
+    case 'wait':
+      return '#CECECE'
+    case 'error':
+      return '#e74c3c'
+    case 'warn':
+      return '#f39c12'
+    case 'success':
+      return '#2ecc71'
+    case 'running':
+      return '#98F5F9'
   }
-  return "#CECECE";
+  return '#CECECE'
 }
 </script>
 
 <template>
   <div style="order: -1">
-    <div ref="cards" @wheel.stop="scroll" class="card-grid">
+    <div ref="cards" class="card-grid" @wheel.stop="scroll">
       <div
+        v-for="v in jobList"
+        :key="v.encryptJobId"
         ref="jobListRef"
         class="card"
-        v-for="v in jobList"
         :style="{
           '--state-color': stateColor(jobMap.get(v.encryptJobId)?.state),
           '--state-show': jobMap.has(v.encryptJobId) ? 'block' : 'none',
@@ -64,31 +65,39 @@ function stateColor(state?: string): string {
         <div class="card-tag">
           {{ v.brandIndustry }},{{ v.jobDegree }},{{ v.brandScaleName }}
         </div>
-        <h3 class="card-title">{{ v.jobName }}</h3>
-        <h3 class="card-salary">{{ v.salaryDesc }}</h3>
+        <h3 class="card-title">
+          {{ v.jobName }}
+        </h3>
+        <h3 class="card-salary">
+          {{ v.salaryDesc }}
+        </h3>
         <div>
-          <el-space :size="3" spacer="|" wrap>
-            <el-tag
-              size="small"
+          <ElSpace :size="3" spacer="|" wrap>
+            <ElTag
               v-for="tag in v.skills"
+              :key="tag"
+              size="small"
               effect="plain"
               type="warning"
             >
               {{ tag }}
-            </el-tag>
-          </el-space>
-          <el-space :size="3" wrap>
-            <el-tag
-              size="small"
+            </ElTag>
+          </ElSpace>
+          <ElSpace :size="3" wrap>
+            <ElTag
               v-for="tag in v.jobLabels"
+              :key="tag"
+              size="small"
               effect="plain"
               type="success"
             >
               {{ tag }}
-            </el-tag>
-          </el-space>
+            </ElTag>
+          </ElSpace>
         </div>
-        <div class="card-footer">{{ v.welfareList.join(",") }}</div>
+        <div class="card-footer">
+          {{ v.welfareList.join(",") }}
+        </div>
         <div class="author-row">
           <img
             alt=""
@@ -96,7 +105,7 @@ function stateColor(state?: string): string {
             height="80"
             :src="v.brandLogo"
             width="80"
-          />
+          >
           <div>
             <span class="company-name">{{ v.brandName }}</span>
             <h4>
@@ -109,7 +118,7 @@ function stateColor(state?: string): string {
         </div>
       </div>
     </div>
-    <el-switch
+    <ElSwitch
       v-model="autoScroll"
       inline-prompt
       active-text="自动滚动"

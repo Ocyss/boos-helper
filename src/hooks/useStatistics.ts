@@ -1,11 +1,11 @@
-import { Statistics } from "@/types/formData";
-import { getCurDay } from "@/utils";
-import { reactiveComputed, watchThrottled } from "@vueuse/core";
-import { todayKey, statisticsKey } from "./useConfForm";
-import { getStorage, setStorage } from "@/utils/storage";
+import type { Statistics } from '@/types/formData'
+import { getCurDay } from '@/utils'
+import { getStorage, setStorage } from '@/utils/storage'
+import { reactiveComputed, watchThrottled } from '@vueuse/core'
+import { statisticsKey, todayKey } from './useConfForm'
 
 const todayData = reactiveComputed<Statistics>(() => {
-  const date = getCurDay();
+  const date = getCurDay()
   const current = {
     date,
     success: 0,
@@ -19,7 +19,7 @@ const todayData = reactiveComputed<Statistics>(() => {
     activityFilter: 0,
     goldHunterFilter: 0,
     repeat: 0,
-    };
+  }
   // TODO
   //   const g = (await storage.getItem<typeof current>(todayKey))??current;
   // logger.debug("统计数据:", g);
@@ -30,24 +30,24 @@ const todayData = reactiveComputed<Statistics>(() => {
   // const statistics = await storage.getItem<typeof current[]>(statisticsKey,{fallback:[]});
   // await storage.setItem(statisticsKey, [g, ...statistics]);
   // await storage.setItem(todayKey, current);
-  return current;
-});
+  return current
+})
 
-let statisticsData: Statistics[] = [];
+let statisticsData: Statistics[] = []
 
-getStorage<Statistics[]>(statisticsKey,[]).then(data=>statisticsData=data)
+getStorage<Statistics[]>(statisticsKey, []).then(data => statisticsData = data)
 
 watchThrottled(
   todayData,
   (v) => {
-      setStorage(todayKey, v);
+    setStorage(todayKey, v)
   },
-  { throttle: 200 }
-);
+  { throttle: 200 },
+)
 
-export const useStatistics = () => {
+export function useStatistics() {
   return {
     todayData,
     statisticsData,
-  };
-};
+  }
+}

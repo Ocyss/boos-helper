@@ -48,9 +48,6 @@ greasyfork地址: <https://greasyfork.org/zh-CN/scripts/491340>
   - [ ] 聊天屏蔽已读消息
   - [ ] boos消息弹窗
 
-
-
-
 ## 项目预览
 
 [![卡片状态](https://s21.ax1x.com/2024/04/14/pFvtxGF.png)](https://imgse.com/i/pFvtxGF)
@@ -58,7 +55,6 @@ greasyfork地址: <https://greasyfork.org/zh-CN/scripts/491340>
 [![统计界面](https://s21.ax1x.com/2024/04/02/pFHa3ZD.png)](https://imgse.com/i/pFHa3ZD)
 [![配置界面](https://s21.ax1x.com/2024/04/02/pFHa8de.png)](https://imgse.com/i/pFHa8de)
 [![日志界面](https://s21.ax1x.com/2024/04/02/pFHalqO.png)](https://imgse.com/i/pFHalqO)
-
 
 # 鸣谢
 

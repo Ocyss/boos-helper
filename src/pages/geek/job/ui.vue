@@ -1,32 +1,29 @@
 <script lang="ts" setup>
-import { onMounted, ref } from "vue";
-import { ElTabPane, ElTabs, ElCheckbox, ElTooltip } from "element-plus";
-import cardVue from "./card.vue";
-import { computed } from "vue";
-import { useMouse, useMouseInElement } from "@vueuse/core";
-import chatVue from "@/components/chat/chat.vue";
-import aboutVue from "./about.vue";
-import aiVue from "./ai.vue";
-import configVue from "./config.vue";
-import logsVue from "./logs.vue";
-import statisticsVue from "./statistics.vue";
-import { useDeliver } from "./hooks/useDeliver";
-import { useJobList } from "./hooks/useJobList";
-import { usePager } from "./hooks/usePager";
-import elmGetter from "@/utils/elmGetter";
-import { netConf } from "@/utils/conf";
+import chatVue from '@/components/chat/chat.vue'
+import { netConf } from '@/utils/conf'
+import elmGetter from '@/utils/elmGetter'
+import { useMouse, useMouseInElement } from '@vueuse/core'
+import { ElCheckbox, ElTabPane, ElTabs, ElTooltip } from 'element-plus'
+import { computed, onMounted, ref } from 'vue'
+import aboutVue from './about.vue'
+import aiVue from './ai.vue'
+import cardVue from './card.vue'
+import configVue from './config.vue'
+import { useDeliver } from './hooks/useDeliver'
+import { useJobList } from './hooks/useJobList'
+import { usePager } from './hooks/usePager'
+import logsVue from './logs.vue'
+import statisticsVue from './statistics.vue'
 
-
-const { initPager } = usePager();
-const { initJobList } = useJobList();
-const { x, y } = useMouse({ type: "client" });
-const { total, current } = useDeliver();
-const helpVisible = ref(false);
-const searchRef = ref();
-const tabsRef = ref();
-const helpContent = ref("鼠标移到对应元素查看提示");
-const helpElWidth = ref(400);
-const { isOutside } = useMouseInElement(tabsRef);
+const { initPager } = usePager()
+const { initJobList } = useJobList()
+const { x, y } = useMouse({ type: 'client' })
+const { total, current } = useDeliver()
+const helpVisible = ref(false)
+const searchRef = ref()
+const tabsRef = ref()
+const helpContent = ref('鼠标移到对应元素查看提示')
+const { isOutside } = useMouseInElement(tabsRef)
 
 const triggerRef = computed(() => {
   return {
@@ -36,65 +33,64 @@ const triggerRef = computed(() => {
         height: 0,
         x: x.value,
         y: y.value,
-      });
+      })
     },
-  };
-});
+  }
+})
 
 const boxStyles = computed(() => {
   if (helpVisible.value && !isOutside.value) {
-    const element = document.elementFromPoint(x.value, y.value);
-    const el = findHelp(element as HTMLElement);
+    const element = document.elementFromPoint(x.value, y.value)
+    const el = findHelp(element as HTMLElement)
     if (el) {
-      const bounding = el.getBoundingClientRect();
-      helpElWidth.value = bounding.width;
+      const bounding = el.getBoundingClientRect()
       return {
         width: `${bounding.width}px`,
         height: `${bounding.height}px`,
         left: `${bounding.left}px`,
         top: `${bounding.top}px`,
-        display: "block",
-        backgroundColor: "#3eaf7c33",
-        transition: "all 0.08s linear",
-      } as Record<string, string | number>;
+        display: 'block',
+        backgroundColor: '#3eaf7c33',
+        transition: 'all 0.08s linear',
+      } as Record<string, string | number>
     }
   }
   return {
-    display: "none",
-  };
-});
+    display: 'none',
+  }
+})
 
 function findHelp(dom: HTMLElement | null) {
-  if (!dom) return;
-  const help = dom.dataset.help;
+  if (!dom)
+    return
+  const help = dom.dataset.help
   if (help) {
-    helpContent.value = help;
-    return dom;
+    helpContent.value = help
+    return dom
   }
-  return findHelp(dom.parentElement);
+  return findHelp(dom.parentElement)
 }
 
 onMounted(() => {
-  initJobList();
-  initPager();
+  initJobList()
+  initPager()
   elmGetter
     .get([
-      ".job-search-wrapper .job-search-box.clearfix",
-      ".job-search-wrapper .search-condition-wrapper.clearfix",
+      '.job-search-wrapper .job-search-box.clearfix',
+      '.job-search-wrapper .search-condition-wrapper.clearfix',
     ])
     .then(([searchEl, conditionEl]) => {
-      searchRef.value.$el.appendChild(searchEl);
-      searchRef.value.$el.appendChild(conditionEl);
+      searchRef.value.$el.appendChild(searchEl)
+      searchRef.value.$el.appendChild(conditionEl)
       // 搜索栏去APP
-      elmGetter.rm(".job-search-scan", searchEl);
-    });
-});
+      elmGetter.rm('.job-search-scan', searchEl)
+    })
+})
 
 function tagOpen(url: string) {
-  window.open(url);
+  window.open(url)
 }
-const VITE_VERSION = import.meta.env.VITE_VERSION;
-const now = new Date().getTime();
+const VITE_VERSION = import.meta.env.VITE_VERSION
 </script>
 
 <template>
@@ -103,10 +99,12 @@ const now = new Date().getTime();
     <el-badge
       :is-dot="(netConf?.version ?? '6') > VITE_VERSION"
       :offset="[-2, 7]"
-      @click="tagOpen('https://greasyfork.org/zh-CN/scripts/491340')"
       style="cursor: pointer; display: inline-flex; margin: 0 4px"
+      @click="tagOpen('https://greasyfork.org/zh-CN/scripts/491340')"
     >
-      <el-tag type="primary">v{{ VITE_VERSION }}</el-tag>
+      <el-tag type="primary">
+        v{{ VITE_VERSION }}
+      </el-tag>
     </el-badge>
 
     <span v-if="total > 0">{{ current + 1 }}/{{ total }}</span>
@@ -120,10 +118,10 @@ const now = new Date().getTime();
     "
     :style="boxStyles"
   />
-  <div class="netAlerts" v-if="netConf && netConf.notification">
+  <div v-if="netConf && netConf.notification" class="netAlerts">
     <template
       v-for="item in netConf.notification.filter(
-        (item) => item.type === 'alert'
+        (item) => item.type === 'alert',
       )"
       :key="item.key ?? item.data.title"
     >
@@ -134,62 +132,62 @@ const now = new Date().getTime();
       /> -->
     </template>
   </div>
-  <el-tooltip :visible="helpVisible && !isOutside" :virtual-ref="triggerRef">
+  <ElTooltip :visible="helpVisible && !isOutside" :virtual-ref="triggerRef">
     <template #content>
-      <div :style="`width: auto;max-width:${helpElWidth}px;font-size:17px;`">
+      <div :style="`width: auto;max-width:${boxStyles.width};font-size:17px;`">
         {{ helpContent }}
       </div>
     </template>
-  </el-tooltip>
-  <el-tabs ref="tabsRef" data-help="鼠标移到对应元素查看提示">
-    <el-tab-pane label="统计" data-help="失败是成功她妈">
-      <statisticsVue></statisticsVue>
-    </el-tab-pane>
-    <el-tab-pane
-      label="搜索"
+  </ElTooltip>
+  <ElTabs ref="tabsRef" data-help="鼠标移到对应元素查看提示">
+    <ElTabPane label="统计" data-help="失败是成功她妈">
+      <statisticsVue />
+    </ElTabPane>
+    <ElTabPane
       ref="searchRef"
+      label="搜索"
       data-help="boos直聘原搜索, 可能出现空白bug"
     />
-    <el-tab-pane label="筛选" data-help="好好看，好好学">
-      <configVue></configVue>
-    </el-tab-pane>
-    <el-tab-pane label="AI" data-help="AI时代，脚本怎么能落伍!">
-      <aiVue></aiVue>
-    </el-tab-pane>
-    <el-tab-pane label="日志" data-help="反正你也不看">
-      <logsVue></logsVue>
-    </el-tab-pane>
-    <el-tab-pane
+    <ElTabPane label="筛选" data-help="好好看，好好学">
+      <configVue />
+    </ElTabPane>
+    <ElTabPane label="AI" data-help="AI时代，脚本怎么能落伍!">
+      <aiVue />
+    </ElTabPane>
+    <ElTabPane label="日志" data-help="反正你也不看">
+      <logsVue />
+    </ElTabPane>
+    <ElTabPane
       label="关于"
       class="hp-about-box"
       data-help="项目是写不完美的,但总要去追求完美"
     >
-      <aboutVue></aboutVue>
-    </el-tab-pane>
-    <el-tab-pane v-if="netConf && netConf.feedback">
+      <aboutVue />
+    </ElTabPane>
+    <ElTabPane v-if="netConf && netConf.feedback">
       <template #label>
         <el-link
           size="large"
-          @click.stop="tagOpen(netConf.feedback)"
           style="height: 100%"
+          @click.stop="tagOpen(netConf.feedback)"
         >
           反馈
         </el-link>
       </template>
-    </el-tab-pane>
-    <el-tab-pane>
+    </ElTabPane>
+    <ElTabPane>
       <template #label>
-        <el-checkbox
+        <ElCheckbox
           v-model="helpVisible"
           label="帮助"
           size="large"
           @click.stop=""
         />
       </template>
-    </el-tab-pane>
-  </el-tabs>
+    </ElTabPane>
+  </ElTabs>
   <Teleport to=".page-job-inner .page-job-content">
-    <cardVue></cardVue>
+    <cardVue />
   </Teleport>
   <Teleport to=".page-job-wrapper">
     <chatVue
@@ -203,7 +201,7 @@ const now = new Date().getTime();
         width: 28%;
         max-width: 540px;
       "
-    ></chatVue>
+    />
   </Teleport>
 </template>
 

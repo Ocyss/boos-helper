@@ -1,74 +1,72 @@
-import {  reactive, toRaw } from "vue";
-import { ref } from "vue";
+import type { FormData, FormInfoData } from '@/types/formData'
+import deepmerge from '@/utils/deepmerge'
 
-import {  watchThrottled } from "@vueuse/core";
+import { logger } from '@/utils/logger'
 
-import deepmerge from "@/utils/deepmerge";
-import { FormData, FormInfoData } from "@/types/formData";
+import { getStorage, setStorage } from '@/utils/storage'
+import { watchThrottled } from '@vueuse/core'
 
-import { logger } from "@/utils/logger";
-import { getStorage, setStorage } from "@/utils/storage";
+import { reactive, ref, toRaw } from 'vue'
 
-
-export const formDataKey = "sync:web-geek-job-FormData";
-export const todayKey = "sync:web-geek-job-Today";
-export const statisticsKey = "sync:web-geek-job-Statistics";
+export const formDataKey = 'sync:web-geek-job-FormData'
+export const todayKey = 'sync:web-geek-job-Today'
+export const statisticsKey = 'sync:web-geek-job-Statistics'
 export const formInfoData: FormInfoData = {
   company: {
-    label: "公司名",
-    help: "公司名排除或包含在集合中，模糊匹配，可用于只投或不投某个公司/子公司。",
+    label: '公司名',
+    help: '公司名排除或包含在集合中，模糊匹配，可用于只投或不投某个公司/子公司。',
   },
   jobTitle: {
-    label: "岗位名",
-    help: "岗位名排除或包含在集合中，模糊匹配，可用于只投或不投某个岗位名。",
+    label: '岗位名',
+    help: '岗位名排除或包含在集合中，模糊匹配，可用于只投或不投某个岗位名。',
   },
   jobContent: {
-    label: "工作内容",
-    help: "会自动检测上文(不是,不,无需),下文(系统,工具),例子：[外包,上门,销售,驾照], 排除: '外包岗位', 不排除: '不是外包'|'销售系统'",
+    label: '工作内容',
+    help: '会自动检测上文(不是,不,无需),下文(系统,工具),例子：[外包,上门,销售,驾照], 排除: \'外包岗位\', 不排除: \'不是外包\'|\'销售系统\'',
   },
   hrPosition: {
-    label: "Hr职位",
-    help: "Hr职位一定包含/排除在集合中，精确匹配, 不在内置中可手动输入,能实现只向经理等进行投递，毕竟人事干的不一定是人事",
+    label: 'Hr职位',
+    help: 'Hr职位一定包含/排除在集合中，精确匹配, 不在内置中可手动输入,能实现只向经理等进行投递，毕竟人事干的不一定是人事',
   },
   salaryRange: {
-    label: "薪资范围",
-    help: "投递工作的薪资范围, 交集匹配, 使用-连接范围, 单位: k。例如：【12-20】",
+    label: '薪资范围',
+    help: '投递工作的薪资范围, 交集匹配, 使用-连接范围, 单位: k。例如：【12-20】',
   },
   companySizeRange: {
-    label: "公司规模范围",
-    help: "投递工作的公司规模, 子集匹配, 使用-连接范围。例如：【500-20000000】",
+    label: '公司规模范围',
+    help: '投递工作的公司规模, 子集匹配, 使用-连接范围。例如：【500-20000000】',
   },
   customGreeting: {
-    label: "自定义招呼语",
-    help: "因为boss不支持将自定义的招呼语设置为默认招呼语。开启表示发送boss默认的招呼语后还会发送自定义招呼语",
+    label: '自定义招呼语',
+    help: '因为boss不支持将自定义的招呼语设置为默认招呼语。开启表示发送boss默认的招呼语后还会发送自定义招呼语',
   },
   greetingVariable: {
-    label: "招呼语变量",
-    help: "使用mitem模板引擎来对招呼语进行渲染;",
+    label: '招呼语变量',
+    help: '使用mitem模板引擎来对招呼语进行渲染;',
   },
   activityFilter: {
-    label: "活跃度过滤",
-    help: "打开后会自动过滤掉最近未活跃的Boss发布的工作。以免浪费每天的100次机会。",
+    label: '活跃度过滤',
+    help: '打开后会自动过滤掉最近未活跃的Boss发布的工作。以免浪费每天的100次机会。',
   },
   goldHunterFilter: {
-    label: "猎头过滤",
-    help: "Boss中有一些猎头发布的工作，但是一般而言这种工作不太行，点击可以过滤猎头发布的职位",
+    label: '猎头过滤',
+    help: 'Boss中有一些猎头发布的工作，但是一般而言这种工作不太行，点击可以过滤猎头发布的职位',
   },
   friendStatus: {
-    label: "好友过滤(已聊)",
-    help: "判断和hr是否建立过聊天，理论上能过滤的同hr，但是不同岗位的工作",
+    label: '好友过滤(已聊)',
+    help: '判断和hr是否建立过聊天，理论上能过滤的同hr，但是不同岗位的工作',
   },
   notification: {
-    label: "发送通知",
-    help: "可以在网站管理中打开通知权限,当停止时会自动发送桌面端通知提醒。",
+    label: '发送通知',
+    help: '可以在网站管理中打开通知权限,当停止时会自动发送桌面端通知提醒。',
   },
   deliveryLimit: {
-    label: "投递上限",
-    help: "达到上限后会自动暂停，默认100次",
+    label: '投递上限',
+    help: '达到上限后会自动暂停，默认100次',
   },
   aiGreeting: {
-    label: "AI招呼语",
-    help: "即使前面招呼语开了也不会发送，只会发送AI生成的招呼语，让gpt来打招呼真是太棒了，毕竟开场白很重要。",
+    label: 'AI招呼语',
+    help: '即使前面招呼语开了也不会发送，只会发送AI生成的招呼语，让gpt来打招呼真是太棒了，毕竟开场白很重要。',
     example: [
       `我现在需要求职，所以请你来写求职招呼语来向boos或hr打招呼，你需要代入我的身份也就是一名求职者.
 ## 能力:
@@ -87,7 +85,7 @@ export const formInfoData: FormInfoData = {
 `,
       [
         {
-          role: "user",
+          role: 'user',
           content: `# Role: 求职小能手
 # Author: Ocyss_04
 ## Definition
@@ -130,12 +128,12 @@ export const formInfoData: FormInfoData = {
 `,
         },
         {
-          role: "assistant",
+          role: 'assistant',
           content:
-            "你好，我是求职小能手，我已经掌握了您的能力。我将利用我的专业技能和严谨认真的态度为您生成独一无二且的求职招呼语。现在请提供岗位信息，我将开始为您生成求职招呼语",
+            '你好，我是求职小能手，我已经掌握了您的能力。我将利用我的专业技能和严谨认真的态度为您生成独一无二且的求职招呼语。现在请提供岗位信息，我将开始为您生成求职招呼语',
         },
         {
-          role: "user",
+          role: 'user',
           content: `### 待处理的岗位信息:\`\`\`
 岗位名:{{ card.jobName }}
 岗位描述:{{ card.postDescription }}
@@ -147,8 +145,8 @@ export const formInfoData: FormInfoData = {
     ],
   },
   aiFiltering: {
-    label: "AI过滤",
-    help: "根据工作内容让gpt分析过滤，真是太稳健了，不放过任何一个垃圾",
+    label: 'AI过滤',
+    help: '根据工作内容让gpt分析过滤，真是太稳健了，不放过任何一个垃圾',
     example: [
       `我现在需要求职，让你根据我的需要对岗位进行评分，方便我筛选岗位。
 ## 要求:
@@ -169,7 +167,7 @@ interface aiFiltering {
 }`,
       [
         {
-          role: "user",
+          role: 'user',
           content: `# Role: 求职评委
 # Author: Ocyss_04
 ## Profile
@@ -202,12 +200,12 @@ interface aiFiltering {
 `,
         },
         {
-          role: "assistant",
+          role: 'assistant',
           content:
-            "你好,我是求职评为,我已经掌握了您的能力。我将利用我的专业技能和严谨认真的态度对你输入的岗位信息进行打分,并返回符合格式的Json格式字符串",
+            '你好,我是求职评为,我已经掌握了您的能力。我将利用我的专业技能和严谨认真的态度对你输入的岗位信息进行打分,并返回符合格式的Json格式字符串',
         },
         {
-          role: "user",
+          role: 'user',
           content: `### 待处理的岗位信息:\`\`\`
 岗位描述:{{ card.postDescription}}
 相关标签:{{card.jobLabels}}
@@ -218,33 +216,33 @@ interface aiFiltering {
     ],
   },
   aiReply: {
-    label: "AI回复",
-    help: "万一消息太多，回不过来了呢，也许能和AiHR聊到地球爆炸？魔法击败魔法",
+    label: 'AI回复',
+    help: '万一消息太多，回不过来了呢，也许能和AiHR聊到地球爆炸？魔法击败魔法',
   },
   record: {
-    label: "内容记录",
-    help: "拿这些数据去训练个Ai岂不是美滋滋咯？",
+    label: '内容记录',
+    help: '拿这些数据去训练个Ai岂不是美滋滋咯？',
   },
   delay: {
     deliveryStarts: {
-      label: "投递开始",
-      help: "点击投递按钮会等待一段时间,默认值10s",
+      label: '投递开始',
+      help: '点击投递按钮会等待一段时间,默认值10s',
     },
     deliveryInterval: {
-      label: "投递间隔",
-      help: "每个投递的间隔,太快易风控,默认值2s",
+      label: '投递间隔',
+      help: '每个投递的间隔,太快易风控,默认值2s',
     },
     deliveryPageNext: {
-      label: "投递翻页",
-      help: "投递完下一页之后等待的间隔,太快易风控,默认值60s",
+      label: '投递翻页',
+      help: '投递完下一页之后等待的间隔,太快易风控,默认值60s',
     },
     messageSending: {
-      label: "消息发送",
-      help: "暂未实现 ,在发送消息前允许等待一定的时间让用户来修改或手动发送,默认值5s",
+      label: '消息发送',
+      help: '暂未实现 ,在发送消息前允许等待一定的时间让用户来修改或手动发送,默认值5s',
       disable: true,
     },
   },
-};
+}
 
 export const defaultFormData: FormData = {
   company: {
@@ -268,19 +266,19 @@ export const defaultFormData: FormData = {
   hrPosition: {
     include: true,
     value: [],
-    options: ["经理", "主管", "法人", "人力资源主管", "hr", "招聘专员"],
+    options: ['经理', '主管', '法人', '人力资源主管', 'hr', '招聘专员'],
     enable: false,
   },
   salaryRange: {
-    value: "8-13",
+    value: '8-13',
     enable: false,
   },
   companySizeRange: {
-    value: "",
+    value: '',
     enable: false,
   },
   customGreeting: {
-    value: "",
+    value: '',
     enable: false,
   },
   deliveryLimit: {
@@ -303,15 +301,15 @@ export const defaultFormData: FormData = {
   },
   aiGreeting: {
     enable: false,
-    prompt: "",
+    prompt: '',
   },
   aiFiltering: {
     enable: false,
-    prompt: "",
+    prompt: '',
   },
   aiReply: {
     enable: false,
-    prompt: "",
+    prompt: '',
   },
   record: {
     enable: false,
@@ -322,89 +320,89 @@ export const defaultFormData: FormData = {
     deliveryPageNext: 60,
     messageSending: 5,
   },
-};
+}
 
+const formData: FormData = reactive(defaultFormData)
+const isLoaded = ref(false)
 
-const formData: FormData = reactive(defaultFormData);
-const isLoaded = ref(false);
+async function init() {
+  const data = deepmerge<FormData>(defaultFormData, await getStorage(formDataKey, {}))
+  Object.assign(formData, data)
+  isLoaded.value = true
+}
 
-const init = async () => {
-  const data = deepmerge<FormData>(defaultFormData, await getStorage(formDataKey, {}));
-  Object.assign(formData, data);
-  isLoaded.value = true;
-};
-
-init();
+init()
 
 watchThrottled(
   formData,
   (v) => {
-    logger.debug("formData改变", toRaw(v));
+    logger.debug('formData改变', toRaw(v))
   },
-  { throttle: 2000 }
-);
+  { throttle: 2000 },
+)
 
 async function confSaving() {
-  const v = toRaw(formData);
-  await setStorage(formDataKey, v);
-  logger.debug("formData保存", toRaw(v));
+  const v = toRaw(formData)
+  await setStorage(formDataKey, v)
+  logger.debug('formData保存', toRaw(v))
 }
 async function confReload() {
-  const v = deepmerge<FormData>(defaultFormData, await getStorage(formDataKey, {}));
-  deepmerge(formData, v, { clone: false });
-  logger.debug("formData已重置");
+  const v = deepmerge<FormData>(defaultFormData, await getStorage(formDataKey, {}))
+  deepmerge(formData, v, { clone: false })
+  logger.debug('formData已重置')
 }
 async function confExport() {
   const data = deepmerge<FormData>(
     defaultFormData,
-    await getStorage(formDataKey, {})
-  );
+    await getStorage(formDataKey, {}),
+  )
 
   const blob = new Blob([JSON.stringify(data)], {
-    type: "application/json",
-  });
-  const link = document.createElement("a");
-  link.href = URL.createObjectURL(blob);
-  link.download = "打招呼配置.json";
-  link.click();
+    type: 'application/json',
+  })
+  const link = document.createElement('a')
+  link.href = URL.createObjectURL(blob)
+  link.download = '打招呼配置.json'
+  link.click()
 }
 function confImport() {
-  const fileInput = document.createElement("input");
-  fileInput.type = "file";
+  const fileInput = document.createElement('input')
+  fileInput.type = 'file'
 
-  fileInput.addEventListener("change", function (e) {
-    const file = (e!.target as HTMLInputElement)!.files?.[0];
-    if (!file || !file.name.endsWith(".json")) {
-      return alert("不是 JSON 文件");
+  fileInput.addEventListener('change', (e) => {
+    const file = (e!.target as HTMLInputElement)!.files?.[0]
+    if (!file || !file.name.endsWith('.json')) {
+      return alert('不是 JSON 文件')
     }
 
-    const reader = new FileReader();
+    const reader = new FileReader()
     reader.onload = async function (e) {
       try {
-        const jsonData = JSON.parse(e!.target!.result as string);
+        const jsonData = JSON.parse(e!.target!.result as string)
 
-        let type = Object.prototype.toString.call(jsonData).slice(8, -1);
-        if (!["Array", "Object"].includes(type)) {
-          return alert("内容非合法 JSON");
+        const type = Object.prototype.toString.call(jsonData).slice(8, -1)
+        if (!['Array', 'Object'].includes(type)) {
+          return alert('内容非合法 JSON')
         }
 
-        await setStorage(formDataKey, jsonData);
-        deepmerge(formData, jsonData, { clone: false });
-      } catch (error) {
-        return alert("内容非合法 JSON");
+        await setStorage(formDataKey, jsonData)
+        deepmerge(formData, jsonData, { clone: false })
       }
-    };
-    reader.readAsText(file);
-  });
+      catch (error: any) {
+        return alert(`内容非合法 JSON, ${error.message}`)
+      }
+    }
+    reader.readAsText(file)
+  })
 
-  fileInput.click();
+  fileInput.click()
 }
 function confDelete() {
-  deepmerge(formData, defaultFormData, { clone: false });
-  logger.debug("formData已清空");
+  deepmerge(formData, defaultFormData, { clone: false })
+  logger.debug('formData已清空')
 }
 
-export const useConfFormData = () => {
+export function useConfFormData() {
   return {
     confSaving,
     confReload,
@@ -415,5 +413,5 @@ export const useConfFormData = () => {
     defaultFormData,
     formData,
     isLoaded,
-  };
-};
+  }
+}
