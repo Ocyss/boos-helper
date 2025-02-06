@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { logger } from "./utils/logger";
+import { logger } from "@/utils/logger";
 import {
   ElDropdown,
   ElDropdownMenu,
@@ -9,12 +9,13 @@ import {
   Action,
   ElMessage,
 } from "element-plus";
-import { GM_deleteValue, GM_getValue, GM_listValues, GM_setValue } from "$";
+
 import storeVue from "@/components/conf/store.vue";
 import userVue from "@/components/conf/user.vue";
 import logVue from "@/components/conf/log.vue";
 import { onMounted, ref } from "vue";
-import { useStore } from "./hooks/useStore";
+import { useStore } from "@/hooks/useStore";
+import { getStorage, setStorage } from "@/utils/storage";
 
 logger.info("BoosHelper挂载成功");
 ElMessage("BoosHelper挂载成功!");
@@ -26,22 +27,13 @@ const confs = {
   log: { name: "日志配置", component: logVue, disabled: false },
 };
 const confKey = ref<keyof typeof confs>("store");
-const dark = ref(GM_getValue("theme-dark", false));
-const clone = async () => {
-  if (confirm("将清空脚本全部的设置!!")) {
-    const asyncKeys = await GM_listValues();
-    for (let index in asyncKeys) {
-      if (!asyncKeys.hasOwnProperty(index)) {
-        continue;
-      }
-      logger.debug(asyncKeys[index]);
-      await GM_deleteValue(asyncKeys[index]);
-    }
-    window.alert("OK!");
-  }
-};
+const dark = ref(false);
 
-function themeChange() {
+getStorage("theme-dark",false).then(res=>{
+  dark.value = res;
+})
+
+async function themeChange() {
   dark.value = !dark.value;
   if (dark.value) {
     ElMessage({
@@ -51,7 +43,7 @@ function themeChange() {
     });
   }
   document.documentElement.classList.toggle("dark", dark.value);
-  GM_setValue("theme-dark", dark.value);
+  await setStorage("theme-dark", dark.value);
 }
 
 // console.log(monkeyWindow, window, unsafeWindow);
@@ -60,7 +52,7 @@ onMounted(async () => {
   await storeInit();
   const protocol = "boos-protocol";
   const protocol_val = "2024/09/06";
-  const protocol_date: string = GM_getValue(protocol);
+  const protocol_date = await getStorage(protocol);
   if (protocol_date !== protocol_val) {
     ElMessageBox.alert(
       `1. 遇到bug即时反馈，不会使用请加群，使用前先好好了解项目，阅读每一个标签和帮助
@@ -84,7 +76,7 @@ greasyfork地址: https://greasyfork.org/zh-CN/scripts/491340
           "--el-messagebox-width: unset; white-space: pre-wrap; width: unset;" as any,
         callback: (action: Action) => {
           if (action === "confirm") {
-            GM_setValue(protocol, protocol_val);
+            setStorage(protocol, protocol_val);
           }
         },
       }

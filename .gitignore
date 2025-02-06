@@ -25,6 +25,8 @@ dist-ssr
 *.sln
 *.sw?
 
+.output
+
 logapi.zhipin.*.pem
 
 boos-helper-config.local.json

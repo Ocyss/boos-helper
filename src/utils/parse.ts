@@ -1,4 +1,3 @@
-import { unsafeWindow } from "$";
 import { parse, STR, OBJ, NUM, ARR, NULL } from "partial-json";
 
 export function parseGptJson<T = any>(json: string): Partial<T> | null {
@@ -8,4 +7,4 @@ export function parseGptJson<T = any>(json: string): Partial<T> | null {
   );
 }
 
-unsafeWindow.parseGptJson = parseGptJson;
+window.parseGptJson = parseGptJson;

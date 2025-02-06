@@ -1,9 +1,8 @@
-import { GM_getValue, GM_setValue } from "$";
 import { Statistics } from "@/types/formData";
 import { getCurDay } from "@/utils";
 import { reactiveComputed, watchThrottled } from "@vueuse/core";
 import { todayKey, statisticsKey } from "./useConfForm";
-import { logger } from "@/utils/logger";
+import { getStorage, setStorage } from "@/utils/storage";
 
 const todayData = reactiveComputed<Statistics>(() => {
   const date = getCurDay();
@@ -20,25 +19,28 @@ const todayData = reactiveComputed<Statistics>(() => {
     activityFilter: 0,
     goldHunterFilter: 0,
     repeat: 0,
-  };
-  const g = GM_getValue(todayKey, current);
-  logger.debug("统计数据:", g);
+    };
+  // TODO
+  //   const g = (await storage.getItem<typeof current>(todayKey))??current;
+  // logger.debug("统计数据:", g);
 
-  if (g.date === date) {
-    return g;
-  }
-  const statistics = GM_getValue(statisticsKey, []);
-  GM_setValue(statisticsKey, [g, ...statistics]);
-  GM_setValue(todayKey, current);
+  // if (g.date === date) {
+  //   return g;
+  // }
+  // const statistics = await storage.getItem<typeof current[]>(statisticsKey,{fallback:[]});
+  // await storage.setItem(statisticsKey, [g, ...statistics]);
+  // await storage.setItem(todayKey, current);
   return current;
 });
 
-const statisticsData = GM_getValue<Statistics[]>(statisticsKey, []);
+let statisticsData: Statistics[] = [];
+
+getStorage<Statistics[]>(statisticsKey,[]).then(data=>statisticsData=data)
 
 watchThrottled(
   todayData,
   (v) => {
-    GM_setValue(todayKey, v);
+      setStorage(todayKey, v);
   },
   { throttle: 200 }
 );

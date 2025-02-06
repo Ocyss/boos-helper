@@ -2,7 +2,6 @@ import { GreetError, PublishError } from "@/types/deliverError";
 import axios from "axios";
 import { useStore } from "../useStore";
 import { ElMessage } from "element-plus";
-import { unsafeWindow } from "$";
 
 const { userInfo } = useStore();
 
@@ -38,7 +37,7 @@ export async function sendPublishReq(
     jobId: data.encryptJobId,
     lid: data.lid,
   };
-  const token = unsafeWindow?.Cookie.get("bst");
+  const token = window?.Cookie.get("bst");
   if (!token) {
     ElMessage.error("没有获取到token,请刷新重试");
     throw new PublishError("没有获取到token");
@@ -80,7 +79,7 @@ export async function requestBossData(
   }
   const url = "https://www.zhipin.com/wapi/zpchat/geek/getBossData";
   // userInfo.value?.token 不相等！
-  const token = unsafeWindow?.Cookie.get("bst");
+  const token = window?.Cookie.get("bst");
   if (!token) {
     ElMessage.error("没有获取到token,请刷新重试");
     throw new GreetError("没有获取到token");

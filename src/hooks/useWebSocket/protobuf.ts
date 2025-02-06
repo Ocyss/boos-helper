@@ -1,7 +1,4 @@
-import protobuf from "protobufjs";
 import { TechwolfChatProtocol, AwesomeMessage } from "./type";
-import { unsafeWindow } from "$";
-
 export class Message {
   msg: Uint8Array;
   hex: string;
@@ -47,9 +44,9 @@ export class Message {
       .join("");
   }
   toArrayBuffer(): ArrayBuffer {
-    return this.msg.buffer.slice(0, this.msg.byteLength);
+    return this.msg.buffer.slice(0, this.msg.byteLength) as ArrayBuffer;
   }
   send() {
-    unsafeWindow.ChatWebsocket.send(this);
+    window.ChatWebsocket.send(this);
   }
 }

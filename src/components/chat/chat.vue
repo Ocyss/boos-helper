@@ -107,7 +107,7 @@ function inputMsgUpdate(v: string) {
           <el-icon
             v-if="chatInput.avatar"
             size="large"
-            v-html="chatInput.avatar.icon"
+            v-html="chatInput.avatar?.icon"
           />
         </el-avatar>
         <el-button type="primary" plain round>发送</el-button>

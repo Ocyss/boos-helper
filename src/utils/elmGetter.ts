@@ -5,9 +5,8 @@
 // @supportURL   https://bbs.tampermonkey.net.cn/thread-2726-1-1.html
 // ==/UserScript==
 // @ts-nocheck
-import { unsafeWindow } from "$";
 
-const win = unsafeWindow || document.defaultView || window;
+const win = document.defaultView || window;
 const doc = win.document;
 const listeners = new WeakMap();
 

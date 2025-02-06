@@ -69,7 +69,7 @@ const recordModel = ref(Array.isArray(m) ? m : [m]);
   <div style="margin-top: 15px">
     <el-button
       type="primary"
-      help="有那么多功能，当然要分等级了，不然岂不是浪费了这么多的模型（主要缺钱）"
+      data-help="有那么多功能，当然要分等级了，不然岂不是浪费了这么多的模型（主要缺钱）"
       @click="aiConfBoxShow = true"
     >
       模型配置

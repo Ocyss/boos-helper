@@ -1,18 +1,18 @@
-import { compile, reactive, toRaw, computed, ref, CSSProperties } from "vue";
+import {  reactive, toRaw } from "vue";
+import { ref } from "vue";
 
-import { GM_getValue, GM_listValues, GM_setValue } from "$";
-
-import { reactiveComputed, watchThrottled } from "@vueuse/core";
+import {  watchThrottled } from "@vueuse/core";
 
 import deepmerge from "@/utils/deepmerge";
-import { FormData, FormInfoData, Statistics } from "@/types/formData";
-import { getCurDay } from "@/utils";
-import { logger } from "@/utils/logger";
-import { Action, ElMessage, ElMessageBox } from "element-plus";
+import { FormData, FormInfoData } from "@/types/formData";
 
-export const formDataKey = "web-geek-job-FormData";
-export const todayKey = "web-geek-job-Today";
-export const statisticsKey = "web-geek-job-Statistics";
+import { logger } from "@/utils/logger";
+import { getStorage, setStorage } from "@/utils/storage";
+
+
+export const formDataKey = "sync:web-geek-job-FormData";
+export const todayKey = "sync:web-geek-job-Today";
+export const statisticsKey = "sync:web-geek-job-Statistics";
 export const formInfoData: FormInfoData = {
   company: {
     label: "公司名",
@@ -324,9 +324,17 @@ export const defaultFormData: FormData = {
   },
 };
 
-const formData: FormData = reactive(
-  deepmerge<FormData>(defaultFormData, GM_getValue(formDataKey, {}))
-);
+
+const formData: FormData = reactive(defaultFormData);
+const isLoaded = ref(false);
+
+const init = async () => {
+  const data = deepmerge<FormData>(defaultFormData, await getStorage(formDataKey, {}));
+  Object.assign(formData, data);
+  isLoaded.value = true;
+};
+
+init();
 
 watchThrottled(
   formData,
@@ -336,20 +344,20 @@ watchThrottled(
   { throttle: 2000 }
 );
 
-function confSaving() {
+async function confSaving() {
   const v = toRaw(formData);
-  GM_setValue(formDataKey, v);
+  await setStorage(formDataKey, v);
   logger.debug("formData保存", toRaw(v));
 }
-function confReload() {
-  const v = deepmerge<FormData>(defaultFormData, GM_getValue(formDataKey, {}));
+async function confReload() {
+  const v = deepmerge<FormData>(defaultFormData, await getStorage(formDataKey, {}));
   deepmerge(formData, v, { clone: false });
   logger.debug("formData已重置");
 }
-function confExport() {
+async function confExport() {
   const data = deepmerge<FormData>(
     defaultFormData,
-    GM_getValue(formDataKey, {})
+    await getStorage(formDataKey, {})
   );
 
   const blob = new Blob([JSON.stringify(data)], {
@@ -371,7 +379,7 @@ function confImport() {
     }
 
     const reader = new FileReader();
-    reader.onload = function (e) {
+    reader.onload = async function (e) {
       try {
         const jsonData = JSON.parse(e!.target!.result as string);
 
@@ -380,7 +388,7 @@ function confImport() {
           return alert("内容非合法 JSON");
         }
 
-        GM_setValue(formDataKey, jsonData);
+        await setStorage(formDataKey, jsonData);
         deepmerge(formData, jsonData, { clone: false });
       } catch (error) {
         return alert("内容非合法 JSON");
@@ -406,5 +414,6 @@ export const useConfFormData = () => {
     formDataKey,
     defaultFormData,
     formData,
+    isLoaded,
   };
 };

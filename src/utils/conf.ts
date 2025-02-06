@@ -1,6 +1,6 @@
 import { ref } from "vue";
 import { ElMessageBox, ElNotification } from "element-plus";
-import { GM_getValue, GM_setValue } from "$";
+import { getStorage, setStorage } from "@/utils/storage";
 export const netConf = ref<NetConf>();
 
 fetch("https://qiu-config.oss-cn-beijing.aliyuncs.com/boos-helper-config.json")
@@ -10,14 +10,14 @@ fetch("https://qiu-config.oss-cn-beijing.aliyuncs.com/boos-helper-config.json")
   .then((data) => {
     netConf.value = data;
     const now = new Date().getTime();
-    netConf.value?.notification.forEach((item) => {
-      if (now > GM_getValue(`netConf-${item.key}`, 0)) {
+    netConf.value?.notification.forEach(async (item) => {
+      if (now > await getStorage(`local:netConf-${item.key}`, 0)) {
         if (item.type === "message") {
           ElMessageBox.alert(item.data.content, item.data.title ?? "message", {
             confirmButtonText: "OK",
             callback: () => {
-              GM_setValue(
-                `netConf-${item.key}`,
+              setStorage(
+                `local:netConf-${item.key}`,
                 now + (item.data.duration ?? 86400) * 1000
               );
             },
@@ -27,8 +27,8 @@ fetch("https://qiu-config.oss-cn-beijing.aliyuncs.com/boos-helper-config.json")
             ...item.data,
             duration: 0,
             onClose() {
-              GM_setValue(
-                `netConf-${item.key}`,
+              setStorage(
+                `local:netConf-${item.key}`,
                 now + (item.data.duration ?? 86400) * 1000
               );
             },

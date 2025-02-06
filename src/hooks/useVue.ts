@@ -1,4 +1,3 @@
-import elmGetter from "@/utils/elmGetter";
 import { ref, Ref } from "vue";
 
 const rootVue = ref();
@@ -6,15 +5,39 @@ const rootVue = ref();
 export const getRootVue = async () => {
   if (rootVue.value) return rootVue.value;
 
-  let wrap = await elmGetter.get<Element & { __vue__: any }>("#wrap");
+  const waitVueMount = () => {
+    return new Promise((resolve, reject) => {
+      const observer = new MutationObserver((mutations, obs) => {
+        const wrap = document.querySelector('#wrap');
+        if (wrap && '__vue__' in wrap) {
+          obs.disconnect();
+          rootVue.value = wrap.__vue__;
+          resolve(rootVue.value);
+        }
+      });
 
-  if (wrap.__vue__) rootVue.value = wrap.__vue__;
-  else {
-    // ElMessage.error("未找到vue根组件");
-    throw new Error("未找到vue根组件");
+      observer.observe(document.documentElement, {
+        childList: true,
+        subtree: true
+      });
+
+      // 5秒后超时
+      setTimeout(() => {
+        observer.disconnect();
+        reject(new Error("未找到vue根组件"));
+      }, 5000);
+    });
+  };
+
+
+  try {
+    await waitVueMount();
+    return rootVue.value;
+  } catch (err) {
+    throw err;
   }
-  return rootVue.value;
 };
+
 export const useHookVueData = (
   selectors: string,
   key: string,

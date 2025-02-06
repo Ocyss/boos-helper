@@ -1,9 +1,6 @@
-import axios from "axios";
 import { llm, llmConf, llmInfo, messageReps, prompt } from "../type";
 import { desc, other } from "../common";
-import { GM_xmlhttpRequest } from "$";
 import { OnStream, request } from "@/utils/request";
-import { logger } from "@/utils/logger";
 
 export type openaiLLMConf = llmConf<
   "openai",

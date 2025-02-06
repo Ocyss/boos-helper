@@ -15,7 +15,7 @@ import { useJobList } from "./hooks/useJobList";
 import { usePager } from "./hooks/usePager";
 import elmGetter from "@/utils/elmGetter";
 import { netConf } from "@/utils/conf";
-import { GM_getValue, GM_setValue } from "$";
+
 
 const { initPager } = usePager();
 const { initJobList } = useJobList();
@@ -44,7 +44,7 @@ const triggerRef = computed(() => {
 const boxStyles = computed(() => {
   if (helpVisible.value && !isOutside.value) {
     const element = document.elementFromPoint(x.value, y.value);
-    const el = findHelp(element);
+    const el = findHelp(element as HTMLElement);
     if (el) {
       const bounding = el.getBoundingClientRect();
       helpElWidth.value = bounding.width;
@@ -64,9 +64,9 @@ const boxStyles = computed(() => {
   };
 });
 
-function findHelp(dom: Element | null) {
+function findHelp(dom: HTMLElement | null) {
   if (!dom) return;
-  const help = dom.getAttribute("help");
+  const help = dom.dataset.help;
   if (help) {
     helpContent.value = help;
     return dom;
@@ -127,11 +127,11 @@ const now = new Date().getTime();
       )"
       :key="item.key ?? item.data.title"
     >
-      <el-alert
+      <!-- <el-alert
         v-if="now > GM_getValue(`netConf-${item.key}`, 0)"
         v-bind="item.data"
         @close="GM_setValue(`netConf-${item.key}`, now + 259200000)"
-      />
+      /> -->
     </template>
   </div>
   <el-tooltip :visible="helpVisible && !isOutside" :virtual-ref="triggerRef">
@@ -141,28 +141,28 @@ const now = new Date().getTime();
       </div>
     </template>
   </el-tooltip>
-  <el-tabs ref="tabsRef" help="鼠标移到对应元素查看提示">
-    <el-tab-pane label="统计" help="失败是成功她妈">
+  <el-tabs ref="tabsRef" data-help="鼠标移到对应元素查看提示">
+    <el-tab-pane label="统计" data-help="失败是成功她妈">
       <statisticsVue></statisticsVue>
     </el-tab-pane>
     <el-tab-pane
       label="搜索"
       ref="searchRef"
-      help="boos直聘原搜索, 可能出现空白bug"
+      data-help="boos直聘原搜索, 可能出现空白bug"
     />
-    <el-tab-pane label="筛选" help="好好看，好好学">
+    <el-tab-pane label="筛选" data-help="好好看，好好学">
       <configVue></configVue>
     </el-tab-pane>
-    <el-tab-pane label="AI" help="AI时代，脚本怎么能落伍!">
+    <el-tab-pane label="AI" data-help="AI时代，脚本怎么能落伍!">
       <aiVue></aiVue>
     </el-tab-pane>
-    <el-tab-pane label="日志" help="反正你也不看">
+    <el-tab-pane label="日志" data-help="反正你也不看">
       <logsVue></logsVue>
     </el-tab-pane>
     <el-tab-pane
       label="关于"
       class="hp-about-box"
-      help="项目是写不完美的,但总要去追求完美"
+      data-help="项目是写不完美的,但总要去追求完美"
     >
       <aboutVue></aboutVue>
     </el-tab-pane>

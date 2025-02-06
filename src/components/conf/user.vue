@@ -1,5 +1,4 @@
 <script lang="ts" setup>
-import { GM_cookie, GM_getValue, GM_setValue } from "$";
 import { useConfFormData, formDataKey, todayKey } from "@/hooks/useConfForm";
 import {
   ElDialog,
@@ -17,7 +16,8 @@ import { useStatistics } from "@/hooks/useStatistics";
 import { computed, reactive, ref, toRaw } from "vue";
 import { useStore, useUserId } from "@/hooks/useStore";
 import { logger } from "@/utils/logger";
-const confUserKey = "conf-user";
+import { getStorage } from "@/utils/storage";
+const confUserKey = "sync:conf-user";
 const { formData } = useConfFormData();
 const { todayData } = useStatistics();
 const { userInfo } = useStore();
@@ -35,7 +35,7 @@ type Data = {
   statistics?: Statistics;
 };
 
-const data = reactive(GM_getValue<{ [keys: string]: Data }>(confUserKey, {}));
+const data = reactive(await getStorage<{ [keys: string]: Data }>(confUserKey,{}));
 const tableData = computed<Data[]>(() => Object.values(data));
 logger.debug("账户数据", toRaw(data));
 
@@ -46,76 +46,76 @@ const handleCurrentChange = (val: Data | undefined) => {
 };
 
 async function create(flag = true) {
-  logger.debug("开始创建账户");
-  try {
-    const list = await new Promise<any[]>((resolve, reject) => {
-      GM_cookie.list({}, (cookies, error) => {
-        if (error) {
-          reject(error);
-        } else {
-          resolve(cookies);
-        }
-      });
-    });
-    logger.debug(list);
+//   logger.debug("开始创建账户");
+//   try {
+//     const list = await new Promise<any[]>((resolve, reject) => {
+//       GM_cookie.list({}, (cookies, error) => {
+//         if (error) {
+//           reject(error);
+//         } else {
+//           resolve(cookies);
+//         }
+//       });
+//     });
+//     logger.debug(list);
 
-    let uid: number | string = useUserId();
-    if (!uid) {
-      throw new Error("找不到uid");
-    }
-    uid = String(uid);
-    data[uid] = {
-      uid,
-      user: userInfo.value?.showName || userInfo.value?.name || "nil",
-      avatar: userInfo.value?.tinyAvatar || userInfo.value?.largeAvatar || "",
-      remark: "",
-      gender: userInfo.value?.gender === 0 ? "man" : "woman",
-      flag: userInfo.value?.studentFlag ? "student" : "staff",
-      date: new Date().toLocaleString(),
-      cookie: JSON.stringify(list),
-      form: toRaw(formData),
-      statistics: toRaw(todayData),
-    };
-    GM_setValue(confUserKey, data);
-    await Promise.all(
-      list.map((item) => GM_cookie.delete({ name: item.name }))
-    );
-    if (flag) {
-      ElMessage.success("创建成功,开始清空ck并刷新");
-      window.location.reload();
-    }
-  } catch (e) {
-    ElMessage.error("遇到错误,请重试," + e);
-    throw new Error("err", { cause: e });
-  }
+//     let uid: number | string = useUserId();
+//     if (!uid) {
+//       throw new Error("找不到uid");
+//     }
+//     uid = String(uid);
+//     data[uid] = {
+//       uid,
+//       user: userInfo.value?.showName || userInfo.value?.name || "nil",
+//       avatar: userInfo.value?.tinyAvatar || userInfo.value?.largeAvatar || "",
+//       remark: "",
+//       gender: userInfo.value?.gender === 0 ? "man" : "woman",
+//       flag: userInfo.value?.studentFlag ? "student" : "staff",
+//       date: new Date().toLocaleString(),
+//       cookie: JSON.stringify(list),
+//       form: toRaw(formData),
+//       statistics: toRaw(todayData),
+//     };
+//     GM_setValue(confUserKey, data);
+//     await Promise.all(
+//       list.map((item) => GM_cookie.delete({ name: item.name }))
+//     );
+//     if (flag) {
+//       ElMessage.success("创建成功,开始清空ck并刷新");
+//       window.location.reload();
+//     }
+//   } catch (e) {
+//     ElMessage.error("遇到错误,请重试," + e);
+//     throw new Error("err", { cause: e });
+//   }
 }
 
 async function change() {
-  try {
-    const data = currentRow.value;
-    if (!data) {
-      ElMessage.error("错误,空状态");
-      return;
-    }
-    currentRow.value = undefined;
-    await create(false);
-    if (data.form) GM_setValue(formDataKey, data.form);
-    if (data.statistics) GM_setValue(todayKey, data.statistics);
-    const ck: any[] = JSON.parse(data.cookie);
-    await Promise.all(ck.map((c) => GM_cookie.set(c)));
-    ElMessage.success("切换完成,即将刷新");
-    window.location.reload();
-  } catch (e: any) {
-    logger.error("错误,切换失败", e);
+//   try {
+//     const data = currentRow.value;
+//     if (!data) {
+//       ElMessage.error("错误,空状态");
+//       return;
+//     }
+//     currentRow.value = undefined;
+//     await create(false);
+//     if (data.form) GM_setValue(formDataKey, data.form);
+//     if (data.statistics) GM_setValue(todayKey, data.statistics);
+//     const ck: any[] = JSON.parse(data.cookie);
+//     await Promise.all(ck.map((c) => GM_cookie.set(c)));
+//     ElMessage.success("切换完成,即将刷新");
+//     window.location.reload();
+//   } catch (e: any) {
+//     logger.error("错误,切换失败", e);
 
-    if (e.name !== "err" || !e.name) ElMessage.error("错误,切换失败");
-  }
+//     if (e.name !== "err" || !e.name) ElMessage.error("错误,切换失败");
+//   }
 }
 function del(d: Data) {
   delete data[d.uid];
   logger.debug(data);
 
-  GM_setValue(confUserKey, toRaw(data));
+  // GM_setValue(confUserKey, toRaw(data));
   ElMessage.success("删除成功");
 }
 </script>

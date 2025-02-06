@@ -112,7 +112,7 @@ function stopBatch() {
   <el-row :gutter="20">
     <el-col :span="5">
       <el-statistic
-        help="统计当天脚本扫描过的所有岗位"
+        data-help="统计当天脚本扫描过的所有岗位"
         :value="todayData.total"
         title="岗位总数："
         suffix="份"
@@ -120,7 +120,7 @@ function stopBatch() {
     </el-col>
     <el-col :span="5">
       <el-statistic
-        help="统计当天岗位过滤的比例,被过滤/总数"
+        data-help="统计当天岗位过滤的比例,被过滤/总数"
         :value="((todayData.total - todayData.success) / todayData.total) * deliveryLimit"
         title="过滤比例："
         suffix="%"
@@ -128,7 +128,7 @@ function stopBatch() {
     </el-col>
     <el-col :span="5">
       <el-statistic
-        help="统计当天岗位中已沟通的比例,已沟通/总数"
+        data-help="统计当天岗位中已沟通的比例,已沟通/总数"
         :value="(todayData.repeat / todayData.total) * deliveryLimit"
         title="沟通比例："
         suffix="%"
@@ -136,7 +136,7 @@ function stopBatch() {
     </el-col>
     <el-col :span="5">
       <el-statistic
-        help="统计当天岗位中的活跃情况,不活跃/总数"
+        data-help="统计当天岗位中的活跃情况,不活跃/总数"
         :value="(todayData.activityFilter / todayData.total) * deliveryLimit"
         title="活跃比例："
         suffix="%"
@@ -144,7 +144,7 @@ function stopBatch() {
     </el-col>
     <el-col :span="4">
       <el-statistic
-        :help="statisticCycleData[statisticCycle].help"
+        :data-help="statisticCycleData[statisticCycle].help"
         :value="cycle + todayData.success"
         suffix="份"
       >
@@ -187,7 +187,7 @@ function stopBatch() {
     <el-button-group style="margin: 10px 30px 0 0">
       <el-button
         type="primary"
-        help="点击开始就会开始投递"
+        data-help="点击开始就会开始投递"
         :loading="deliverLock"
         @click="startBatch"
       >
@@ -196,7 +196,7 @@ function stopBatch() {
       <el-button
         v-if="deliverLock && !deliverStop"
         type="warning"
-        help="暂停后应该能继续"
+        data-help="暂停后应该能继续"
         @click="stopBatch"
       >
         暂停
@@ -204,14 +204,14 @@ function stopBatch() {
       <el-button
         v-if="deliverLock && !deliverStop"
         type="danger"
-        help="停止后应该不能继续"
+        data-help="停止后应该不能继续"
         @click="stopBatch"
       >
         停止
       </el-button>
     </el-button-group>
     <el-progress
-      help="我会统计当天脚本投递的数量,该记录并不准确"
+      data-help="我会统计当天脚本投递的数量,该记录并不准确"
       style="flex: 1"
       :percentage="todayData.success / deliveryLimit"
     />

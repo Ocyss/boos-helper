@@ -121,7 +121,7 @@ const { deliverLock } = useCommon();
           v-for="(item, key) in formInfoData.delay"
           :key
           :label="item.label"
-          :help="item.help"
+          :data-help="item.help"
         >
           <el-input-number
             v-model="formData.delay[key]"
@@ -163,23 +163,23 @@ const { deliverLock } = useCommon();
   <div style="margin-top: 15px">
     <el-button
       type="primary"
-      help="保存配置，用于后续直接使用当前配置。"
+      data-help="保存配置，用于后续直接使用当前配置。"
       @click="confSaving"
     >
       保存配置
     </el-button>
-    <el-button type="primary" help="重新加载本地配置" @click="confReload">
+    <el-button type="primary" data-help="重新加载本地配置" @click="confReload">
       重载配置
     </el-button>
-    <el-button type="primary" help="互联网就是要分享" @click="confExport">
+    <el-button type="primary" data-help="互联网就是要分享" @click="confExport">
       导出配置
     </el-button>
-    <el-button type="primary" help="互联网就是要分享" @click="confImport">
+    <el-button type="primary" data-help="互联网就是要分享" @click="confImport">
       导入配置
     </el-button>
     <el-button
       type="primary"
-      help="清空配置,不会帮你保存,可以重载恢复"
+      data-help="清空配置,不会帮你保存,可以重载恢复"
       @click="confDelete"
     >
       删除配置

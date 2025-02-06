@@ -1,4 +1,3 @@
-import { GM_getValue, GM_setValue } from "$";
 import { logger } from "@/utils/logger";
 import { ElMessage } from "element-plus";
 import { ref, toRaw } from "vue";
@@ -7,6 +6,7 @@ import { user, userLLMConf } from "./llms/user";
 import { moonshot, moonshotLLMConf } from "./llms/moonshot";
 import { coze, cozeLLMConf } from "./llms/coze";
 import { llm, prompt } from "./type";
+import { getStorage, setStorage } from "@/utils/storage";
 
 export const confModelKey = "conf-model";
 export const llms = [openai.info, moonshot.info, coze.info];
@@ -15,8 +15,17 @@ export const llmsIcons = llms.reduce((acc, cur) => {
   if (cur.mode.icon) acc[cur.mode.mode] = cur.mode.icon;
   return acc;
 }, {} as Record<string, string>);
-const modelData = ref(GM_getValue<modelData[]>(confModelKey, []));
-logger.debug("ai模型数据", toRaw(modelData.value));
+
+const modelData = ref<modelData[]>([]);
+
+
+async function init() {
+  const data = await getStorage<modelData[]>(confModelKey, []);
+  logger.debug("ai模型数据", data);
+  modelData.value = data;
+}
+
+init()
 
 export type modelData = {
   key: string;
@@ -49,8 +58,8 @@ function getGpt(model: modelData, template: string | prompt): llm {
   throw new Error(`GPT不存在, 可能已删除停止维护, ${model.data.mode}`);
 }
 
-function save() {
-  GM_setValue(confModelKey, toRaw(modelData.value));
+async function save() {
+  await setStorage(confModelKey, toRaw(modelData.value));
   ElMessage.success("保存成功");
 }
 
