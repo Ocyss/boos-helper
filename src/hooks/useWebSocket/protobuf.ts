@@ -47,6 +47,7 @@ export class Message {
   }
 
   toArrayBuffer(): ArrayBuffer {
+    // eslint-disable-next-line ts/no-unnecessary-type-assertion
     return this.msg.buffer.slice(0, this.msg.byteLength) as ArrayBuffer
   }
 

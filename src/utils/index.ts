@@ -50,8 +50,9 @@ export function animate({
   )
 }
 let delayLoadId: number | undefined
+
 // 延迟
-export function delay(s: number) {
+export async function delay(s: number) {
   loader({ ms: s * 1000 })
   return new Promise(resolve => setTimeout(resolve, s * 1000))
 }
@@ -66,39 +67,38 @@ export function loader({ ms = 10000, color = '#54f98d', onDone = () => {} }) {
     load = l
   }
   load.style.background = color
-  if (delayLoadId) {
+  if (delayLoadId != null) {
     cancelAnimationFrame(delayLoadId)
     delayLoadId = undefined
   }
-  if (load) {
-    animate({
-      duration: ms,
-      callId(id) {
-        delayLoadId = id
-      },
-      timing(timeFraction) {
-        return timeFraction
-      },
-      draw(progress) {
-        if (load)
-          load.style.width = `${progress * 100}%`
-      },
-      end() {
-        if (load)
-          load.style.width = '0%'
-        onDone()
-      },
-    })
-  }
+  animate({
+    duration: ms,
+    callId(id) {
+      delayLoadId = id
+    },
+    timing(timeFraction) {
+      return timeFraction
+    },
+    draw(progress) {
+      load.style.width = `${progress * 100}%`
+    },
+    end() {
+      load.style.width = '0%'
+      onDone()
+    },
+  })
+
   return () => {
-    if (delayLoadId)
+    if (delayLoadId != null) {
       cancelAnimationFrame(delayLoadId)
-    delayLoadId = undefined
+      delayLoadId = undefined
+    }
     const load = document.querySelector<HTMLDivElement>('#loader')
     if (load)
       load.style.width = '0%'
   }
 }
+
 // 获取当前日期
 export function getCurDay(currentDate = new Date()) {
   const year = currentDate.getFullYear()
@@ -106,6 +106,7 @@ export function getCurDay(currentDate = new Date()) {
   const day = String(currentDate.getDate()).padStart(2, '0')
   return `${year}-${month}-${day}`
 }
+
 // 获取当前时间
 export function getCurTime(currentDate = new Date()) {
   const hours = String(currentDate.getHours() + 1).padStart(2, '0')

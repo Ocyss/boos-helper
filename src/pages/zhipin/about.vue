@@ -76,12 +76,12 @@ import { ElImage, ElLink } from 'element-plus'
           飞书问卷结果
         </ElLink>
 
-        <ElLink
+        <!-- <ElLink
           href="https://applink.feishu.cn/client/chat/chatter/add_by_link?link_token=410v5499-7193-411f-8258-94ae0cac4fc0"
           target="_blank"
         >
-          飞书交流群
-        </ElLink>
+          飞书交流群(已满)
+        </ElLink> -->
       </el-space>
     </div>
     <div

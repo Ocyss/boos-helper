@@ -1,15 +1,14 @@
-<script lang="ts" setup>
+<script lang="tsx" setup>
+import type { MyJobListData } from '@/hooks/useJobList'
 import type { prompt } from '@/hooks/useModel/type'
 import type { FormInfoAi } from '@/types/formData'
+import type { CheckboxValueType, TableTooltipData } from 'element-plus'
+import JobCard from '@/components/JobCard.vue'
 import { formInfoData, useConfFormData } from '@/hooks/useConfForm'
-import { useModel } from '@/hooks/useModel'
+import { jobList } from '@/hooks/useJobList'
+import { getGpt, useModel } from '@/hooks/useModel'
 import {
-  ElAlert,
-  ElButton,
-  ElDialog,
-  ElInput,
-  ElLink,
-  ElSelectV2,
+  ElMessage,
   ElText,
 } from 'element-plus'
 import { ref } from 'vue'
@@ -17,6 +16,7 @@ import { ref } from 'vue'
 const props = defineProps<{
   data: 'aiGreeting' | 'aiFiltering' | 'aiReply'
 }>()
+
 const { formData, confSaving } = useConfFormData()
 const { modelData } = useModel()
 const show = defineModel<boolean>({ required: true })
@@ -66,6 +66,117 @@ function addMessage() {
     message.value.push({ role: 'user', content: '' })
   }
 }
+
+const testDialog = ref(false)
+
+interface TestData {
+  job: MyJobListData
+  testContent: Array<{ time: string, prompt?: string, content?: string }>
+  checked: CheckboxValueType
+}
+
+const testData = reactive<Array<TestData>>([])
+
+function test() {
+  testDialog.value = true
+}
+
+const testJobLoading = ref(false)
+const testJobStop = ref(true)
+
+async function addTestJob() {
+  testJobLoading.value = true
+  try {
+    let count = 0
+    for (const item of jobList._list.value) {
+      if (testData.some(v => v.job.encryptJobId === item.encryptJobId)) {
+        continue
+      }
+      if (item.card == null) {
+        await new Promise(resolve => setTimeout(resolve, 1000))
+        await item.getCard()
+      }
+      testData.push({ job: item, testContent: [], checked: false })
+      count++
+      if (count > 3) {
+        break
+      }
+    }
+  }
+  finally {
+    testJobLoading.value = false
+  }
+}
+
+async function testJob() {
+  if (!testJobStop.value) {
+    testJobStop.value = true
+    return
+  }
+  testJobLoading.value = true
+  testJobStop.value = false
+  const md = modelData.value.find(
+    v => model.value === v.key,
+  )
+  if (!model.value || !md) {
+    ElMessage.warning('请在上级弹窗右上角选择模型')
+    return
+  }
+  try {
+    const gpt = getGpt(md, message.value)
+    const handle = async (item: TestData) => {
+      if (testJobStop.value) {
+        return
+      }
+      const { content, prompt, reasoning_content } = await gpt.message({
+        data: {
+          data: item.job,
+          card: item.job.card,
+        },
+      })
+      item.testContent.push({ time: new Date().toLocaleString(), prompt, content: reasoning_content ? `思考过程: ${reasoning_content}\n\n${content}` : content })
+    }
+
+    for (let i = 0; i < testData.length; i += 3) {
+      const batch = testData.slice(i, i + 3)
+      await Promise.all(batch.map(handle))
+    }
+  }
+  finally {
+    testJobLoading.value = false
+    testJobStop.value = true
+  }
+}
+
+function Row({ cells, rowData }: { cells: any[], rowData: TestData }) {
+  if (rowData.testContent.length > 0) {
+    return (
+      <div class="test-content-wrapper">
+        <div class="test-content-list">
+          {rowData.testContent.slice(-3).map(item => (
+            <div class="test-content-item" key={item.time}>
+              <div class="test-content-time">{item.time}</div>
+              <ElText class="test-content-prompt" line-clamp="3">{item.prompt}</ElText>
+              <ElText class="test-content-content" line-clamp="3">{item.content}</ElText>
+            </div>
+          ))}
+        </div>
+      </div>
+    )
+  }
+  return cells
+}
+Row.inheritAttrs = false
+function savePrompt() {
+  if (model.value == null) {
+    ElMessage.warning('请在右上角选择模型')
+    return
+  }
+  formData[props.data].model = model.value
+  formData[props.data].prompt = message.value
+  confSaving()
+  show.value = false
+}
 </script>
 
 <template>
@@ -77,11 +188,6 @@ function addMessage() {
     destroy-on-close
     :z-index="20"
   >
-    <ElAlert
-      title="对于性能强的模型使用单对话在够用的同时也能减少tokens的使用。而性能稍弱的模型使用多对话来加强引导,但也会消耗更多的tokens"
-      type="info"
-      :closable="false"
-    />
     <div class="select-form-box">
       <el-radio-group
         v-model="singleMode"
@@ -105,13 +211,13 @@ function addMessage() {
 
     <ElText style="margin: 20px 0" tag="div">
       使用
-      <ElLink
+      <el-link
         type="primary"
         href="https://ygorko.github.io/mitem/"
         target="_blank"
       >
         mitem
-      </ElLink>
+      </el-link>
       来渲染模板。在多对话模式下，只有最后的消息会使用模板。
       <ElLink type="primary" href="#" target="_blank">
         变量表
@@ -177,16 +283,13 @@ function addMessage() {
         <ElButton @click="show = false">
           取消
         </ElButton>
-
+        <ElButton type="primary" @click="test">
+          测试
+        </ElButton>
         <ElButton
           type="primary"
           @click="
-            () => {
-              formData[data].model = model;
-              formData[data].prompt = message;
-              confSaving();
-              show = false;
-            }
+            savePrompt
           "
         >
           保存
@@ -194,9 +297,66 @@ function addMessage() {
       </div>
     </template>
   </ElDialog>
+  <ElDialog v-model="testDialog" title="Prompt 测试" width="800">
+    <el-space direction="horizontal" size="large">
+      <ElButton :loading="testJobLoading" @click="addTestJob">
+        添加4个页面岗位
+      </ElButton>
+      <ElButton type="primary" @click="testJob">
+        {{ testJobStop ? '测试' : '停止' }}
+      </ElButton>
+    </el-space>
+    <el-table :data="testData" style="width: 100%">
+      <el-table-column type="expand">
+        <template #default="scope">
+          <div class="test-content-wrapper">
+            <div class="test-content-list">
+              <div v-for="item in scope.row.testContent.slice(-3)" :key="item.time" class="test-content-item">
+                <div class="test-content-time">
+                  {{ item.time }}
+                </div>
+                <div class="test-content-prompt" :title="item.prompt">
+                  {{ item.prompt }}
+                </div>
+                <div class="test-content-content" :title="item.content">
+                  {{ item.content }}
+                </div>
+              </div>
+            </div>
+          </div>
+        </template>
+      </el-table-column>
+      <el-table-column prop="job.jobName" label="岗位名" width="180">
+        <template #default="scope">
+          <el-popover effect="light" trigger="hover" placement="top" popper-style="padding: 0;">
+            <template #default>
+              <JobCard :job="scope.row.job" :hover="false" style="width: 300px;" />
+            </template>
+            <template #reference>
+              <div>{{ scope.row.job.jobName }}</div>
+            </template>
+          </el-popover>
+        </template>
+      </el-table-column>
+      <el-table-column prop="job.card.postDescription" label="内容">
+        <template #default="scope">
+          <div :title="scope.row.job.card.postDescription" style="width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">
+            {{ scope.row.job.card.postDescription }}
+          </div>
+        </template>
+      </el-table-column>
+    </el-table>
+    <template #footer>
+      <div>
+        <ElButton @click="testDialog = false">
+          取消
+        </ElButton>
+      </div>
+    </template>
+  </ElDialog>
 </template>
 
-<style lang="scss">
+<style>
 .el-alert--info.is-light,
 .el-alert--info.is-light .el-alert__description {
   white-space: pre-line;
@@ -205,5 +365,47 @@ function addMessage() {
   display: flex;
   align-items: center;
   justify-content: space-between;
+}
+
+.test-content-wrapper {
+  padding: 8px;
+}
+.test-content-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.test-content-item {
+  display: flex;
+  border: 1px solid #dcdfe6;
+  border-radius: 4px;
+}
+.test-content-time,
+.test-content-prompt {
+  width: 180px;
+  border-right: 1px solid #dcdfe6;
+  padding: 8px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.test-content-time{
+  width: 130px;
+}
+.test-content-content {
+  flex: 1;
+  padding: 8px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.el-table-v2__row-depth-0 {
+  height: 50px;
+}
+
+.el-table-v2__cell-text {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 </style>

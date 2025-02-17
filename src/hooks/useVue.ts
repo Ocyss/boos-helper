@@ -3,11 +3,12 @@ import { ref } from 'vue'
 
 const rootVue = ref()
 
-export async function getRootVue() {
-  if (rootVue.value)
+export async function getRootVue(): Promise<any> {
+  if (rootVue.value !== undefined) {
     return rootVue.value
+  }
 
-  const waitVueMount = () => {
+  const waitVueMount = async () => {
     return new Promise((resolve, reject) => {
       const observer = new MutationObserver((mutations, obs) => {
         const wrap = document.querySelector('#wrap')
@@ -35,24 +36,29 @@ export async function getRootVue() {
   return rootVue.value
 }
 
-export function useHookVueData(selectors: string, key: string, data: Ref<any>) {
+export function useHookVueData<T = any>(selectors: string, key: string, data: Ref<T>, update?: (val: T) => void) {
   return () => {
-    const jobVue = document.querySelector<any>(selectors).__vue__
+    const jobVue = document.querySelector<any>(selectors)?.__vue__
+
     data.value = jobVue[key]
-    // eslint-disable-next-line no-restricted-properties
+    // eslint-disable-next-line no-restricted-properties, ts/no-unsafe-call
     const originalSet = jobVue.__lookupSetter__(key)
     // eslint-disable-next-line accessor-pairs
     Object.defineProperty(jobVue, key, {
-      set(val) {
+      set(val: T) {
         data.value = val
+        update?.(val)
+        // eslint-disable-next-line ts/no-unsafe-call
         originalSet.call(this, val)
       },
     })
   }
 }
+
 export function useHookVueFn(selectors: string, key: string) {
   return () => {
-    const jobVue = document.querySelector<any>(selectors).__vue__
+    const jobVue = document.querySelector<any>(selectors)?.__vue__
+
     return jobVue[key]
   }
 }

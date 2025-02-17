@@ -1,4 +1,5 @@
 export const errMap = new Map<string, boolean>()
+
 function createCustomError(
   name: string,
   state = 'warning' as 'warning' | 'danger',
@@ -19,6 +20,7 @@ function createCustomError(
     }
   }
 }
+
 export const RepeatError = createCustomError('重复沟通')
 export type RepeatError = InstanceType<typeof RepeatError>
 export const JobTitleError = createCustomError('岗位名筛选')

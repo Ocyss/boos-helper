@@ -21,14 +21,12 @@ import {
 } from 'element-plus'
 import { computed, ref } from 'vue'
 import { useDeliver } from './hooks/useDeliver'
-import { useJobList } from './hooks/useJobList'
 import { usePager } from './hooks/usePager'
 
 const log = useLog()
 const { todayData, statisticsData } = useStatistics()
 const { deliverLock, deliverStop } = useCommon()
 const { jobListHandle } = useDeliver()
-const { jobList, jobMap } = useJobList()
 const { next, page } = usePager()
 const { formData } = useConfFormData()
 const statisticCycle = ref(1)
@@ -61,10 +59,10 @@ const cycle = computed(() => {
   for (
     let i = 0;
     // eslint-disable-next-line no-unmodified-loop-condition
-    (date === -1 || i < date - 1) && i < statisticsData.length;
+    (date === -1 || i < date - 1) && i < statisticsData.value.length;
     i++
   ) {
-    ans += statisticsData[i].success
+    ans += statisticsData.value[i].success
   }
   return ans
 })
@@ -80,13 +78,12 @@ async function startBatch() {
     logger.debug('start batch', page)
     while (page.value.page <= 10 && !deliverStop.value) {
       await delay(formData.delay.deliveryStarts)
-      await jobListHandle(jobList.value, jobMap.actions)
+      await jobListHandle()
       if (deliverStop.value) {
         break
       }
       await delay(formData.delay.deliveryPageNext)
       next()
-      jobMap.actions.clear()
     }
   }
   catch (e) {

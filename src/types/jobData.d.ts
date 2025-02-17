@@ -155,5 +155,3 @@ interface JobCard {
   /** 是否登录，例如：true */
   login: boolean
 }
-
-type JobList = JobListData[]

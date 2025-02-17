@@ -9,10 +9,12 @@ import type {
 } from '@/types/deliverError'
 import type { Column } from 'element-plus'
 
-import { ElTag } from 'element-plus'
-import { h, ref } from 'vue'
+import type { MyJobListData } from './useJobList'
+import JobCard from '@/components/JobCard.vue'
+import { ElPopover, ElTag } from 'element-plus'
+import { ref } from 'vue'
 
-type logErr =
+export type logErr =
   | null
   | undefined
   | PublishError
@@ -24,9 +26,8 @@ type logErr =
   | UnknownError
 
 export interface logData {
-  listData: JobListData
+  listData: MyJobListData
   el?: Element
-  card?: JobCard
   boosData?: BoosData
   message?: string
   state?: string
@@ -42,6 +43,7 @@ export interface logData {
 type logState = 'info' | 'success' | 'warning' | 'danger'
 
 interface log {
+  job?: MyJobListData
   title: string // 标题
   state: logState // 信息,成功,过滤,出错
   state_name: string // 标签文本
@@ -55,6 +57,18 @@ const columns: Column<log>[] = [
     title: '标题',
     dataKey: 'title',
     width: 200,
+    cellRenderer: ({ rowData }) => (
+      rowData.job != null
+        ? (
+            <ElPopover placement="top" popper-style="padding: 0;">
+              {{
+                default: () => <JobCard job={rowData.job} hover={false} style="width: 300px" />,
+                reference: () => <div>{rowData.title}</div>,
+              }}
+            </ElPopover>
+          )
+        : <div>{rowData.title}</div>
+    ),
   },
   {
     key: 'state',
@@ -62,7 +76,7 @@ const columns: Column<log>[] = [
     width: 150,
     align: 'center',
     cellRenderer: ({ rowData }) =>
-      h(ElTag, { type: rowData.state ?? 'primary' }, () => rowData.state_name),
+      <ElTag type={rowData.state ?? 'primary'}>{rowData.state_name}</ElTag>,
   },
   {
     key: 'message',
@@ -91,12 +105,13 @@ const data = ref<log[]>([
 ])
 
 export function useLog() {
-  const add = (title: string, err: logErr, logdata?: logData, msg?: string) => {
+  const add = (job: MyJobListData, err: logErr, logdata?: logData, msg?: string) => {
     const state = !err ? 'success' : err.state
     const message = msg ?? (err ? err.message : undefined)
 
     data.value.push({
-      title,
+      job,
+      title: job.jobName,
       state,
       state_name: err?.name ?? '投递成功',
       message,

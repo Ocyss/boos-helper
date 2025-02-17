@@ -1,8 +1,32 @@
-import type { modelData } from '../useModel'
-import type { ChatInput, ChatMessages } from './type'
+import type { modelData } from './useModel'
 import { getCurDay, getCurTime } from '@/utils'
 import { reactive, ref, toRaw } from 'vue'
-import { llmsIcons } from '../useModel'
+import { llmsIcons } from './useModel'
+
+export type ChatMessages = ChatMessage[]
+
+export interface ChatMessage {
+  id: number
+  role: 'boos' | 'user' | 'assistant'
+  name?: string
+  content: string
+  date: [string, string]
+  avatar: string | ChatAvatar
+  url?: string
+  data?: Record<string, any>
+}
+
+export interface ChatInput {
+  role: 'user' | 'assistant'
+  name?: string
+  content: string
+  input: boolean
+  avatar?: ChatAvatar
+}
+export interface ChatAvatar {
+  icon?: string
+  color?: string
+}
 
 const chatMessages = ref<ChatMessages>([])
 

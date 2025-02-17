@@ -1,8 +1,7 @@
 <script lang="ts" setup>
 import type { modelData } from '@/hooks/useModel'
-import { formInfoData } from '@/hooks/useConfForm'
 import { llms, useModel } from '@/hooks/useModel'
-import deepmerge from '@/utils/deepmerge'
+import deepmerge, { jsonClone } from '@/utils/deepmerge'
 import { logger } from '@/utils/logger'
 import { reactiveComputed } from '@vueuse/core'
 import { computed, ref } from 'vue'
@@ -23,7 +22,8 @@ const createName = ref(props.model?.name || '')
 const createColor = ref(props.model?.color || color16())
 const testShow = ref(false)
 const { getGpt } = useModel()
-const llmsOptions = computed(() =>
+
+const _llmsOptions = computed(() =>
   llms.map((v) => {
     const m = v.mode
     return { ...m, value: m.mode }
@@ -63,7 +63,7 @@ const llmFormData = reactiveComputed<r>(() => {
   return res
 })
 
-function updateFormLLM(_v: string) {
+function _updateFormLLM(_v: string) {
   // for (const key in llmFormData) {
   //   delete llmFormData[key];
   // }
@@ -130,7 +130,7 @@ async function test() {
     JSON.stringify(props.model || { name: '', key: '' }),
   )
   data.name = createName.value
-  data.data = JSON.parse(JSON.stringify(llmFormData)) as modelData['data'] & {}
+  data.data = jsonClone(llmFormData) as modelData['data'] & {}
   data.data.mode = selectLLM.value
   logger.debug(data)
 
@@ -144,7 +144,12 @@ async function test() {
       testOut.value += d
     },
   })
-  testOut.value = msg.content || ''
+  if (msg.reasoning_content) {
+    testOut.value = `思考过程: ${msg.reasoning_content}\n\n${msg.content}`
+  }
+  else {
+    testOut.value = msg.content || ''
+  }
   logger.debug('TestRes', msg)
   logger.groupEnd()
 }
@@ -152,7 +157,7 @@ async function test() {
 function create() {
   const data: modelData = props.model || { name: '', key: '' }
   data.name = createName.value
-  data.data = JSON.parse(JSON.stringify(llmFormData)) as modelData['data'] & {}
+  data.data = jsonClone(llmFormData) as modelData['data'] & {}
   data.data.mode = selectLLM.value
   data.color = createColor.value
   emit('create', data)
@@ -162,7 +167,7 @@ function create() {
 <template>
   <el-dialog
     v-model="show"
-    :title="formInfoData.record.label"
+    title="创建AI模型"
     width="70%"
     align-center
     destroy-on-close
@@ -185,19 +190,19 @@ function create() {
         </el-form-item>
       </div>
 
-      <el-segmented
+      <!-- <el-segmented
         v-model="selectLLM"
         :options="llmsOptions"
         block
         @update:model-value="updateFormLLM"
       >
         <template #default="{ item }">
-          <div class="llms-select">
+          <div v-if="typeof item === 'object'" class="llms-select">
             <el-icon size="20" v-html="item.icon" />
             <div>{{ item.label || item.mode }}</div>
           </div>
         </template>
-      </el-segmented>
+      </el-segmented> -->
       <el-form label-width="auto" size="large" label-position="left">
         <lForm :key="formLLM" v-model="llmFormData" :data="llms[formLLM]" />
       </el-form>

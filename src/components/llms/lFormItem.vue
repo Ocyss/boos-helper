@@ -20,7 +20,7 @@ const fromVal = defineModel<any>({ required: true })
 function getComponent(elm: formElm['type'] | undefined) {
   switch (elm) {
     case 'input':
-      return { el: ElInput, defaultConf: {} }
+      return { el: ElInput, defaultConf: { clearable: true } }
     case 'inputNumber':
       return { el: ElInputNumber, defaultConf: {} }
     case 'select':
@@ -85,4 +85,12 @@ const { el, defaultConf } = getComponent(props.value.type)
   </el-form-item>
 </template>
 
-<style lang="scss" scoped></style>
+<style>
+.el-input__wrapper {
+  width: 100%;
+}
+
+.el-slider .el-slider__input {
+  width: 200px !important;
+}
+</style>

@@ -1,11 +1,18 @@
+import type { MyJobListData } from '@/hooks/useJobList'
 import type { logData } from '../useLog'
-import type { handleFn } from './type'
 import { errMap, UnknownError } from '@/types/deliverError'
 import { useConfFormData } from '../useConfForm'
-import { requestCard } from './api'
 import * as h from './handles'
 
-export * from './api'
+export * from './utils'
+
+export interface handleArgs {
+  data: MyJobListData
+}
+
+export type handleFn = (args: handleArgs, ctx: logData) => Promise<void>
+export type handleCFn = (handles: handleFn[]) => void
+
 const { formData } = useConfFormData()
 
 export function createHandle(): {
@@ -37,18 +44,19 @@ export function createHandle(): {
   // 猎头过滤
   if (formData.goldHunterFilter.value)
     h.goldHunterFilter(handles)
+
+  // 活跃度过滤
+  if (formData.activityFilter.value)
+    h.activityFilter(handlesRes)
+  // Hr职位筛选
+  if (formData.hrPosition.enable)
+    h.hrPosition(handlesRes)
   // 好友状态过滤
   if (formData.friendStatus.value)
     h.jobFriendStatus(handlesRes)
   // 工作内容筛选
   if (formData.jobContent.enable)
     h.jobContent(handlesRes)
-  // Hr职位筛选
-  if (formData.hrPosition.enable)
-    h.hrPosition(handlesRes)
-  // 活跃度过滤
-  if (formData.activityFilter.value)
-    h.activityFilter(handlesRes)
   // AI过滤
   if (formData.aiFiltering.enable)
     h.aiFiltering(handlesRes)
@@ -66,25 +74,10 @@ export function createHandle(): {
     before: async (args, ctx) => {
       try {
         // 异步运行 card 请求前的筛选
-        await Promise.all(handles.map(handle => handle(args, ctx)))
-
-        if (handlesRes.length > 0) {
-          const cardResp = await requestCard({
-            lid: args.data.lid,
-            securityId: args.data.securityId,
-          })
-          if (cardResp.data.code === 0) {
-            ctx.card = cardResp.data.zpData.jobCard
-            // 异步运行 card 请求后的筛选
-            await Promise.all(handlesRes.map(handle => handle(args, ctx)))
-          }
-          else {
-            throw new UnknownError(`请求响应错误:${cardResp.data.message}`)
-          }
-        }
+        await Promise.all(handles.map(async handle => handle(args, ctx)))
       }
       catch (e: any) {
-        if (errMap.has(e.name)) {
+        if (errMap.has(e?.name as string)) {
           throw e
         }
         throw new UnknownError(`预期外:${e.message}`)
@@ -94,28 +87,17 @@ export function createHandle(): {
       if (handlesAfter.length === 0)
         return
       try {
-        if (!ctx.card) {
-          const cardResp = await requestCard({
-            lid: args.data.lid,
-            securityId: args.data.securityId,
-          })
-          if (cardResp.data.code === 0) {
-            ctx.card = cardResp.data.zpData.jobCard
-          }
-          else {
-            throw new UnknownError(`请求响应错误:${cardResp.data.message}`)
-          }
-        }
-        await Promise.all(handlesAfter.map(handle => handle(args, ctx)))
+        await args.data.getCard()
+        await Promise.all(handlesAfter.map(async handle => handle(args, ctx)))
       }
       catch (e: any) {
-        if (errMap.has(e.name)) {
+        if (errMap.has(e?.name as string)) {
           throw e
         }
         throw new UnknownError(`预期外:${e.message}`)
       }
     },
-    record: (ctx) => {
+    record: async (ctx) => {
       if (formData.record.enable)
         return h.record(ctx)
       return Promise.resolve()

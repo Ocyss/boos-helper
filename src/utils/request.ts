@@ -1,5 +1,6 @@
-import { events } from 'fetch-event-stream'
+import type { events } from 'fetch-event-stream'
 import { loader } from '.'
+import { sendMessage } from './message'
 
 export class RequestError extends Error {
   constructor(message: string) {
@@ -107,61 +108,65 @@ export type RequestArgs<TContext, TResponseType extends ResponseType> = Partial<
     'method' | 'url' | 'data' | 'headers' | 'timeout' | 'responseType'
   > & {
     onStream: OnStream
-    isFetch: boolean
+    isBackground: boolean
   }
 >
-let axiosLoad: () => void
 
-export function request<TContext, TResponseType extends ResponseType = 'json'>({
-  method = 'POST',
-  url = '',
-  data = '',
-  headers = {},
-  timeout = 5,
-  responseType = 'json' as TResponseType,
-  onStream = async () => {},
-}: RequestArgs<TContext, TResponseType>) {
-  const abortController = new AbortController()
+export async function request<TContext, TResponseType extends ResponseType = 'json'>(args: RequestArgs<TContext, TResponseType>) {
+  const {
+    method = 'POST',
+    url = '',
+    data = '',
+    headers = {},
+    timeout = 18000,
+    responseType = 'json' as TResponseType,
+    isBackground = false,
+  } = args
 
+  const signal = AbortSignal.timeout(timeout * 1000)
   return new Promise((resolve, reject) => {
-    // Start loading indication
-    axiosLoad = loader({ ms: timeout * 1000, color: '#F79E63' })
-    fetch(url, {
+    const axiosLoad = loader({ ms: timeout * 1000, color: '#F79E63' })
+
+    const requestData = {
       method,
       headers,
       body: data,
-      signal: abortController.signal,
-    })
-      .then(async (response) => {
+      referrerPolicy: 'no-referrer',
+    } as RequestInit
+
+    if (isBackground) {
+      sendMessage('request', { url, data: requestData, timeout, responseType }).then((res) => {
+        if (res instanceof Error) {
+          reject(res)
+        }
+        else {
+          resolve(res)
+        }
+      }).catch((e) => {
+        reject(e)
+      }).finally(() => {
+        axiosLoad()
+      })
+    }
+    else {
+      fetch(url, { ...requestData, signal }).then(async (response) => {
         if (!response.body) {
           reject(new RequestError('没有响应体'))
           return
         }
         if (!response.ok) {
           const errorText = await response.text()
-          if (axiosLoad)
-            axiosLoad()
           reject(new RequestError(`${errorText} | ${response.statusText}`))
           return
         }
-        if (responseType === 'stream') {
-          // const reader = response.body.getReader();
-          const stream = events(response, abortController.signal)
-          await onStream(stream)
-        }
-        else {
-          const result
-            = responseType === 'json'
-              ? await response.json()
-              : await response.text()
-          if (axiosLoad)
-            axiosLoad()
-          resolve(result)
-        }
-      })
-      .catch((e) => {
-        if (axiosLoad)
-          axiosLoad()
+
+        const result
+              = responseType === 'json'
+                ? await response.json()
+                : await response.text()
+
+        resolve(result)
+      }).catch((e) => {
         if (e.name === 'AbortError') {
           reject(new RequestError('用户中止'))
         }
@@ -169,19 +174,19 @@ export function request<TContext, TResponseType extends ResponseType = 'json'>({
           const msg = `${e.message}`
           reject(new RequestError(msg))
         }
-      })
-
-    // Set timeout
-    setTimeout(() => {
-      abortController.abort()
-      if (axiosLoad)
+      }).finally(() => {
         axiosLoad()
+      })
+    }
+
+    setTimeout(() => {
+      axiosLoad()
       reject(new RequestError(`超时 ${Math.round(timeout / 1000)}s`))
     }, timeout * 1000)
   })
 }
 
-request.post = <TContext, TResponseType extends ResponseType = 'json'>(
+request.post = async <TContext, TResponseType extends ResponseType = 'json'>(
   args: Omit<RequestArgs<TContext, TResponseType>, 'method'>,
 ) => {
   return request<TContext, TResponseType>({
@@ -190,7 +195,7 @@ request.post = <TContext, TResponseType extends ResponseType = 'json'>(
   })
 }
 
-request.get = <TContext, TResponseType extends ResponseType = 'json'>(
+request.get = async <TContext, TResponseType extends ResponseType = 'json'>(
   args: Omit<RequestArgs<TContext, TResponseType>, 'method'>,
 ) => {
   return request<TContext, TResponseType>({

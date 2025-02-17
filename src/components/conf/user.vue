@@ -1,7 +1,9 @@
 <script lang="ts" setup>
-import type { FormData, Statistics } from '@/types/formData'
+import type { CookieInfo } from '@/utils/message/cookie'
+import { getStatistics, setStatistics } from '@/hooks/useStatistics'
 import { logger } from '@/utils/logger'
-import { getStorage } from '@/utils/storage'
+import { clearCookie, deleteCookie, getCookieInfo, saveCookie, switchCookie } from '@/utils/message/cookie'
+import { setStorage } from '@/utils/message/storage'
 import {
   ElAlert,
   ElAvatar,
@@ -13,106 +15,121 @@ import {
   ElTableColumn,
   ElTag,
 } from 'element-plus'
-import { computed, reactive, ref, toRaw } from 'vue'
-
-const confUserKey = 'sync:conf-user'
+import { computed, ref } from 'vue'
 
 const show = defineModel<boolean>({ required: true })
-interface Data {
-  uid: string
-  user: string
-  avatar: string
-  remark: string
-  gender: 'man' | 'woman'
-  flag: 'student' | 'staff'
-  date: string
-  cookie: string
-  form?: FormData
-  statistics?: Statistics
-}
 
-const data = reactive(await getStorage<{ [keys: string]: Data }>(confUserKey, {}))
-const tableData = computed<Data[]>(() => Object.values(data))
-logger.debug('账户数据', toRaw(data))
+const { formData } = useConfFormData()
+const { userInfo, getUserId } = useUserInfo()
+const data = ref<Record<string, CookieInfo>>({})
 
-const currentRow = ref<Data | undefined>()
+const tableData = computed(() => Object.values(data.value))
 
-function handleCurrentChange(val: Data | undefined) {
+getCookieInfo().then((res) => {
+  res = res ?? {}
+  logger.debug('账户数据', res)
+  data.value = res
+})
+
+const currentRow = ref<CookieInfo | undefined>()
+const loading = ref(false)
+
+function handleCurrentChange(val: CookieInfo | undefined) {
   currentRow.value = val
 }
 
-async function create(_flag = true) {
-//   logger.debug("开始创建账户");
-//   try {
-//     const list = await new Promise<any[]>((resolve, reject) => {
-//       GM_cookie.list({}, (cookies, error) => {
-//         if (error) {
-//           reject(error);
-//         } else {
-//           resolve(cookies);
-//         }
-//       });
-//     });
-//     logger.debug(list);
+async function create(change = false) {
+  logger.debug('开始创建账户')
+  try {
+    loading.value = true
 
-//     let uid: number | string = useUserId();
-//     if (!uid) {
-//       throw new Error("找不到uid");
-//     }
-//     uid = String(uid);
-//     data[uid] = {
-//       uid,
-//       user: userInfo.value?.showName || userInfo.value?.name || "nil",
-//       avatar: userInfo.value?.tinyAvatar || userInfo.value?.largeAvatar || "",
-//       remark: "",
-//       gender: userInfo.value?.gender === 0 ? "man" : "woman",
-//       flag: userInfo.value?.studentFlag ? "student" : "staff",
-//       date: new Date().toLocaleString(),
-//       cookie: JSON.stringify(list),
-//       form: toRaw(formData),
-//       statistics: toRaw(todayData),
-//     };
-//     GM_setValue(confUserKey, data);
-//     await Promise.all(
-//       list.map((item) => GM_cookie.delete({ name: item.name }))
-//     );
-//     if (flag) {
-//       ElMessage.success("创建成功,开始清空ck并刷新");
-//       window.location.reload();
-//     }
-//   } catch (e) {
-//     ElMessage.error("遇到错误,请重试," + e);
-//     throw new Error("err", { cause: e });
-//   }
+    let uid: number | string = getUserId()
+    // 如果不切换账号或者
+    // 切换账号但是有uid则创建
+    if (!change || uid) {
+      if (!uid) {
+        throw new Error('找不到uid')
+      }
+      uid = String(uid)
+
+      const val: CookieInfo = {
+        uid,
+        user: userInfo.value?.showName || userInfo.value?.name || '未知用户',
+        avatar: userInfo.value?.tinyAvatar || userInfo.value?.largeAvatar || '',
+        remark: '',
+        gender: userInfo.value?.gender === 0 ? 'man' : 'woman',
+        flag: userInfo.value?.studentFlag ? 'student' : 'staff',
+        date: new Date().toLocaleString(),
+        form: jsonClone(formData),
+        statistics: await getStatistics(),
+      }
+      data.value[uid] = val
+
+      await saveCookie(val)
+      ElMessage.success(change ? '已保存当前账号，准备切换' : '账号已保存，正在清空Cookie并刷新页面')
+      if (!change) {
+        setTimeout(() => window.location.reload(), 1500)
+      }
+    }
+
+    await clearCookie()
+  }
+  catch (error) {
+    logger.error('创建账号失败', error)
+    ElMessage.error(`创建账号失败: ${error}`)
+  }
+  finally {
+    loading.value = false
+  }
 }
 
 async function change() {
-//   try {
-//     const data = currentRow.value;
-//     if (!data) {
-//       ElMessage.error("错误,空状态");
-//       return;
-//     }
-//     currentRow.value = undefined;
-//     await create(false);
-//     if (data.form) GM_setValue(formDataKey, data.form);
-//     if (data.statistics) GM_setValue(todayKey, data.statistics);
-//     const ck: any[] = JSON.parse(data.cookie);
-//     await Promise.all(ck.map((c) => GM_cookie.set(c)));
-//     ElMessage.success("切换完成,即将刷新");
-//     window.location.reload();
-//   } catch (e: any) {
-//     logger.error("错误,切换失败", e);
+  try {
+    loading.value = true
+    const targetAccount = jsonClone(currentRow.value)
+    if (!targetAccount) {
+      ElMessage.error('请先选择要切换的账号')
+      return
+    }
 
-//     if (e.name !== "err" || !e.name) ElMessage.error("错误,切换失败");
-//   }
+    // 保存当前账号状态
+    await create(true)
+    currentRow.value = undefined
+
+    // 恢复目标账号的配置
+    if (targetAccount.form) {
+      await setStorage(formDataKey, targetAccount.form)
+    }
+
+    if (targetAccount.statistics) {
+      await setStatistics(targetAccount.statistics)
+    }
+
+    // 切换到目标账号
+    await switchCookie(targetAccount.uid)
+
+    ElMessage.success('账号切换成功，即将刷新页面')
+    setTimeout(() => window.location.reload(), 1500)
+  }
+  catch (error) {
+    logger.error('账号切换失败', error)
+    ElMessage.error('账号切换失败，请重试')
+  }
+  finally {
+    loading.value = false
+  }
 }
-function del(d: Data) {
-  delete data[d.uid]
-  logger.debug(data)
 
-  // GM_setValue(confUserKey, toRaw(data));
-  ElMessage.success('删除成功')
+async function del(d: CookieInfo) {
+  try {
+    delete data.value[d.uid]
+    await deleteCookie(d.uid)
+    ElMessage.success('账号删除成功')
+  }
+  catch (error) {
+    logger.error('删除账号失败', error)
+    ElMessage.error('删除账号失败，请重试')
+  }
 }
 </script>
 
@@ -202,12 +219,17 @@ function del(d: Data) {
           @confirm="() => create()"
         >
           <template #reference>
-            <ElButton type="primary">
+            <ElButton type="primary" :loading="loading">
               新建&登出
             </ElButton>
           </template>
         </ElPopconfirm>
-        <ElButton type="primary" :disabled="!currentRow" @click="change">
+        <ElButton
+          type="primary"
+          :disabled="!currentRow"
+          :loading="loading"
+          @click="change"
+        >
           切换
         </ElButton>
       </div>

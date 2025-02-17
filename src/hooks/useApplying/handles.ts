@@ -1,5 +1,5 @@
 import type { logData } from '../useLog'
-import type { handleCFn } from './type'
+import type { handleCFn } from './index'
 import { useStatistics } from '@/hooks/useStatistics'
 import {
   ActivityError,
@@ -24,12 +24,11 @@ import { useConfFormData } from '../useConfForm'
 
 import { useModel } from '../useModel'
 
-import { useUserId } from '../useStore'
+import { useUserInfo } from '../useStore'
 import { Message } from '../useWebSocket'
-import { requestBossData } from './api'
+import { rangeMatch, requestBossData } from './utils'
 
-import { rangeMatch } from './utils'
-
+const { getUserId } = useUserInfo()
 const { chatInputInit, chatMessages } = useChat()
 const { modelData, getGpt } = useModel()
 const { formData } = useConfFormData()
@@ -68,9 +67,9 @@ export const jobTitle: handleCFn = h =>
         throw new JobTitleError('岗位名不包含关键词')
       }
     }
-    catch (e: any) {
+    catch (e) {
       todayData.jobTitle++
-      throw new JobTitleError(e.message)
+      throw new JobTitleError(errorHandle(e))
     }
   })
 
@@ -101,9 +100,9 @@ export const company: handleCFn = h =>
         throw new CompanyNameError('公司名不包含关键词')
       }
     }
-    catch (e: any) {
+    catch (e) {
       todayData.company++
-      throw new CompanyNameError(e.message)
+      throw new CompanyNameError(errorHandle(e))
     }
   })
 
@@ -123,9 +122,9 @@ export const salaryRange: handleCFn = h =>
         )
       }
     }
-    catch (e: any) {
+    catch (e) {
       todayData.salaryRange++
-      throw new SalaryError(e.message)
+      throw new SalaryError(errorHandle(e))
     }
   })
 
@@ -141,16 +140,16 @@ export const companySizeRange: handleCFn = h =>
         )
       }
     }
-    catch (e: any) {
+    catch (e) {
       todayData.companySizeRange++
-      throw new CompanySizeError(e.message)
+      throw new CompanySizeError(errorHandle(e))
     }
   })
 
 export const jobContent: handleCFn = h =>
-  h.push(async (_, { card }) => {
+  h.push(async (_, ctx) => {
     try {
-      const content = card?.postDescription
+      const content = ctx.listData.card?.postDescription
       for (const x of formData.jobContent.value) {
         if (!x) {
           continue
@@ -158,7 +157,7 @@ export const jobContent: handleCFn = h =>
         const re = new RegExp(
           `(?<!(不|无).{0,5})${x}(?!系统|软件|工具|服务)`,
         )
-        if (content && re.test(content)) {
+        if (content != null && re.test(content)) {
           if (formData.jobContent.include) {
             return
           }
@@ -169,21 +168,21 @@ export const jobContent: handleCFn = h =>
         throw new JobDescriptionError('工作内容中不包含关键词')
       }
     }
-    catch (e: any) {
+    catch (e) {
       todayData.jobContent++
-      throw new JobDescriptionError(e.message)
+      throw new JobDescriptionError(errorHandle(e))
     }
   })
 
 export const hrPosition: handleCFn = h =>
-  h.push(async (_, { card }) => {
+  h.push(async (_, ctx) => {
     try {
-      const content = card?.bossTitle
+      const content = ctx.listData.card?.bossTitle
       for (const x of formData.hrPosition.value) {
         if (!x) {
           continue
         }
-        if (content && content.trim() === x) {
+        if (content != null && content.trim() === x) {
           if (formData.hrPosition.include) {
             return
           }
@@ -194,17 +193,17 @@ export const hrPosition: handleCFn = h =>
         throw new HrPositionError(`Hr职位不在白名单中: ${content}`)
       }
     }
-    catch (e: any) {
+    catch (e) {
       todayData.hrPosition++
-      throw new HrPositionError(e.message)
+      throw new HrPositionError(errorHandle(e))
     }
   })
 
 export const jobFriendStatus: handleCFn = h =>
   h.push(async (_, ctx) => {
-    const content = ctx.card?.friendStatus
+    const content = ctx.listData.card?.friendStatus
 
-    if (content && content !== 0) {
+    if (content != null && content !== 0) {
       throw new FriendStatusError('已经是好友了')
     }
   })
@@ -224,13 +223,13 @@ export const aiFiltering: handleCFn = (h) => {
         data: {
           data: ctx.listData,
           boos: ctx.boosData,
-          card: ctx.card,
+          card: ctx.listData.card,
         },
         onStream: chatInput.handle,
         onPrompt: s => chatBoosMessage(ctx, s),
       })
       ctx.aiFilteringQ = prompt
-      if (!content) {
+      if (content == null) {
         return
       }
       ctx.aiFilteringAraw = content
@@ -240,16 +239,16 @@ export const aiFiltering: handleCFn = (h) => {
         positive: string[] | string
       }>(content)
       ctx.aiFilteringAjson = data || {}
-      const mg = `分数${data?.rating}\n消极：${data?.negative}\n积极：${data?.positive}`
+      const mg = `分数${data?.rating}\n消极：${data?.negative?.toString()}\n积极：${data?.positive?.toString()}`
       ctx.aiFilteringAtext = content
       chatInput.end(mg)
-      if (!data || !data.rating || data.rating < 40) {
+      if (!data || data.rating == null || data.rating < 40) {
         throw new AIFilteringError(mg)
       }
     }
-    catch (e: any) {
+    catch (e) {
       todayData.jobContent++
-      throw new AIFilteringError(e.message)
+      throw new AIFilteringError(errorHandle(e))
     }
     finally {
       chatInput.end('Err~')
@@ -258,33 +257,33 @@ export const aiFiltering: handleCFn = (h) => {
 }
 
 export const activityFilter: handleCFn = h =>
-  h.push(async (_, { card }) => {
+  h.push(async (_, ctx) => {
     try {
-      const activeText = card?.activeTimeDesc
-      if (!activeText || activeText.includes('月') || activeText.includes('年'))
+      const activeText = ctx.listData.card?.activeTimeDesc
+      if (activeText == null || activeText.includes('月') || activeText.includes('年'))
         throw new ActivityError(`不活跃,当前活跃度 [${activeText}]`)
     }
-    catch (e: any) {
+    catch (e) {
       todayData.activityFilter++
-      throw new ActivityError(e.message)
+      throw new ActivityError(errorHandle(e))
     }
   })
 
 export const customGreeting: handleCFn = (h) => {
   const template = miTem.compile(formData.customGreeting.value)
-  const uid = useUserId()
+  const uid = getUserId()
   if (!uid) {
     ElMessage.error('没有获取到uid,请刷新重试')
     throw new GreetError('没有获取到uid')
   }
   h.push(async (args, ctx) => {
     try {
-      const boosData = await requestBossData(ctx.card!)
+      const boosData = await requestBossData(ctx.listData.card!)
       ctx.boosData = boosData
 
       let msg = formData.customGreeting.value
-      if (formData.greetingVariable.value && ctx.card) {
-        msg = template({ card: ctx.card })
+      if (formData.greetingVariable.value && ctx.listData.card) {
+        msg = template({ card: ctx.listData.card })
       }
       ctx.message = msg
       const buf = new Message({
@@ -295,8 +294,8 @@ export const customGreeting: handleCFn = (h) => {
       })
       buf.send()
     }
-    catch (e: any) {
-      throw new GreetError(e?.message)
+    catch (e) {
+      throw new GreetError(errorHandle(e))
     }
   })
 }
@@ -322,7 +321,7 @@ export const aiGreeting: handleCFn = (h) => {
     return
   }
   const gpt = getGpt(model, formData.aiGreeting.prompt)
-  const uid = useUserId()
+  const uid = getUserId()
   if (!uid) {
     ElMessage.error('没有获取到uid,请刷新重试')
     throw new GreetError('没有获取到uid')
@@ -330,21 +329,24 @@ export const aiGreeting: handleCFn = (h) => {
   h.push(async (args, ctx) => {
     const chatInput = chatInputInit(model)
     try {
-      const boosData = await requestBossData(ctx.card!)
-      const { content, prompt } = await gpt.message({
+      const boosData = await requestBossData(ctx.listData.card!)
+      const { content, prompt, reasoning_content } = await gpt.message({
         data: {
           data: ctx.listData,
           boos: ctx.boosData,
-          card: ctx.card,
+          card: ctx.listData.card,
         },
         onStream: chatInput.handle,
         onPrompt: s => chatBoosMessage(ctx, s),
       })
       ctx.aiGreetingQ = prompt
-      if (!content) {
+      if (content == null) {
         return
       }
       ctx.message = content
+      if (reasoning_content != null && reasoning_content.length > 0) {
+        ctx.message = `思考过程: ${reasoning_content}\n\n${content}`
+      }
       ctx.aiGreetingA = content
       chatInput.end(content)
       const buf = new Message({
@@ -355,8 +357,8 @@ export const aiGreeting: handleCFn = (h) => {
       })
       buf.send()
     }
-    catch (e: any) {
-      throw new GreetError(e?.message)
+    catch (e) {
+      throw new GreetError(errorHandle(e))
     }
     finally {
       chatInput.end('Err~')
@@ -365,8 +367,16 @@ export const aiGreeting: handleCFn = (h) => {
 }
 
 export async function record(_ctx: logData) {
-  const _model = modelData.value.filter(v =>
-    formData.record.model?.includes(v.key),
-  )
-  // await requestGpt(model, ctx, {});
+  // TODO: 记录数据
+  // const model = modelData.value.filter(v =>
+  //   formData.record.model?.includes(v.key),
+  // )
+  // await requestGpt(model, ctx, {})
+}
+
+function errorHandle(e: any): string {
+  if (e instanceof Error) {
+    return e.message
+  }
+  return `${e}`
 }

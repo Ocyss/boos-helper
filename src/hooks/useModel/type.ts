@@ -68,6 +68,7 @@ export abstract class llm<C = any> {
 
 export interface messageReps<T = string> {
   content?: T
+  reasoning_content?: string
   prompt?: string
   usage?: { total_tokens: number, input_tokens: number, output_tokens: number }
 }
@@ -100,7 +101,7 @@ export type llmInfo<T extends object> = {
   [K in keyof T]-?: K extends 'mode'
     ? {
         mode: T[K]
-        label?: string
+        label: string
         icon?: string
         desc?: string
         disabled?: boolean

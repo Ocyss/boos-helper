@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import chatVue from '@/components/chat/chat.vue'
+import { jobList } from '@/hooks/useJobList'
 import { netConf } from '@/utils/conf'
 import elmGetter from '@/utils/elmGetter'
 import { useMouse, useMouseInElement } from '@vueuse/core'
@@ -10,13 +10,11 @@ import aiVue from './ai.vue'
 import cardVue from './card.vue'
 import configVue from './config.vue'
 import { useDeliver } from './hooks/useDeliver'
-import { useJobList } from './hooks/useJobList'
 import { usePager } from './hooks/usePager'
 import logsVue from './logs.vue'
 import statisticsVue from './statistics.vue'
 
 const { initPager } = usePager()
-const { initJobList } = useJobList()
 const { x, y } = useMouse({ type: 'client' })
 const { total, current } = useDeliver()
 const helpVisible = ref(false)
@@ -72,7 +70,7 @@ function findHelp(dom: HTMLElement | null) {
 }
 
 onMounted(() => {
-  initJobList()
+  jobList.initJobList()
   initPager()
   elmGetter
     .get([
@@ -90,14 +88,14 @@ onMounted(() => {
 function tagOpen(url: string) {
   window.open(url)
 }
-const VITE_VERSION = import.meta.env.VITE_VERSION
+const VITE_VERSION = __APP_VERSION__
 </script>
 
 <template>
   <h2 style="display: flex; align-items: center">
     Boos-Helper
     <el-badge
-      :is-dot="(netConf?.version ?? '6') > VITE_VERSION"
+      :is-dot="(netConf?.version ?? '0') > VITE_VERSION"
       :offset="[-2, 7]"
       style="cursor: pointer; display: inline-flex; margin: 0 4px"
       @click="tagOpen('https://greasyfork.org/zh-CN/scripts/491340')"
@@ -189,7 +187,7 @@ const VITE_VERSION = import.meta.env.VITE_VERSION
   <Teleport to=".page-job-inner .page-job-content">
     <cardVue />
   </Teleport>
-  <Teleport to=".page-job-wrapper">
+  <!-- <Teleport to=".page-job-wrapper">
     <chatVue
       style="
         position: fixed;
@@ -202,7 +200,7 @@ const VITE_VERSION = import.meta.env.VITE_VERSION
         max-width: 540px;
       "
     />
-  </Teleport>
+  </Teleport> -->
 </template>
 
 <style lang="scss">

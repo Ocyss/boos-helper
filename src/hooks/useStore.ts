@@ -28,23 +28,19 @@ const userInfo = ref<{
   multiExpect: boolean
 }>()
 
-async function storeInit() {
+async function userInfoInit() {
   const v = await getRootVue()
   const store = v?.$store?.state
   userInfo.value = store?.userInfo
   logger.debug('userInfo: ', userInfo.value)
 }
 
-export function useStore() {
+export function useUserInfo() {
   return {
-    storeInit,
+    userInfoInit,
     userInfo,
+    getUserId: () => userInfo.value?.userId
+    ?? window?._PAGE?.uid
+    ?? window?._PAGE?.userId,
   }
-}
-export function useUserId() {
-  return (
-    userInfo.value?.userId
-    || window?._PAGE?.uid
-    || window?._PAGE?.userId
-  )
 }

@@ -14,10 +14,7 @@ async function main(router: any) {
   }
   switch (router.path) {
     case '/web/geek/job':
-      module = await import('../pages/geek/job')
-      break
-    case '/web/geek/chat':
-      // module = await import("./pages/web/geek/chat");
+      module = await import('@/pages/zhipin')
       break
   }
   module.run()

@@ -14,7 +14,7 @@ const enable = defineModel<boolean>('enable', { required: true })
 </script>
 
 <template>
-  <ElFormItem :help>
+  <ElFormItem :data-help="help">
     <template #label>
       <ElCheckbox v-model="enable" :label size="small" />
       <ElLink

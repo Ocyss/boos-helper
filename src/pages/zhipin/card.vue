@@ -1,0 +1,106 @@
+<script lang="ts" setup>
+import { jobList } from '@/hooks/useJobList'
+import { ref, watchEffect } from 'vue'
+import { useDeliver } from './hooks/useDeliver'
+
+const { current } = useDeliver()
+const jobListRef = ref<HTMLElement[]>()
+const autoScroll = ref(true)
+const cards = ref<HTMLDivElement>()
+
+function scroll(e: any) {
+  e.preventDefault()
+  if (!cards.value) {
+    return
+  }
+  const left = -e.wheelDelta || e.deltaY / 2
+  cards.value.scrollLeft = cards.value.scrollLeft + left
+  autoScroll.value = false
+}
+
+watchEffect(() => {
+  const d = jobListRef.value
+  if (autoScroll.value && d && d.length > current.value) {
+    d[current.value].scrollIntoView({
+      behavior: 'smooth',
+      block: 'nearest',
+      inline: 'center',
+    })
+  }
+})
+</script>
+
+<template>
+  <div style="order: -1">
+    <div ref="cards" class="card-grid" @wheel.stop="scroll">
+      <JobCard v-for="job in jobList.list" :key="job.encryptJobId" :job="job" hover />
+    </div>
+    <ElSwitch
+      v-model="autoScroll"
+      inline-prompt
+      active-text="自动滚动"
+      inactive-text="自动滚动"
+    />
+  </div>
+</template>
+
+<style lang="scss" scoped>
+// https://css-tricks.com/
+// https://uiverse.io/Subaashbala/polite-newt-9
+
+.card-grid {
+  display: grid;
+  gap: 1rem;
+  grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+  margin: 0 0 1.5rem;
+  position: relative;
+  overflow-x: scroll;
+  scrollbar-color: #c6c6c6 #e9e9e9;
+  scrollbar-gutter: always;
+  padding: 3rem 0 3rem 2rem;
+  margin: 0;
+  display: flex;
+  color: #000;
+  -webkit-overflow-scrolling: touch;
+  &::-webkit-scrollbar {
+    width: 10px;
+    height: 10px;
+  }
+  &::-webkit-scrollbar-thumb {
+    background: #434343;
+    border-radius: 10px;
+    box-shadow: inset 2px 2px 2px hsla(0, 0%, 100%, 0.25),
+      inset -2px -2px 2px rgba(0, 0, 0, 0.25);
+  }
+  &::-webkit-scrollbar-track {
+    background: linear-gradient(
+      90deg,
+      #434343,
+      #434343 1px,
+      #262626 0,
+      #262626
+    );
+  }
+}
+
+html.dark {
+  .card-grid {
+    scrollbar-color: #666 #201c29;
+    color: #fff;
+    &::-webkit-scrollbar-thumb {
+      background: #434343;
+      box-shadow: inset 2px 2px 2px hsla(0, 0%, 100%, 0.25),
+        inset -2px -2px 2px rgba(0, 0, 0, 0.25);
+    }
+    &::-webkit-scrollbar-track {
+      background: linear-gradient(
+        90deg,
+        #434343,
+        #434343 1px,
+        #262626 0,
+        #262626
+      );
+    }
+  }
+}
+</style>

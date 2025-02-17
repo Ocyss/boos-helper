@@ -37,4 +37,7 @@ interface Window {
   parseGptJson: (json: any) => any
   __q_getStorage: (key: string, defaultValue?: any) => Promise<any>
   __q_setStorage: (key: string, value: any) => Promise<boolean>
+  __q_jobList: JobList
 }
+
+declare const __APP_VERSION__: string

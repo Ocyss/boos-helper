@@ -1,21 +1,16 @@
-import type { cozeLLMConf } from './llms/coze'
-import type { moonshotLLMConf } from './llms/moonshot'
-import type { openaiLLMConf } from './llms/openai'
-import type { userLLMConf } from './llms/user'
+import type { openaiLLMConf } from './openai'
 import type { llm, prompt } from './type'
 import { logger } from '@/utils/logger'
-import { getStorage, setStorage } from '@/utils/storage'
+import { getStorage, setStorage } from '@/utils/message/storage'
 import { ElMessage } from 'element-plus'
 import { ref, toRaw } from 'vue'
-import { coze } from './llms/coze'
-import { moonshot } from './llms/moonshot'
-import { openai } from './llms/openai'
+import { openai } from './openai'
 
 export const confModelKey = 'conf-model'
-export const llms = [openai.info, moonshot.info, coze.info]
+export const llms = [openai.info]
 
 export const llmsIcons = llms.reduce((acc, cur) => {
-  if (cur.mode.icon)
+  if (cur.mode.icon != null)
     acc[cur.mode.mode] = cur.mode.icon
   return acc
 }, {} as Record<string, string>)
@@ -28,16 +23,16 @@ async function init() {
   modelData.value = data
 }
 
-init()
+void init()
 
 export interface modelData {
   key: string
   name: string
   color?: string
-  data?: moonshotLLMConf | userLLMConf | openaiLLMConf | cozeLLMConf
+  data?: openaiLLMConf
 }
 
-function getGpt(model: modelData, template: string | prompt): llm {
+export function getGpt(model: modelData, template: string | prompt): llm {
   if (!model.data) {
     throw new Error('GPT数据不存在')
   }
@@ -45,21 +40,11 @@ function getGpt(model: modelData, template: string | prompt): llm {
     template = [...template].map(v => ({ ...v }))
   }
   try {
-    switch (model.data.mode) {
-      case 'openai':
-        return new openai.Gpt(model.data, template)
-      case 'moonshot':
-        return new moonshot.Gpt(model.data, template)
-      case 'coze':
-        return new coze.Gpt(model.data, template)
-      case 'user':
-        break
-    }
+    return new openai.Gpt(model.data, template)
   }
   catch (e: any) {
     throw new Error(`GPT构建错误, ${e.message}`)
   }
-  throw new Error(`GPT不存在, 可能已删除停止维护, ${model.data.mode}`)
 }
 
 async function save() {

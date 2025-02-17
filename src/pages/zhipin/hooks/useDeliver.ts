@@ -1,9 +1,9 @@
-import type { logData } from '@/hooks/useLog'
-import type { Actions } from '@/hooks/useMap'
+import type { logData, logErr } from '@/hooks/useLog'
 import { createHandle, sendPublishReq } from '@/hooks/useApplying'
 import { useCommon } from '@/hooks/useCommon'
 import { useConfFormData } from '@/hooks/useConfForm'
 
+import { jobList } from '@/hooks/useJobList'
 import { useLog } from '@/hooks/useLog'
 import { useStatistics } from '@/hooks/useStatistics'
 import { delay, notification } from '@/utils'
@@ -17,52 +17,33 @@ const log = useLog()
 const { todayData } = useStatistics()
 const { deliverStop } = useCommon()
 const { formData } = useConfFormData()
-async function jobListHandle(
-  jobList: JobList,
-  jobMap: Actions<
-    string,
-    {
-      state: string
-      msg: string
-    }
-  >,
-) {
-  log.info('获取岗位', `本次获取到 ${jobList.length} 个`)
-  total.value = jobList.length
+
+async function jobListHandle() {
+  log.info('获取岗位', `本次获取到 ${jobList._list.value.length} 个`)
+  total.value = jobList._list.value.length
   const h = createHandle()
-  jobList.forEach((v) => {
-    if (!jobMap.has(v.encryptJobId)) {
-      jobMap.set(v.encryptJobId, {
-        state: 'wait',
-        msg: '等待中',
-      })
-    }
+  jobList._list.value.forEach((v) => {
+    v.status.setStatus('wait', '等待中')
   })
-  for (const [index, data] of jobList.entries()) {
+  for (const [index, data] of jobList._list.value.entries()) {
     current.value = index
     if (deliverStop.value) {
-      log.info('暂停投递', `剩余 ${jobList.length - index} 个未处理`)
+      log.info('暂停投递', `剩余 ${jobList._list.value.length - index} 个未处理`)
       return
     }
-    if (jobMap.get(data.encryptJobId)?.state !== 'wait')
+    if (data.status.status !== 'wait')
       continue
 
     try {
-      jobMap.set(data.encryptJobId, {
-        state: 'running',
-        msg: '处理中',
-      })
-      const ctx: logData = { listData: JSON.parse(JSON.stringify(data)) }
+      data.status.setStatus('running', '处理中')
+      const ctx: logData = { listData: data }
       try {
         await h.before({ data }, ctx)
         await sendPublishReq(data)
         await h.after({ data }, ctx)
-        log.add(data.jobName, null, ctx, ctx.message)
+        log.add(data, null, ctx, ctx.message)
         todayData.success++
-        jobMap.set(data.encryptJobId, {
-          state: 'success',
-          msg: '投递成功',
-        })
+        data.status.setStatus('success', '投递成功')
         logger.warn('成功', ctx)
         ctx.state = '成功'
         if (todayData.success >= formData.deliveryLimit.value) {
@@ -77,24 +58,18 @@ async function jobListHandle(
         }
       }
       catch (e: any) {
-        jobMap.set(data.encryptJobId, {
-          state: e.state === 'warning' ? 'warn' : 'error',
-          msg: e.name || '没有消息',
-        })
-        log.add(data.jobName, e, ctx)
+        data.status.setStatus(e.state === 'warning' ? 'warn' : 'error', e.name as string ?? '没有消息')
+        log.add(data, e as logErr, ctx)
         logger.warn('过滤', ctx)
         ctx.state = '过滤'
-        ctx.err = e.message || ''
+        ctx.err = e.message ?? ''
       }
       finally {
         await h.record(ctx)
       }
     }
     catch (e) {
-      jobMap.set(data.encryptJobId, {
-        state: 'error',
-        msg: '未知报错',
-      })
+      data.status.setStatus('error', '未知报错')
       logger.error('未知报错', e, data)
       if (formData.notification.value) {
         notification('未知报错')

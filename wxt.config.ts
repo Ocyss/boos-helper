@@ -1,33 +1,29 @@
+import vueJsx from '@vitejs/plugin-vue-jsx'
 import AutoImport from 'unplugin-auto-import/vite'
-import { ElementPlusResolver } from 'unplugin-vue-components/resolvers'
 
+import { ElementPlusResolver } from 'unplugin-vue-components/resolvers'
 import Components from 'unplugin-vue-components/vite'
 import { defineConfig } from 'wxt'
-import { displayName, version } from './package.json'
+import { version } from './package.json'
 
 const matches = ['*://zhipin.com/*', '*://*.zhipin.com/*']
-
-const EXT_USER_AGENT = JSON.stringify(`${displayName}/${version}`)
 
 export default defineConfig({
   srcDir: 'src',
   modules: ['@wxt-dev/module-vue'],
   manifest: {
-    permissions: ['scripting', 'webNavigation', 'storage', 'notifications'],
+    permissions: ['scripting', 'webNavigation', 'storage', 'notifications', 'cookies'],
     web_accessible_resources: [
       {
         resources: ['main-world.js'],
         matches,
       },
     ],
-    host_permissions: matches,
-  },
-  imports: {
-
+    host_permissions: ['http://*/*', 'https://*/*'],
   },
   vite: () => ({
     define: {
-      EXT_USER_AGENT,
+      __APP_VERSION__: JSON.stringify(version),
     },
     ssr: {
       noExternal: [
@@ -37,6 +33,7 @@ export default defineConfig({
       ],
     },
     plugins: [
+      vueJsx(),
       AutoImport({
         resolvers: [ElementPlusResolver()],
       }),
@@ -62,5 +59,4 @@ export default defineConfig({
       })
     },
   },
-
 })

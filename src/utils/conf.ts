@@ -1,23 +1,23 @@
-import { getStorage, setStorage } from '@/utils/storage'
+import { getStorage, setStorage } from '@/utils/message/storage'
 import { ElMessageBox, ElNotification } from 'element-plus'
 import { ref } from 'vue'
 
 export const netConf = ref<NetConf>()
 
-fetch('https://qiu-config.oss-cn-beijing.aliyuncs.com/boos-helper-config.json')
-  .then((res) => {
+void fetch('https://qiu-config.oss-cn-beijing.aliyuncs.com/boos-helper-config.json')
+  .then(async (res) => {
     return res.json()
   })
-  .then((data) => {
+  .then(async (data) => {
     netConf.value = data
     const now = new Date().getTime()
-    netConf.value?.notification.forEach(async (item) => {
+    return Promise.all(netConf.value?.notification.map(async (item) => {
       if (now > await getStorage(`local:netConf-${item.key}`, 0)) {
         if (item.type === 'message') {
-          ElMessageBox.alert(item.data.content, item.data.title ?? 'message', {
+          void ElMessageBox.alert(item.data.content, item.data.title ?? 'message', {
             confirmButtonText: 'OK',
             callback: () => {
-              setStorage(
+              void setStorage(
                 `local:netConf-${item.key}`,
                 now + (item.data.duration ?? 86400) * 1000,
               )
@@ -25,11 +25,11 @@ fetch('https://qiu-config.oss-cn-beijing.aliyuncs.com/boos-helper-config.json')
           })
         }
         else if (item.type === 'notification') {
-          ElNotification({
+          void ElNotification({
             ...item.data,
             duration: 0,
             onClose() {
-              setStorage(
+              void setStorage(
                 `local:netConf-${item.key}`,
                 now + (item.data.duration ?? 86400) * 1000,
               )
@@ -40,7 +40,7 @@ fetch('https://qiu-config.oss-cn-beijing.aliyuncs.com/boos-helper-config.json')
           })
         }
       }
-    })
+    }) ?? [])
   })
 
 export interface NetConf {

@@ -6,9 +6,9 @@ import logVue from '@/components/conf/log.vue'
 
 import storeVue from '@/components/conf/store.vue'
 import userVue from '@/components/conf/user.vue'
-import { useStore } from '@/hooks/useStore'
+import { useUserInfo } from '@/hooks/useStore'
 import { logger } from '@/utils/logger'
-import { getStorage, setStorage } from '@/utils/storage'
+import { getStorage, setStorage } from '@/utils/message/storage'
 import {
   ElAvatar,
   ElDropdown,
@@ -21,13 +21,16 @@ import { onMounted, ref } from 'vue'
 
 logger.info('BoosHelper挂载成功')
 ElMessage('BoosHelper挂载成功!')
-const { storeInit } = useStore()
+const { userInfoInit } = useUserInfo()
+
 const confBox = ref(false)
+
 const confs = {
-  store: { name: '存储配置', component: storeVue, disabled: false },
-  user: { name: '账号配置', component: userVue, disabled: true },
-  log: { name: '日志配置', component: logVue, disabled: false },
+  store: { name: '存储配置', component: storeVue, disabled: true },
+  user: { name: '账号配置', component: userVue, disabled: false },
+  log: { name: '日志配置', component: logVue, disabled: true },
 }
+
 const confKey = ref<keyof typeof confs>('store')
 const dark = ref(false)
 
@@ -51,7 +54,7 @@ async function themeChange() {
 // console.log(monkeyWindow, window, unsafeWindow);
 
 onMounted(async () => {
-  await storeInit()
+  await userInfoInit()
   const protocol = 'boos-protocol'
   const protocol_val = '2024/09/06'
   const protocol_date = await getStorage(protocol)
@@ -119,7 +122,7 @@ greasyfork地址: https://greasyfork.org/zh-CN/scripts/491340
     </template>
   </ElDropdown>
   <Teleport to="body">
-    <component :is="confs[confKey].component" v-model="confBox" />
+    <component :is="confs[confKey].component" id="help-conf-box" v-model="confBox" />
   </Teleport>
 </template>
 

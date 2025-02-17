@@ -118,7 +118,7 @@ const { deliverLock } = useCommon()
           v-for="(item, key) in formInfoData.delay"
           :key
           :label="item.label"
-          :data-help="item.help"
+          :data-help="item['data-help']"
         >
           <el-input-number
             v-model="formData.delay[key]"

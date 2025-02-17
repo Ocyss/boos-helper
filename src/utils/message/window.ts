@@ -25,7 +25,7 @@ export function defineWindowMessaging<T extends ProtocolMap>(config: WindowMessa
   const responseListeners = new Map<string, (response: any) => void>()
 
   // 发送消息
-  function sendMessage<K extends keyof T>(
+  async function sendMessage<K extends keyof T>(
     type: K,
     data: Parameters<T[K]>[0],
     targetOrigin: string = '*',
@@ -34,7 +34,7 @@ export function defineWindowMessaging<T extends ProtocolMap>(config: WindowMessa
       const messageId = uid()
 
       // 设置响应监听器
-      const handleResponse = (response: any) => {
+      const handleResponse = (response: ReturnType<T[K]>) => {
         resolve(response)
         responseListeners.delete(messageId)
       }
@@ -67,14 +67,14 @@ export function defineWindowMessaging<T extends ProtocolMap>(config: WindowMessa
   }
 
   // 设置消息监听器
+  // eslint-disable-next-line ts/no-misused-promises
   window.addEventListener('message', async (event) => {
     const { data } = event
-
     // 处理请求消息
     if (data.type === REQUEST_TYPE && data.namespace === namespace) {
       if (data.instanceId === instanceId)
         return
-      const handler = handlers.get(data.message.type)
+      const handler = handlers.get(data.message.type as string)
       if (handler) {
         const response = await handler(data.message.data)
         window.postMessage(
@@ -91,7 +91,7 @@ export function defineWindowMessaging<T extends ProtocolMap>(config: WindowMessa
 
     // 处理响应消息
     if (data.type === RESPONSE_TYPE && data.namespace === namespace) {
-      const listener = responseListeners.get(data.messageId)
+      const listener = responseListeners.get(data.messageId as string)
       if (listener) {
         listener(data.response)
       }

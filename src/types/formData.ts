@@ -39,8 +39,8 @@ export interface FormData {
 
 export type FormInfoData = {
   [key in keyof Omit<FormData, 'aiGreeting' | 'aiFiltering' | 'delay'>]: {
-    label: string
-    help?: string
+    'label': string
+    'data-help'?: string
   };
 } & {
   aiGreeting: FormInfoAi
@@ -49,9 +49,9 @@ export type FormInfoData = {
 }
 
 export interface FormInfoAi {
-  label: string
-  help?: string
-  example: [string, prompt]
+  'label': string
+  'data-help'?: string
+  'example': [string, prompt]
 }
 
 export interface FormDataSelect {
@@ -89,8 +89,8 @@ interface ConfDelay {
 
 type ConfInfoDelay = {
   [Key in keyof ConfDelay]: {
-    label: string
-    help?: string
-    disable?: boolean
+    'label': string
+    'data-help'?: string
+    'disable'?: boolean
   };
 }

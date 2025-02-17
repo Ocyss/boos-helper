@@ -26,7 +26,8 @@ function change(v: Partial<FormDataAi>) {
 <template>
   <ElSpace wrap fill :fill-ratio="32" style="width: 100%">
     <formSwitch
-      v-bind="formInfoData.aiGreeting"
+      :label="formInfoData.aiGreeting.label"
+      :data-help="formInfoData.aiGreeting['data-help']"
       :data="formData.aiGreeting"
       :lock="deliverLock"
       @show="
@@ -36,7 +37,8 @@ function change(v: Partial<FormDataAi>) {
       @change="change"
     />
     <formSwitch
-      v-bind="formInfoData.aiFiltering"
+      :label="formInfoData.aiFiltering.label"
+      :data-help="formInfoData.aiFiltering['data-help']"
       :data="formData.aiFiltering"
       :lock="deliverLock"
       @show="
@@ -46,7 +48,8 @@ function change(v: Partial<FormDataAi>) {
       @change="change"
     />
     <formSwitch
-      v-bind="formInfoData.aiReply"
+      :label="formInfoData.aiReply.label"
+      :data-help="formInfoData.aiReply['data-help']"
       :data="formData.aiReply"
       disabled
       @show="

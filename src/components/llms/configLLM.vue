@@ -16,7 +16,7 @@ function del(d: modelData) {
 }
 
 function copy(d: modelData) {
-  d = JSON.parse(JSON.stringify(d))
+  d = jsonCloney(d)
   d.key = new Date().getTime().toString()
   d.name = `${d.name} 副本`
   modelData.value.push(d)
@@ -48,6 +48,10 @@ function create(d: modelData) {
   }
   createBoxShow.value = false
 }
+
+function jsonCloney(_d: modelData): modelData {
+  throw new Error('Function not implemented.')
+}
 </script>
 
 <template>
@@ -74,7 +78,6 @@ function create(d: modelData) {
           </div>
         </template>
       </el-table-column>
-      <el-table-column prop="data.mode" label="类型" />
       <el-table-column prop="data.url" label="url" />
       <el-table-column label="管理">
         <template #default="scope">

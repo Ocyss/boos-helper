@@ -18,7 +18,7 @@ defineEmits<{
 </script>
 
 <template>
-  <ElButtonGroup :type="data.enable ? 'success' : 'danger'" :help>
+  <ElButtonGroup :type="data.enable ? 'success' : 'danger'" :data-help="help">
     <ElButton :disabled="lock || disabled" @click="$emit('change', data)">
       {{ label }}
     </ElButton>

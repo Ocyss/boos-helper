@@ -1,6 +1,7 @@
+import type { ProtocolCommonMap } from '@/utils/message/types'
 import type { StorageItemKey } from 'wxt/storage'
-
 import { onMessage } from '@/utils/message'
+import { sendBrowserMessage } from '@/utils/message/browser'
 import 'element-plus/dist/index.css'
 import 'element-plus/theme-chalk/dark/css-vars.css'
 import './main.css'
@@ -32,6 +33,14 @@ export default defineContentScript({
       }
     })
 
+    forwardMessage('cookie:info')
+    forwardMessage('cookie:switch')
+    forwardMessage('cookie:save')
+    forwardMessage('cookie:delete')
+    forwardMessage('cookie:clear')
+    forwardMessage('cookie:clear')
+    forwardMessage('request')
+
     await injectScript('/main-world.js', {
       keepInDom: true,
     })
@@ -39,3 +48,9 @@ export default defineContentScript({
     console.log('Done!')
   },
 })
+
+export function forwardMessage<T extends keyof ProtocolCommonMap>(type: T) {
+  onMessage(type, async (data) => {
+    return sendBrowserMessage(type, data)
+  })
+}

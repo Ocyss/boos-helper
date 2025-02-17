@@ -3,71 +3,72 @@ import deepmerge from '@/utils/deepmerge'
 
 import { logger } from '@/utils/logger'
 
-import { getStorage, setStorage } from '@/utils/storage'
+import { getStorage, setStorage } from '@/utils/message/storage'
 import { watchThrottled } from '@vueuse/core'
 
 import { reactive, ref, toRaw } from 'vue'
 
 export const formDataKey = 'sync:web-geek-job-FormData'
-export const todayKey = 'sync:web-geek-job-Today'
-export const statisticsKey = 'sync:web-geek-job-Statistics'
+export const todayKey = 'local:web-geek-job-Today'
+export const statisticsKey = 'local:web-geek-job-Statistics'
+
 export const formInfoData: FormInfoData = {
   company: {
-    label: '公司名',
-    help: '公司名排除或包含在集合中，模糊匹配，可用于只投或不投某个公司/子公司。',
+    'label': '公司名',
+    'data-help': '公司名排除或包含在集合中，模糊匹配，可用于只投或不投某个公司/子公司。',
   },
   jobTitle: {
-    label: '岗位名',
-    help: '岗位名排除或包含在集合中，模糊匹配，可用于只投或不投某个岗位名。',
+    'label': '岗位名',
+    'data-help': '岗位名排除或包含在集合中，模糊匹配，可用于只投或不投某个岗位名。',
   },
   jobContent: {
-    label: '工作内容',
-    help: '会自动检测上文(不是,不,无需),下文(系统,工具),例子：[外包,上门,销售,驾照], 排除: \'外包岗位\', 不排除: \'不是外包\'|\'销售系统\'',
+    'label': '工作内容',
+    'data-help': '会自动检测上文(不是,不,无需),下文(系统,工具),例子：[外包,上门,销售,驾照], 排除: \'外包岗位\', 不排除: \'不是外包\'|\'销售系统\'',
   },
   hrPosition: {
-    label: 'Hr职位',
-    help: 'Hr职位一定包含/排除在集合中，精确匹配, 不在内置中可手动输入,能实现只向经理等进行投递，毕竟人事干的不一定是人事',
+    'label': 'Hr职位',
+    'data-help': 'Hr职位一定包含/排除在集合中，精确匹配, 不在内置中可手动输入,能实现只向经理等进行投递，毕竟人事干的不一定是人事',
   },
   salaryRange: {
-    label: '薪资范围',
-    help: '投递工作的薪资范围, 交集匹配, 使用-连接范围, 单位: k。例如：【12-20】',
+    'label': '薪资范围',
+    'data-help': '投递工作的薪资范围, 交集匹配, 使用-连接范围, 单位: k。例如：【12-20】',
   },
   companySizeRange: {
-    label: '公司规模范围',
-    help: '投递工作的公司规模, 子集匹配, 使用-连接范围。例如：【500-20000000】',
+    'label': '公司规模范围',
+    'data-help': '投递工作的公司规模, 子集匹配, 使用-连接范围。例如：【500-20000000】',
   },
   customGreeting: {
-    label: '自定义招呼语',
-    help: '因为boss不支持将自定义的招呼语设置为默认招呼语。开启表示发送boss默认的招呼语后还会发送自定义招呼语',
+    'label': '自定义招呼语',
+    'data-help': '因为boss不支持将自定义的招呼语设置为默认招呼语。开启表示发送boss默认的招呼语后还会发送自定义招呼语',
   },
   greetingVariable: {
-    label: '招呼语变量',
-    help: '使用mitem模板引擎来对招呼语进行渲染;',
+    'label': '招呼语变量',
+    'data-help': '使用mitem模板引擎来对招呼语进行渲染;',
   },
   activityFilter: {
-    label: '活跃度过滤',
-    help: '打开后会自动过滤掉最近未活跃的Boss发布的工作。以免浪费每天的100次机会。',
+    'label': '活跃度过滤',
+    'data-help': '打开后会自动过滤掉最近未活跃的Boss发布的工作。以免浪费每天的100次机会。',
   },
   goldHunterFilter: {
-    label: '猎头过滤',
-    help: 'Boss中有一些猎头发布的工作，但是一般而言这种工作不太行，点击可以过滤猎头发布的职位',
+    'label': '猎头过滤',
+    'data-help': 'Boss中有一些猎头发布的工作，但是一般而言这种工作不太行，点击可以过滤猎头发布的职位',
   },
   friendStatus: {
-    label: '好友过滤(已聊)',
-    help: '判断和hr是否建立过聊天，理论上能过滤的同hr，但是不同岗位的工作',
+    'label': '好友过滤(已聊)',
+    'data-help': '判断和hr是否建立过聊天，理论上能过滤的同hr，但是不同岗位的工作',
   },
   notification: {
-    label: '发送通知',
-    help: '可以在网站管理中打开通知权限,当停止时会自动发送桌面端通知提醒。',
+    'label': '发送通知',
+    'data-help': '可以在网站管理中打开通知权限,当停止时会自动发送桌面端通知提醒。',
   },
   deliveryLimit: {
-    label: '投递上限',
-    help: '达到上限后会自动暂停，默认100次',
+    'label': '投递上限',
+    'data-help': '达到上限后会自动暂停，默认100次',
   },
   aiGreeting: {
-    label: 'AI招呼语',
-    help: '即使前面招呼语开了也不会发送，只会发送AI生成的招呼语，让gpt来打招呼真是太棒了，毕竟开场白很重要。',
-    example: [
+    'label': 'AI招呼语',
+    'data-help': '即使前面招呼语开了也不会发送，只会发送AI生成的招呼语，让gpt来打招呼真是太棒了，毕竟开场白很重要。',
+    'example': [
       `我现在需要求职，所以请你来写求职招呼语来向boos或hr打招呼，你需要代入我的身份也就是一名求职者.
 ## 能力:
 \"我叫Ocyss,是一名19岁的全栈工程师，拥有丰富的前后端客户端开发经验，并且我也能够进行服务器运维。我是一个完美主义者，追求效率至上，我会把所有麻烦重复的事情都编写成脚本。我擅长使用Golang, Kitex, Hertz, Gin, Gorm, Cobra等后端技术，Rust和Iced, Slint等客户端技术，以及Vue3, Vite, scss, Nuxt, naiveui, element-plus等前端技术。我还熟悉Mysql, Redis, PostgreSQL, Python, Docker, Linux等运维和其他技术。我曾经参与过多个项目的开发，如全栈博客系统，飞书多维表格插件，字节青训营项目等。我相信我的技能和经验可以为您的公司带来价值。\"
@@ -145,9 +146,9 @@ export const formInfoData: FormInfoData = {
     ],
   },
   aiFiltering: {
-    label: 'AI过滤',
-    help: '根据工作内容让gpt分析过滤，真是太稳健了，不放过任何一个垃圾',
-    example: [
+    'label': 'AI过滤',
+    'data-help': '根据工作内容让gpt分析过滤，真是太稳健了，不放过任何一个垃圾',
+    'example': [
       `我现在需要求职，让你根据我的需要对岗位进行评分，方便我筛选岗位。
 ## 要求:
 - 加分: 双休,早九晚五,新技术,机会多,年轻人多
@@ -216,30 +217,30 @@ interface aiFiltering {
     ],
   },
   aiReply: {
-    label: 'AI回复',
-    help: '万一消息太多，回不过来了呢，也许能和AiHR聊到地球爆炸？魔法击败魔法',
+    'label': 'AI回复',
+    'data-help': '万一消息太多，回不过来了呢，也许能和AiHR聊到地球爆炸？魔法击败魔法',
   },
   record: {
-    label: '内容记录',
-    help: '拿这些数据去训练个Ai岂不是美滋滋咯？',
+    'label': '内容记录',
+    'data-help': '拿这些数据去训练个Ai岂不是美滋滋咯？',
   },
   delay: {
     deliveryStarts: {
-      label: '投递开始',
-      help: '点击投递按钮会等待一段时间,默认值10s',
+      'label': '投递开始',
+      'data-help': '点击投递按钮会等待一段时间,默认值10s',
     },
     deliveryInterval: {
-      label: '投递间隔',
-      help: '每个投递的间隔,太快易风控,默认值2s',
+      'label': '投递间隔',
+      'data-help': '每个投递的间隔,太快易风控,默认值2s',
     },
     deliveryPageNext: {
-      label: '投递翻页',
-      help: '投递完下一页之后等待的间隔,太快易风控,默认值60s',
+      'label': '投递翻页',
+      'data-help': '投递完下一页之后等待的间隔,太快易风控,默认值60s',
     },
     messageSending: {
-      label: '消息发送',
-      help: '暂未实现 ,在发送消息前允许等待一定的时间让用户来修改或手动发送,默认值5s',
-      disable: true,
+      'label': '消息发送',
+      'data-help': '暂未实现 ,在发送消息前允许等待一定的时间让用户来修改或手动发送,默认值5s',
+      'disable': true,
     },
   },
 }
@@ -315,7 +316,7 @@ export const defaultFormData: FormData = {
     enable: false,
   },
   delay: {
-    deliveryStarts: 10,
+    deliveryStarts: 3,
     deliveryInterval: 2,
     deliveryPageNext: 60,
     messageSending: 5,
@@ -331,7 +332,7 @@ async function init() {
   isLoaded.value = true
 }
 
-init()
+void init()
 
 watchThrottled(
   formData,
@@ -342,15 +343,17 @@ watchThrottled(
 )
 
 async function confSaving() {
-  const v = toRaw(formData)
+  const v = jsonClone(formData)
   await setStorage(formDataKey, v)
-  logger.debug('formData保存', toRaw(v))
+  logger.debug('formData保存', v)
 }
+
 async function confReload() {
   const v = deepmerge<FormData>(defaultFormData, await getStorage(formDataKey, {}))
   deepmerge(formData, v, { clone: false })
   logger.debug('formData已重置')
 }
+
 async function confExport() {
   const data = deepmerge<FormData>(
     defaultFormData,
@@ -365,12 +368,13 @@ async function confExport() {
   link.download = '打招呼配置.json'
   link.click()
 }
+
 function confImport() {
   const fileInput = document.createElement('input')
   fileInput.type = 'file'
 
   fileInput.addEventListener('change', (e) => {
-    const file = (e!.target as HTMLInputElement)!.files?.[0]
+    const file = (e.target as HTMLInputElement).files?.[0]
     if (!file || !file.name.endsWith('.json')) {
       return alert('不是 JSON 文件')
     }
@@ -378,7 +382,7 @@ function confImport() {
     const reader = new FileReader()
     reader.onload = async function (e) {
       try {
-        const jsonData = JSON.parse(e!.target!.result as string)
+        const jsonData = JSON.parse(e.target!.result as string)
 
         const type = Object.prototype.toString.call(jsonData).slice(8, -1)
         if (!['Array', 'Object'].includes(type)) {
@@ -397,6 +401,7 @@ function confImport() {
 
   fileInput.click()
 }
+
 function confDelete() {
   deepmerge(formData, defaultFormData, { clone: false })
   logger.debug('formData已清空')
