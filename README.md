@@ -3,6 +3,15 @@
 > 
 > 使用该脚本有一定风险(如黑号,封号,权重降低等)，本项目不承担任何责任
 
+# 重要提示
+
+本项目完全重构成浏览器扩展，原功能保持不变进行大量bug修复和页面优化
+预计2025年3月在chrome，edge等扩展商店上架，完全免费，欢迎打赏支持下
+
+提前参与测试：
+选择最新的 Pre-release 版本
+https://github.com/Ocyss/boos-helper/releases
+
 ## 项目介绍
 
 Boos直聘助手, 皆在减少投递简历的麻烦, 和提高投递简历的效率,技术栈使用VIte + Vue3 + element-plus, 代码由 Vite 打包无加密混淆最小化,开源在 Github 欢迎前来Pr
