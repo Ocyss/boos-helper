@@ -49,7 +49,7 @@ async function showDescriptionHandler() {
     <h3 class="card-salary">
       {{ job.salaryDesc }}
     </h3>
-    <div v-show="showDescription" class="card-content" @click="showDescription = false">
+    <div v-show="showDescription" class="card-content" :title="job.card?.postDescription" @click="showDescription = false">
       {{ job.card?.postDescription }}
     </div>
     <div v-show="!showDescription" class="card-content" @click="showDescriptionHandler">
@@ -115,7 +115,9 @@ async function showDescriptionHandler() {
   margin: 0;
   position: relative;
   min-width: 300px;
+  max-width: 360px;
   min-height: 28rem;
+  max-height: 32rem;
   box-shadow: -2rem 0 1rem -2rem #cdb9b9;
 
   * {
@@ -179,6 +181,7 @@ async function showDescriptionHandler() {
     flex: 1;
     display: flex;
     flex-direction: column;
+    overflow: hidden;
   }
   .avatar {
     width: 40px;

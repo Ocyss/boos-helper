@@ -16,7 +16,7 @@ function del(d: modelData) {
 }
 
 function copy(d: modelData) {
-  d = jsonCloney(d)
+  d = jsonClone(d)
   d.key = new Date().getTime().toString()
   d.name = `${d.name} 副本`
   modelData.value.push(d)
@@ -47,10 +47,6 @@ function create(d: modelData) {
     modelData.value.push(d)
   }
   createBoxShow.value = false
-}
-
-function jsonCloney(_d: modelData): modelData {
-  throw new Error('Function not implemented.')
 }
 </script>
 

@@ -24,7 +24,7 @@ import { useDeliver } from './hooks/useDeliver'
 import { usePager } from './hooks/usePager'
 
 const log = useLog()
-const { todayData, statisticsData } = useStatistics()
+const { todayData, statisticsData, updateStatistics } = useStatistics()
 const { deliverLock, deliverStop } = useCommon()
 const { jobListHandle } = useDeliver()
 const { next, page } = usePager()
@@ -72,8 +72,8 @@ const deliveryLimit = computed(() => {
 })
 
 async function startBatch() {
-  log.reset()
   deliverLock.value = true
+  deliverStop.value = false
   try {
     logger.debug('start batch', page)
     while (page.value.page <= 10 && !deliverStop.value) {
@@ -100,13 +100,32 @@ async function startBatch() {
       ElMessage.info('投递结束')
     }
     deliverLock.value = false
-    deliverStop.value = false
   }
 }
 
 function stopBatch() {
   deliverStop.value = true
 }
+
+function resetFilter() {
+  jobList._list.value.forEach((v) => {
+    switch (v.status.status) {
+      case 'success':
+        break
+      case 'pending':
+      case 'wait':
+      case 'running':
+      case 'error':
+      case 'warn':
+      default:
+        v.status.setStatus('wait', '等待中')
+    }
+  })
+}
+
+onMounted(() => {
+  updateStatistics()
+})
 </script>
 
 <template>
@@ -196,6 +215,14 @@ function stopBatch() {
         开始
       </ElButton>
       <ElButton
+        v-if="!deliverLock && deliverStop"
+        type="warning"
+        data-help="重置已被筛选的岗位，开始将重新处理"
+        @click="resetFilter"
+      >
+        重置筛选
+      </ElButton>
+      <ElButton
         v-if="deliverLock && !deliverStop"
         type="warning"
         data-help="暂停后应该能继续"
@@ -203,19 +230,11 @@ function stopBatch() {
       >
         暂停
       </ElButton>
-      <ElButton
-        v-if="deliverLock && !deliverStop"
-        type="danger"
-        data-help="停止后应该不能继续"
-        @click="stopBatch"
-      >
-        停止
-      </ElButton>
     </ElButtonGroup>
     <ElProgress
       data-help="我会统计当天脚本投递的数量,该记录并不准确"
       style="flex: 1"
-      :percentage="todayData.success / deliveryLimit"
+      :percentage="Number(((todayData.success / deliveryLimit) * 100).toFixed(1))"
     />
   </div>
 </template>

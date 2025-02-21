@@ -115,6 +115,13 @@ export const salaryRange: handleCFn = h =>
         text,
         formData.salaryRange.value,
         'intersection',
+        (start, end) => {
+          if (!/k/i.test(text)) {
+            return [start / 1000, end / 1000]
+          }
+          // 兼职特殊不处理
+          return [start, end]
+        },
       )
       if (!v) {
         throw new SalaryError(
@@ -219,7 +226,7 @@ export const aiFiltering: handleCFn = (h) => {
   h.push(async (_, ctx) => {
     const chatInput = chatInputInit(model)
     try {
-      const { content, prompt } = await gpt.message({
+      const { content, prompt, reasoning_content } = await gpt.message({
         data: {
           data: ctx.listData,
           boos: ctx.boosData,
@@ -232,26 +239,41 @@ export const aiFiltering: handleCFn = (h) => {
       if (content == null) {
         return
       }
-      ctx.aiFilteringAraw = content
-      const data = parseGptJson<{
-        rating: number
-        negative: string[] | string
-        positive: string[] | string
+      interface Item {
+        reason: string
+        score: number
+      }
+      const res = parseGptJson<{
+        negative: Item[]
+        positive: Item[]
       }>(content)
-      ctx.aiFilteringAjson = data || {}
-      const mg = `分数${data?.rating}\n消极：${data?.negative?.toString()}\n积极：${data?.positive?.toString()}`
-      ctx.aiFilteringAtext = content
+
+      ctx.aiFilteringAjson = res || {}
+
+      const hand = (acc: { score: number, reason: string }, curr: Item) => ({
+        score: acc.score + Math.abs(curr.score),
+        reason: `${acc.reason}\n${curr.reason}/(${Math.abs(curr.score)}分)`,
+      })
+      const data = {
+        negative: res?.negative?.reduce(hand, { score: 0, reason: '' }),
+        positive: res?.positive?.reduce(hand, { score: 0, reason: '' }),
+      }
+
+      const rating = (data?.positive?.score ?? 0) - (data?.negative?.score ?? 0)
+
+      const mg = `分数${rating}\n消极:${data?.negative?.reason}\n\n积极:${data?.positive?.reason}`
+
+      ctx.aiFilteringAtext = mg
+      ctx.aiFilteringR = reasoning_content
       chatInput.end(mg)
-      if (!data || data.rating == null || data.rating < 40) {
+      if (rating < 10) {
         throw new AIFilteringError(mg)
       }
     }
     catch (e) {
       todayData.jobContent++
-      throw new AIFilteringError(errorHandle(e))
-    }
-    finally {
       chatInput.end('Err~')
+      throw new AIFilteringError(errorHandle(e))
     }
   })
 }
@@ -285,13 +307,16 @@ export const customGreeting: handleCFn = (h) => {
       if (formData.greetingVariable.value && ctx.listData.card) {
         msg = template({ card: ctx.listData.card })
       }
+
       ctx.message = msg
+
       const buf = new Message({
         form_uid: uid.toString(),
         to_uid: boosData.data.bossId.toString(),
         to_name: boosData.data.encryptBossId, // encryptUserId
         content: msg,
       })
+
       buf.send()
     }
     catch (e) {
@@ -344,10 +369,8 @@ export const aiGreeting: handleCFn = (h) => {
         return
       }
       ctx.message = content
-      if (reasoning_content != null && reasoning_content.length > 0) {
-        ctx.message = `思考过程: ${reasoning_content}\n\n${content}`
-      }
       ctx.aiGreetingA = content
+      ctx.aiGreetingR = reasoning_content
       chatInput.end(content)
       const buf = new Message({
         form_uid: uid.toString(),
@@ -358,10 +381,8 @@ export const aiGreeting: handleCFn = (h) => {
       buf.send()
     }
     catch (e) {
-      throw new GreetError(errorHandle(e))
-    }
-    finally {
       chatInput.end('Err~')
+      throw new GreetError(errorHandle(e))
     }
   })
 }

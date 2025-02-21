@@ -75,6 +75,8 @@ export function createHandle(): {
       try {
         // 异步运行 card 请求前的筛选
         await Promise.all(handles.map(async handle => handle(args, ctx)))
+        await args.data.getCard()
+        await Promise.all(handlesRes.map(async handle => handle(args, ctx)))
       }
       catch (e: any) {
         if (errMap.has(e?.name as string)) {
@@ -87,7 +89,6 @@ export function createHandle(): {
       if (handlesAfter.length === 0)
         return
       try {
-        await args.data.getCard()
         await Promise.all(handlesAfter.map(async handle => handle(args, ctx)))
       }
       catch (e: any) {

@@ -23,7 +23,17 @@ async function jobListHandle() {
   total.value = jobList._list.value.length
   const h = createHandle()
   jobList._list.value.forEach((v) => {
-    v.status.setStatus('wait', '等待中')
+    switch (v.status.status) {
+      case 'success':
+      case 'warn':
+        break
+      case 'pending':
+      case 'wait':
+      case 'running':
+      case 'error':
+      default:
+        v.status.setStatus('wait', '等待中')
+    }
   })
   for (const [index, data] of jobList._list.value.entries()) {
     current.value = index

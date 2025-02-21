@@ -71,7 +71,7 @@ const testDialog = ref(false)
 
 interface TestData {
   job: MyJobListData
-  testContent: Array<{ time: string, prompt?: string, content?: string }>
+  testContent: Array<{ time: string, prompt?: string, reasoning_content?: string, content?: string }>
   checked: CheckboxValueType
 }
 
@@ -134,11 +134,16 @@ async function testJob() {
           card: item.job.card,
         },
       })
-      item.testContent.push({ time: new Date().toLocaleString(), prompt, content: reasoning_content ? `思考过程: ${reasoning_content}\n\n${content}` : content })
+      item.testContent.push({
+        time: new Date().toLocaleTimeString('zh-CN', { hour12: false }),
+        prompt,
+        reasoning_content,
+        content,
+      })
     }
 
-    for (let i = 0; i < testData.length; i += 3) {
-      const batch = testData.slice(i, i + 3)
+    for (let i = 0; i < testData.length; i += 4) {
+      const batch = testData.slice(i, i + 4)
       await Promise.all(batch.map(handle))
     }
   }
@@ -167,15 +172,17 @@ function Row({ cells, rowData }: { cells: any[], rowData: TestData }) {
   return cells
 }
 Row.inheritAttrs = false
-function savePrompt() {
+
+async function savePrompt() {
   if (model.value == null) {
     ElMessage.warning('请在右上角选择模型')
     return
   }
   formData[props.data].model = model.value
   formData[props.data].prompt = message.value
-  confSaving()
-  show.value = false
+  await confSaving()
+  ElMessage.success('保存成功')
+  // show.value = false
 }
 </script>
 
@@ -281,9 +288,9 @@ function savePrompt() {
     <template #footer>
       <div>
         <ElButton @click="show = false">
-          取消
+          关闭
         </ElButton>
-        <ElButton type="primary" @click="test">
+        <ElButton type="info" @click="test">
           测试
         </ElButton>
         <ElButton
@@ -297,7 +304,18 @@ function savePrompt() {
       </div>
     </template>
   </ElDialog>
-  <ElDialog v-model="testDialog" title="Prompt 测试" width="800">
+  <ElDialog
+    v-model="testDialog"
+    title="Prompt 测试"
+    width="800"
+    height="80vh"
+    align-center
+    draggable
+    :z-index="21"
+    :close-on-press-escape="false"
+    :close-on-click-modal="false"
+    :modal="false"
+  >
     <el-space direction="horizontal" size="large">
       <ElButton :loading="testJobLoading" @click="addTestJob">
         添加4个页面岗位
@@ -317,6 +335,9 @@ function savePrompt() {
                 </div>
                 <div class="test-content-prompt" :title="item.prompt">
                   {{ item.prompt }}
+                </div>
+                <div v-if="item.reasoning_content" class="test-content-reasoning-content" :title="item.reasoning_content">
+                  {{ item.reasoning_content }}
                 </div>
                 <div class="test-content-content" :title="item.content">
                   {{ item.content }}
@@ -381,7 +402,8 @@ function savePrompt() {
   border-radius: 4px;
 }
 .test-content-time,
-.test-content-prompt {
+.test-content-prompt,
+.test-content-reasoning-content {
   width: 180px;
   border-right: 1px solid #dcdfe6;
   padding: 8px;
@@ -389,8 +411,11 @@ function savePrompt() {
   text-overflow: ellipsis;
   white-space: nowrap;
 }
-.test-content-time{
+.test-content-time,.test-content-prompt{
   width: 130px;
+}
+.test-content-reasoning-content {
+  width: 200px;
 }
 .test-content-content {
   flex: 1;

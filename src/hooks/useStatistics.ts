@@ -65,11 +65,10 @@ export async function updateStatistics() {
   await setStorage(todayKey, curData)
 }
 
-onMounted(updateStatistics)
-
 export function useStatistics() {
   return {
     todayData,
     statisticsData,
+    updateStatistics,
   }
 }

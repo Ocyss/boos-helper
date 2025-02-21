@@ -114,6 +114,7 @@ export function rangeMatch(
   rangeStr: string,
   input?: string,
   mode: 'intersection' | 'subset' = 'subset', // 交集、子集，默认: 子集
+  numberHandler: (start: number, end: number) => [number, number] = (start, end) => [start, end],
 ): [boolean, string] {
   if (!rangeStr) {
     return [false, '无内容']
@@ -126,8 +127,7 @@ export function rangeMatch(
     err = match[0]
   }
   if (match && input != null) {
-    const start = Number.parseInt(match[1])
-    const end = Number.parseInt(match[2] || match[1])
+    const [start, end] = numberHandler(Number.parseInt(match[1]), Number.parseInt(match[2] || match[1]))
 
     // 如果输入只有一个数字的情况
     if (/^\d+$/.test(input)) {

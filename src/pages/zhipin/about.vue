@@ -19,35 +19,11 @@ import { ElImage, ElLink } from 'element-plus'
           </ElLink>
         </div>
       </div>
-      <div
-        class="hp-about"
-        data-help="如果对你有帮助一定要Star呀!"
-        style="margin-left: 20px"
-      >
-        <div>
-          <ElLink
-            href="https://github.com/Ocyss"
-            target="_blank"
-            type="danger"
-          >
-            Boss-Helper [Boos直聘助手]
-          </ElLink>
-        </div>
-        <div>
-          <ElLink
-            href="https://greasyfork.org/zh-CN/scripts/468125-boss-batch-push-boss%E7%9B%B4%E8%81%98%E6%89%B9%E9%87%8F%E6%8A%95%E7%AE%80%E5%8E%86"
-            target="_blank"
-            type="danger"
-          >
-            Boss Batch Push [Boss直聘批量投简历]
-          </ElLink>
-        </div>
-      </div>
     </div>
     <div data-help="记得来个Star或者好评吧" style="margin-top: 10px">
-      本插件完全免费开源且无广告, 如果有问题请反馈
+      该脚本分为浏览器扩展和油猴脚本，油猴脚本已开源
       <br>
-      Github开源地址:
+      Github地址:
       <ElLink href="https://github.com/ocyss/boos-helper" target="_blank">
         https://github.com/ocyss/boos-helper
       </ElLink>

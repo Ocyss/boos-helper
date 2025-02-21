@@ -34,7 +34,7 @@ interface Window {
   Cookie: {
     get: (key: string) => string
   }
-  parseGptJson: (json: any) => any
+  __q_parseGptJson: (json: any) => any
   __q_getStorage: (key: string, defaultValue?: any) => Promise<any>
   __q_setStorage: (key: string, value: any) => Promise<boolean>
   __q_jobList: JobList

@@ -10,8 +10,7 @@ import type {
 import type { Column } from 'element-plus'
 
 import type { MyJobListData } from './useJobList'
-import JobCard from '@/components/JobCard.vue'
-import { ElPopover, ElTag } from 'element-plus'
+import { ElTag } from 'element-plus'
 import { ref } from 'vue'
 
 export type logErr =
@@ -33,10 +32,11 @@ export interface logData {
   state?: string
   err?: string
   aiFilteringQ?: string
-  aiFilteringAraw?: string
+  aiFilteringR?: string
   aiFilteringAjson?: object
   aiFilteringAtext?: string
   aiGreetingQ?: string
+  aiGreetingR?: string
   aiGreetingA?: string
 }
 
@@ -51,6 +51,9 @@ interface log {
   data?: logData
 }
 
+const dialogData = reactive<{ show: boolean, data?: log }>({ show: false })
+
+const data = ref<log[]>([])
 const columns: Column<log>[] = [
   {
     key: 'title',
@@ -58,16 +61,13 @@ const columns: Column<log>[] = [
     dataKey: 'title',
     width: 200,
     cellRenderer: ({ rowData }) => (
-      rowData.job != null
-        ? (
-            <ElPopover placement="top" popper-style="padding: 0;">
-              {{
-                default: () => <JobCard job={rowData.job} hover={false} style="width: 300px" />,
-                reference: () => <div>{rowData.title}</div>,
-              }}
-            </ElPopover>
-          )
-        : <div>{rowData.title}</div>
+      <a onClick={() => {
+        dialogData.show = true
+        dialogData.data = rowData
+      }}
+      >
+        {rowData.title}
+      </a>
     ),
   },
   {
@@ -87,22 +87,6 @@ const columns: Column<log>[] = [
     align: 'left',
   },
 ]
-
-const dataOld = ref<log[]>([])
-const data = ref<log[]>([
-  {
-    title: '嘿嘿嘿',
-    state: 'info',
-    state_name: '消息',
-    message: '目前没有投递日志啦',
-  },
-  {
-    title: '啦啦啦',
-    state: 'success',
-    state_name: '消息',
-    message: '要查看其他日志请点击右上角的悬浮按钮',
-  },
-])
 
 export function useLog() {
   const add = (job: MyJobListData, err: logErr, logdata?: logData, msg?: string) => {
@@ -128,28 +112,15 @@ export function useLog() {
     })
   }
   const clear = () => {
-    dataOld.value = []
-    data.value = []
-  }
-  const reset = () => {
-    dataOld.value = data.value
     data.value = []
   }
 
-  const Row = ({ cells }: { cells: any, rowData: log }) => {
-    // if (rowData.data) return h("div", {}, rowData.data);
-    return cells
-  }
-
-  Row.inheritAttrs = false
   return {
     columns,
     data,
-    dataOld,
     clear,
-    reset,
     add,
     info,
-    Row,
+    dialogData,
   }
 }
