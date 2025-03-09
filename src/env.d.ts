@@ -37,6 +37,9 @@ interface Window {
   __q_parseGptJson: (json: any) => any
   __q_getStorage: (key: string, defaultValue?: any) => Promise<any>
   __q_setStorage: (key: string, value: any) => Promise<boolean>
+  __q_sendMessage: any
+  __q_onMessage: any
+  __q_notify: any
   __q_jobList: JobList
 }
 

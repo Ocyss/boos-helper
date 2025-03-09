@@ -1,3 +1,4 @@
+import { deserializeError, serializeError } from 'serialize-error'
 import type { MaybePromise } from './types'
 import { uid } from 'uid'
 
@@ -30,12 +31,20 @@ export function defineWindowMessaging<T extends ProtocolMap>(config: WindowMessa
     data: Parameters<T[K]>[0],
     targetOrigin: string = '*',
   ): Promise<ReturnType<T[K]>> {
-    return new Promise((resolve) => {
+    return new Promise((resolve, reject) => {
       const messageId = uid()
 
       // 设置响应监听器
       const handleResponse = (response: ReturnType<T[K]>) => {
-        resolve(response)
+        if ((response as any )instanceof Error) {
+          reject(response)
+        } 
+        else if ((response && typeof response === 'object' && "_QError" in response && response._QError)){
+          reject(deserializeError(response._QError))
+        }
+        else {
+          resolve(response)
+        }
         responseListeners.delete(messageId)
       }
       responseListeners.set(messageId, handleResponse)
@@ -67,7 +76,6 @@ export function defineWindowMessaging<T extends ProtocolMap>(config: WindowMessa
   }
 
   // 设置消息监听器
-  // eslint-disable-next-line ts/no-misused-promises
   window.addEventListener('message', async (event) => {
     const { data } = event
     // 处理请求消息
@@ -76,16 +84,29 @@ export function defineWindowMessaging<T extends ProtocolMap>(config: WindowMessa
         return
       const handler = handlers.get(data.message.type as string)
       if (handler) {
-        const response = await handler(data.message.data)
-        window.postMessage(
-          {
-            type: RESPONSE_TYPE,
-            namespace,
-            messageId: data.messageId,
-            response,
-          },
-          event.origin,
-        )
+        try {
+          const response = await handler(data.message.data)
+          window.postMessage(
+              {
+              type: RESPONSE_TYPE,
+              namespace,
+              messageId: data.messageId,
+              response,
+            },
+            event.origin,
+          )
+        }
+        catch (error) {          
+          window.postMessage(
+            {
+              type: RESPONSE_TYPE,
+              namespace,
+              messageId: data.messageId,
+              response: { _QError: serializeError(error) },
+            },
+            event.origin,
+          )
+        }
       }
     }
 

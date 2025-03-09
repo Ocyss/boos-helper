@@ -27,7 +27,8 @@ const { deliverLock } = useCommon()
   >
     <el-collapse accordion>
       <el-collapse-item title="筛选配置" name="1">
-        <el-alert title="复选框打钩才会启用，别忘记打钩启用哦" type="success" show-icon style="margin-bottom: 20px;" />
+        <el-alert title="复选框打钩才会启用，别忘记打钩启用哦" type="success" show-icon style="margin: 10px 0;" />
+        <el-alert title="排除和包含可点击切换，混合模式适用性过低不会考虑开发" type="success" show-icon style="margin: 10px 0;" />
         <el-space wrap style="width: 100%">
           <form-item
             v-bind="formInfoData.company"

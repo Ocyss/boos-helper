@@ -1,18 +1,17 @@
-// 通知
-export function notification(_content: string) {
-  // browser.notifications.create({
-  //   type: "basic",
-  //   iconUrl:
-  //     "https://img.bosszhipin.com/beijin/mcs/banner/3e9d37e9effaa2b6daf43f3f03f7cb15cfcd208495d565ef66e7dff9f98764da.jpg",
-  //   title: "Boss直聘批量投简历",
-  //   message: content,
+import { sendMessage } from './message'
 
-  // });
-  // browser.runtime.sendMessage({
-  //   type: "notification",
-  //   content,
-  // });
+// 通知
+export async function notification(content: string, type: 'basic' | 'image' | 'list' | 'progress' = 'basic') {
+  return sendMessage('notify', {
+    title: 'Boss直聘批量投简历',
+    message: content,
+    type,
+    iconUrl:
+      'https://img.bosszhipin.com/beijin/mcs/banner/3e9d37e9effaa2b6daf43f3f03f7cb15cfcd208495d565ef66e7dff9f98764da.jpg',
+  })
 }
+
+window.__q_notify = notification
 
 // 动画
 export function animate({

@@ -147,6 +147,10 @@ async function testJob() {
       await Promise.all(batch.map(handle))
     }
   }
+  catch (err: any) {
+    console.error(err)
+    ElMessage.error(err.message)
+  }
   finally {
     testJobLoading.value = false
     testJobStop.value = true

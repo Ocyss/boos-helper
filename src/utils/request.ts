@@ -154,9 +154,9 @@ export async function request<TContext, TResponseType extends ResponseType = 'js
           reject(new RequestError('没有响应体'))
           return
         }
-        if (!response.ok) {
+        if (!response.ok || response.status >= 400) {
           const errorText = await response.text()
-          reject(new RequestError(`${errorText} | ${response.statusText}`))
+          reject(new RequestError(`状态码: ${response.status}: ${errorText} | ${response.statusText}`))
           return
         }
 
@@ -178,11 +178,6 @@ export async function request<TContext, TResponseType extends ResponseType = 'js
         axiosLoad()
       })
     }
-
-    setTimeout(() => {
-      axiosLoad()
-      reject(new RequestError(`超时 ${Math.round(timeout / 1000)}s`))
-    }, timeout * 1000)
   })
 }
 

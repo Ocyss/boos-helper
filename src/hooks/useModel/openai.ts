@@ -148,13 +148,18 @@ class Gpt extends llm<openaiLLMConf> {
     onPrompt(prompt)
     const stream = ''
     const ans: messageReps = { prompt }
-    const res = await this.post({
+    let res: any
+
+    res = await this.post({
       prompt: prompts,
       json,
       onStream: async (_reader) => {
-        // TODO: 处理 stream 输出
+      // TODO: 处理 stream 输出
       },
     })
+    
+
+
     if (!this.conf.advanced.stream) {
       const msg = (res.choices as any[]).pop()
       ans.content = msg?.message?.content ?? ''
@@ -203,7 +208,6 @@ class Gpt extends llm<openaiLLMConf> {
       onStream,
       isBackground: this.conf.other.background,
     })
-
     return res
   }
 }

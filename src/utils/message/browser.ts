@@ -1,5 +1,6 @@
 import type { MaybePromise, ProtocolCommonMap } from './types'
 import { uid } from 'uid'
+import { serializeError, deserializeError } from 'serialize-error';
 
 // 协议映射类型
 type ProtocolMap = Record<string, any>
@@ -24,7 +25,16 @@ export function defineBrowserMessaging<T extends ProtocolMap>() {
         type,
         data,
       },
-    }) as ReturnType<T[K]>
+    }).then((res) => {
+      if (res instanceof Error) {
+        throw res
+      }else if ((res && typeof res === 'object' && "_QError" in res && res._QError)){
+        throw deserializeError(res._QError)
+      }
+      return res as ReturnType<T[K]>
+    }).catch((e) => {
+      throw e
+    })
   }
 
   function onMessage<K extends keyof T>(
@@ -38,8 +48,13 @@ export function defineBrowserMessaging<T extends ProtocolMap>() {
   browser.runtime.onMessage.addListener(async (data: any) => {
     const handler = handlers.get(data.message.type as string)
     if (handler) {
-      const response = await handler(data.message.data)
-      return response
+      try {
+        const response = await handler(data.message.data)
+        return response
+      }
+      catch (e: any) {
+        return { _QError: serializeError(e) }
+      }
     }
     return null
   })

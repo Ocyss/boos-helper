@@ -15,7 +15,7 @@ export default defineConfig({
     default_locale: 'zh_CN',
     name: '__MSG_extName__',
     description: '__MSG_extDescription__',
-    permissions: ['storage', 'cookies'],
+    permissions: ['storage', 'cookies', 'notifications'],
     web_accessible_resources: [
       {
         resources: ['main-world.js'],

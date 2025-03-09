@@ -94,7 +94,7 @@ async function startBatch() {
     logger.debug(log.data)
 
     if (formData.notification.value) {
-      notification('投递结束')
+      await notification('投递结束')
     }
     else {
       ElMessage.info('投递结束')

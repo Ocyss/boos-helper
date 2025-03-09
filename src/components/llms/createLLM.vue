@@ -5,6 +5,9 @@ import deepmerge, { jsonClone } from '@/utils/deepmerge'
 import { logger } from '@/utils/logger'
 import { reactiveComputed } from '@vueuse/core'
 import { computed, ref } from 'vue'
+import {
+  ElMessage,
+} from 'element-plus'
 
 const props = defineProps<{
   model?: modelData
@@ -136,6 +139,7 @@ async function test() {
 
   const gpt = getGpt(data, testIn.value)
   testOut.value = ''
+  try{
   logger.group('LLMTest')
   const msg = await gpt.message({
     data: {},
@@ -150,7 +154,12 @@ async function test() {
   else {
     testOut.value = msg.content || ''
   }
-  logger.debug('TestRes', msg)
+    logger.debug('TestRes', msg)
+
+  }
+  catch (err: any) {
+    ElMessage.error(err.message)
+  }
   logger.groupEnd()
 }
 

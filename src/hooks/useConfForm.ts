@@ -5,6 +5,7 @@ import { logger } from '@/utils/logger'
 
 import { getStorage, setStorage } from '@/utils/message/storage'
 import { watchThrottled } from '@vueuse/core'
+import { ElMessage } from 'element-plus'
 
 import { reactive, ref, toRaw } from 'vue'
 
@@ -303,14 +304,21 @@ watchThrottled(
 
 async function confSaving() {
   const v = jsonClone(formData)
-  await setStorage(formDataKey, v)
-  logger.debug('formData保存', v)
+  try {
+    await setStorage(formDataKey, v)
+    logger.debug('formData保存', v)
+    ElMessage.success('保存成功')
+  }
+  catch (error: any) {
+    ElMessage.error(`保存失败: ${error.message}`)
+  }
 }
 
 async function confReload() {
   const v = deepmerge<FormData>(defaultFormData, await getStorage(formDataKey, {}))
   deepmerge(formData, v, { clone: false })
   logger.debug('formData已重置')
+  ElMessage.success('重置成功')
 }
 
 async function confExport() {
@@ -364,6 +372,7 @@ function confImport() {
 function confDelete() {
   deepmerge(formData, defaultFormData, { clone: false })
   logger.debug('formData已清空')
+  ElMessage.success('清空成功')
 }
 
 export function useConfFormData() {

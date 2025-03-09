@@ -58,11 +58,9 @@ async function jobListHandle() {
         ctx.state = '成功'
         if (todayData.success >= formData.deliveryLimit.value) {
           if (formData.notification.value) {
-            notification(`投递到达上限 ${formData.deliveryLimit.value}，已暂停投递`)
+            await notification(`投递到达上限 ${formData.deliveryLimit.value}，已暂停投递`)
           }
-          else {
-            ElMessage.info(`投递到达上限 ${formData.deliveryLimit.value}，已暂停投递`)
-          }
+          ElMessage.info(`投递到达上限 ${formData.deliveryLimit.value}，已暂停投递`)
           deliverStop.value = true
           return
         }
@@ -82,8 +80,9 @@ async function jobListHandle() {
       data.status.setStatus('error', '未知报错')
       logger.error('未知报错', e, data)
       if (formData.notification.value) {
-        notification('未知报错')
+        await notification('未知报错')
       }
+      ElMessage.error('未知报错')
     }
     finally {
       todayData.total++

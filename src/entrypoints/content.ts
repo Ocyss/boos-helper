@@ -14,8 +14,6 @@ function genKey(key: string): StorageItemKey {
 export default defineContentScript({
   matches: ['*://zhipin.com/*', '*://*.zhipin.com/*'],
   async main(_ctx) {
-    console.log('Injecting script...')
-
     onMessage('storage:get', async ({ key }) => {
       const k = genKey(key)
       const v = await storage.getItem(k)
@@ -23,14 +21,15 @@ export default defineContentScript({
     })
 
     onMessage('storage:set', async ({ key, value }) => {
-      try {
         await storage.setItem(genKey(key), value)
         return true
+    })
+
+    onMessage('contentScript:test', async ({ type }) => {
+      if (type === 'error') {
+        throw new Error(`test error date: ${Date.now()}`)
       }
-      catch (error) {
-        console.error('storage:set', error)
-        return false
-      }
+      return Date.now()
     })
 
     forwardMessage('cookie:info')
@@ -40,17 +39,18 @@ export default defineContentScript({
     forwardMessage('cookie:clear')
     forwardMessage('cookie:clear')
     forwardMessage('request')
+    forwardMessage('notify')
+
+    forwardMessage('background:test')
 
     await injectScript('/main-world.js', {
       keepInDom: true,
     })
-
-    console.log('Done!')
   },
 })
 
 export function forwardMessage<T extends keyof ProtocolCommonMap>(type: T) {
   onMessage(type, async (data) => {
-    return sendBrowserMessage(type, data)
+      return await sendBrowserMessage(type, data)
   })
 }
