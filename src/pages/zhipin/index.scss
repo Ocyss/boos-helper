@@ -1,5 +1,5 @@
 #wrap {
-  min-width: unset;
+  min-width: unset !important;
   .inner {
     width: unset;
   }
@@ -13,11 +13,16 @@
       width: 65%;
       max-width: 870px;
       min-width: 320px;
-      margin: 20px auto 20px 30%;
+      margin: 20px auto;
       &.fix-top {
         position: unset;
         margin-top: unset;
         box-shadow: unset;
+      }
+      .satisfaction-feedback-wrapper,
+      .hot-link-wrapper,
+      .breadcrumb-wrapper {
+        width: 100%;
       }
     }
   }
@@ -219,4 +224,8 @@ html.dark {
   .job-loading-wrapper .job-loading-list li {
     filter: invert(83%);
   }
+}
+
+#footer-wrapper {
+  width: 100%;
 }

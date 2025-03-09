@@ -12,7 +12,10 @@ export default defineConfig({
   srcDir: 'src',
   modules: ['@wxt-dev/module-vue'],
   manifest: {
-    permissions: ['scripting', 'webNavigation', 'storage', 'notifications', 'cookies'],
+    default_locale: 'zh_CN',
+    name: '__MSG_extName__',
+    description: '__MSG_extDescription__',
+    permissions: ['storage', 'cookies'],
     web_accessible_resources: [
       {
         resources: ['main-world.js'],
