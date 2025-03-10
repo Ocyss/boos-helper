@@ -1,12 +1,13 @@
 import type { FormData, FormInfoData } from '@/types/formData'
 import deepmerge from '@/utils/deepmerge'
 
-import { logger } from '@/utils/logger'
+import { exportJson, importJson } from '@/utils/jsonImportExport'
 
+import { logger } from '@/utils/logger'
 import { getCookieInfo } from '@/utils/message/cookie'
 import { getStorage, setStorage } from '@/utils/message/storage'
-import { watchThrottled } from '@vueuse/core'
 
+import { watchThrottled } from '@vueuse/core'
 import { ElMessage } from 'element-plus'
 import { uid } from 'uid'
 import { reactive, ref, toRaw } from 'vue'
@@ -374,49 +375,17 @@ async function confExport() {
     defaultFormData,
     await getStorage(formDataKey, {}),
   )
-
-  const blob = new Blob([JSON.stringify(data)], {
-    type: 'application/json',
-  })
-  const link = document.createElement('a')
-  link.href = URL.createObjectURL(blob)
-  link.download = '打招呼配置.json'
-  link.click()
+  exportJson(data, '打招呼配置')
 }
 
-function confImport() {
-  const fileInput = document.createElement('input')
-  fileInput.type = 'file'
+async function confImport() {
+  let jsonData = await importJson<Partial<FormData>>()
 
-  fileInput.addEventListener('change', (e) => {
-    const file = (e.target as HTMLInputElement).files?.[0]
-    if (!file || !file.name.endsWith('.json')) {
-      return alert('不是 JSON 文件')
-    }
-
-    const reader = new FileReader()
-    reader.onload = async function (e) {
-      try {
-        let jsonData: Partial<FormData> = JSON.parse(e.target!.result as string)
-
-        const type = Object.prototype.toString.call(jsonData).slice(8, -1)
-        if (!['Array', 'Object'].includes(type)) {
-          return alert('内容非合法 JSON')
-        }
-        jsonData.userId = undefined
-        jsonData = await formDataHandler(jsonData) ?? jsonData
-        // await setStorage(formDataKey, jsonData)
-        deepmerge(formData, jsonData, { clone: false })
-        ElMessage.success('导入成功, 切记要手动保存哦')
-      }
-      catch (error: any) {
-        return alert(`内容非合法 JSON, ${error.message}`)
-      }
-    }
-    reader.readAsText(file)
-  })
-
-  fileInput.click()
+  jsonData.userId = undefined
+  jsonData = await formDataHandler(jsonData) ?? jsonData
+  // await setStorage(formDataKey, jsonData)
+  deepmerge(formData, jsonData, { clone: false })
+  ElMessage.success('导入成功, 切记要手动保存哦')
 }
 
 function confDelete() {

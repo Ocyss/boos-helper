@@ -57,5 +57,6 @@ export function useModel() {
     modelData,
     save,
     getGpt,
+    init,
   }
 }

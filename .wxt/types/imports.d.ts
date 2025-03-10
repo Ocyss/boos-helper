@@ -32,6 +32,7 @@ declare global {
   const deleteUser: typeof import('/home/q/dev/personal/monkey-extension/boos-helper/src/hooks/useUser')['deleteUser']
   const effectScope: typeof import('vue')['effectScope']
   const elmGetter: typeof import('/home/q/dev/personal/monkey-extension/boos-helper/src/utils/elmGetter')['default']
+  const exportJson: typeof import('/home/q/dev/personal/monkey-extension/boos-helper/src/utils/jsonImportExport')['exportJson']
   const fakeBrowser: typeof import('wxt/testing')['fakeBrowser']
   const formDataKey: typeof import('/home/q/dev/personal/monkey-extension/boos-helper/src/hooks/useConfForm')['formDataKey']
   const formInfoData: typeof import('/home/q/dev/personal/monkey-extension/boos-helper/src/hooks/useConfForm')['formInfoData']
@@ -43,6 +44,7 @@ declare global {
   const getStatistics: typeof import('/home/q/dev/personal/monkey-extension/boos-helper/src/hooks/useStatistics')['getStatistics']
   const getUserId: typeof import('/home/q/dev/personal/monkey-extension/boos-helper/src/hooks/useUser')['getUserId']
   const h: typeof import('vue')['h']
+  const importJson: typeof import('/home/q/dev/personal/monkey-extension/boos-helper/src/utils/jsonImportExport')['importJson']
   const inject: typeof import('vue')['inject']
   const injectScript: typeof import('wxt/client')['injectScript']
   const isPlainObject: typeof import('/home/q/dev/personal/monkey-extension/boos-helper/src/utils/deepmerge')['isPlainObject']
@@ -171,6 +173,7 @@ declare module 'vue' {
     readonly deleteUser: UnwrapRef<typeof import('/home/q/dev/personal/monkey-extension/boos-helper/src/hooks/useUser')['deleteUser']>
     readonly effectScope: UnwrapRef<typeof import('vue')['effectScope']>
     readonly elmGetter: UnwrapRef<typeof import('/home/q/dev/personal/monkey-extension/boos-helper/src/utils/elmGetter')['default']>
+    readonly exportJson: UnwrapRef<typeof import('/home/q/dev/personal/monkey-extension/boos-helper/src/utils/jsonImportExport')['exportJson']>
     readonly fakeBrowser: UnwrapRef<typeof import('wxt/testing')['fakeBrowser']>
     readonly formDataKey: UnwrapRef<typeof import('/home/q/dev/personal/monkey-extension/boos-helper/src/hooks/useConfForm')['formDataKey']>
     readonly formInfoData: UnwrapRef<typeof import('/home/q/dev/personal/monkey-extension/boos-helper/src/hooks/useConfForm')['formInfoData']>
@@ -182,6 +185,7 @@ declare module 'vue' {
     readonly getStatistics: UnwrapRef<typeof import('/home/q/dev/personal/monkey-extension/boos-helper/src/hooks/useStatistics')['getStatistics']>
     readonly getUserId: UnwrapRef<typeof import('/home/q/dev/personal/monkey-extension/boos-helper/src/hooks/useUser')['getUserId']>
     readonly h: UnwrapRef<typeof import('vue')['h']>
+    readonly importJson: UnwrapRef<typeof import('/home/q/dev/personal/monkey-extension/boos-helper/src/utils/jsonImportExport')['importJson']>
     readonly inject: UnwrapRef<typeof import('vue')['inject']>
     readonly injectScript: UnwrapRef<typeof import('wxt/client')['injectScript']>
     readonly isPlainObject: UnwrapRef<typeof import('/home/q/dev/personal/monkey-extension/boos-helper/src/utils/deepmerge')['isPlainObject']>

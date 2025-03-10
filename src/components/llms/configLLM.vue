@@ -2,11 +2,12 @@
 import type { modelData } from '@/hooks/useModel'
 import { llmsIcons, useModel } from '@/hooks/useModel'
 import deepmerge from '@/utils/deepmerge'
+import { exportJson, importJson } from '@/utils/jsonImportExport'
 import { ElMessage } from 'element-plus'
 import { ref } from 'vue'
 
 const show = defineModel<boolean>({ required: true })
-const { modelData, save } = useModel()
+const { modelData, save, init } = useModel()
 
 const createBoxShow = ref(false)
 
@@ -22,15 +23,19 @@ function copy(d: modelData) {
   modelData.value.push(d)
   ElMessage.success('复制成功')
 }
+
 const createModelData = ref()
+
 function edit(d: modelData) {
   createModelData.value = d
   createBoxShow.value = true
 }
+
 function newllm() {
   createModelData.value = undefined
   createBoxShow.value = true
 }
+
 function create(d: modelData) {
   if (d.key) {
     const old = modelData.value.find(v => v.key === d.key)
@@ -47,6 +52,22 @@ function create(d: modelData) {
     modelData.value.push(d)
   }
   createBoxShow.value = false
+}
+
+function close() {
+  init()
+  show.value = false
+}
+
+function exportllm() {
+  exportJson(jsonClone(modelData.value), 'Ai模型配置')
+}
+
+function importllm() {
+  importJson<modelData[]>().then((data) => {
+    modelData.value = data
+    ElMessage.success('导入成功, 请手动保存')
+  })
 }
 </script>
 
@@ -113,8 +134,14 @@ function create(d: modelData) {
 
     <template #footer>
       <div>
-        <el-button @click="show = false">
+        <el-button @click="close">
           取消
+        </el-button>
+        <el-button type="success" @click="exportllm">
+          导出
+        </el-button>
+        <el-button type="success" @click="importllm">
+          导入
         </el-button>
         <el-button type="primary" @click="newllm">
           新建
