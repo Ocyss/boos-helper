@@ -151,14 +151,18 @@ const VITE_VERSION = __APP_VERSION__
   </ElTooltip>
   <ElTabs ref="tabsRef" data-help="鼠标移到对应元素查看提示">
     <ElTabPane label="统计" data-help="失败是成功她妈">
+      <ElAlert style="margin-bottom: 10px" title="数据并不完全准确，投递上限根据自身情况调整，过高的上限也许会适得其反" type="warning" />
       <statisticsVue />
     </ElTabPane>
     <ElTabPane
       ref="searchRef"
       label="搜索"
       data-help="boos直聘原搜索, 可能出现空白bug"
-    />
+    >
+      <ElAlert style="margin-bottom: 10px" title="如果卡片数据为空不完整，请点击任意的boos原筛选功能来手动刷新下。" type="info" />
+    </ElTabPane>
     <ElTabPane label="筛选" data-help="好好看，好好学">
+      <ElAlert style="margin-bottom: 10px" title="每一个配置都请先阅读完整的帮助文档，再进行配置" type="warning" />
       <configVue />
     </ElTabPane>
     <ElTabPane label="AI" data-help="AI时代，脚本怎么能落伍!">
@@ -168,7 +172,7 @@ const VITE_VERSION = __APP_VERSION__
       <logsVue />
     </ElTabPane>
     <ElTabPane
-      label="关于"
+      label="关于&赞赏"
       class="hp-about-box"
       data-help="项目是写不完美的,但总要去追求完美"
     >
@@ -196,7 +200,7 @@ const VITE_VERSION = __APP_VERSION__
       </template>
     </ElTabPane>
   </ElTabs>
-  <Teleport to=".page-job-inner .page-job-content">
+  <Teleport to="#boos-helper-job-warp,.page-job-inner .page-job-content">
     <cardVue />
   </Teleport>
   <!-- <Teleport to=".page-job-wrapper">

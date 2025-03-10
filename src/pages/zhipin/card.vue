@@ -31,7 +31,7 @@ watchEffect(() => {
 </script>
 
 <template>
-  <div style="order: -1">
+  <div style="order: -1" class="boos-helper-card">
     <div ref="cards" class="card-grid" @wheel.stop="scroll">
       <JobCard v-for="job in jobList.list" :key="job.encryptJobId" :job="job" hover />
     </div>

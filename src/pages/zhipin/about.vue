@@ -12,11 +12,19 @@ import { ElImage, ElLink } from 'element-plus'
             Ocyss_04
           </ElLink>
         </div>
-        <div data-help="更应该感谢这些人">
-          鸣谢:&#12288;
-          <ElLink href="https://github.com/yangfeng20" target="_blank">
-            yangfeng20
-          </ElLink>
+        <div data-help="感谢每一个人的付出">
+          <div>
+            鸣谢:&#12288;
+            <ElLink href="https://github.com/yangfeng20" target="_blank">
+              yangfeng20
+            </ElLink>
+          </div>
+          <div>
+            感谢贡献:&#12288;
+            <ElLink href="https://github.com/engvuchen" target="_blank">
+              engvuchen
+            </ElLink>
+          </div>
         </div>
       </div>
     </div>

@@ -28,7 +28,8 @@
   }
   .page-job-content,
   .job-list-wrapper,
-  .job-card-wrapper {
+  .job-card-wrapper,
+  .recommend-search-inner {
     width: 100% !important;
   }
   .page-job-inner .page-job-content {
@@ -126,6 +127,19 @@
     }
     .search-btn {
       margin: 0 15px;
+    }
+  }
+
+  .job-detail-container{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    .boos-helper-card{
+      flex: 1;
+    }
+    .job-detail-box{
+      overflow-y: auto;
     }
   }
 }
