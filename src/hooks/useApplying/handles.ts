@@ -1,6 +1,11 @@
 import type { logData } from '../useLog'
 import type { handleCFn } from './index'
+import { useChat } from '@/hooks/useChat'
+import { useConfFormData } from '@/hooks/useConfForm'
+import { useModel } from '@/hooks/useModel'
 import { useStatistics } from '@/hooks/useStatistics'
+import { getUserId } from '@/hooks/useUser'
+import { Message } from '@/hooks/useWebSocket'
 import {
   ActivityError,
   AIFilteringError,
@@ -14,21 +19,15 @@ import {
   JobTitleError,
   SalaryError,
 } from '@/types/deliverError'
+
 import { getCurDay, getCurTime } from '@/utils'
+
 import { parseGptJson } from '@/utils/parse'
+
 import { ElMessage } from 'element-plus'
 import { miTem } from 'mitem'
-import { useChat } from '../useChat'
-
-import { useConfFormData } from '../useConfForm'
-
-import { useModel } from '../useModel'
-
-import { useUserInfo } from '../useStore'
-import { Message } from '../useWebSocket'
 import { rangeMatch, requestBossData } from './utils'
 
-const { getUserId } = useUserInfo()
 const { chatInputInit, chatMessages } = useChat()
 const { modelData, getGpt } = useModel()
 const { formData } = useConfFormData()

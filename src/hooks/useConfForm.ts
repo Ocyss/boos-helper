@@ -3,11 +3,14 @@ import deepmerge from '@/utils/deepmerge'
 
 import { logger } from '@/utils/logger'
 
+import { getCookieInfo } from '@/utils/message/cookie'
 import { getStorage, setStorage } from '@/utils/message/storage'
 import { watchThrottled } from '@vueuse/core'
-import { ElMessage } from 'element-plus'
 
+import { ElMessage } from 'element-plus'
+import { uid } from 'uid'
 import { reactive, ref, toRaw } from 'vue'
+import { changeUser, createUser, getUserId, useCookieInfo } from './useUser'
 
 export const formDataKey = 'local:web-geek-job-FormData'
 export const todayKey = 'local:web-geek-job-Today'
@@ -281,13 +284,58 @@ export const defaultFormData: FormData = {
     deliveryPageNext: 60,
     messageSending: 5,
   },
+  version: '20240401',
 }
 
 const formData: FormData = reactive(defaultFormData)
 const isLoaded = ref(false)
 
+const FROM_VERSION: [string, (from: Partial<FormData>) => Partial<FormData>][] = [
+  ['20240401', (from) => {
+    return from
+  }],
+]
+
+async function formDataHandler(from: Partial<FormData>) {
+  try {
+    for (let i = FROM_VERSION.length - 1; i >= 0; i--) {
+      const [version, fn] = FROM_VERSION[i]
+      if ((from?.version ?? '20240401') >= version) {
+        break
+      }
+      from = fn(from)
+      from.version = version
+    }
+    const uid = getUserId()
+    // eslint-disable-next-line eqeqeq
+    if (uid != null && from.userId != null && from.userId != uid) {
+      const data = await getCookieInfo()
+      if (uid in data) {
+        await changeUser(data[uid])
+        ElMessage.success('匹配到账号配置 恢复中, 3s后刷新页面')
+        setTimeout(() => window.location.reload(), 3000)
+        return
+      }
+      else {
+        ElMessage.success('登录新账号')
+        from.userId = uid
+      }
+    }
+    else if (uid != null && from.userId == null) {
+      from.userId = uid
+    }
+  }
+  catch (err) {
+    logger.error('用户配置初始化失败', err)
+    ElMessage.error(`用户配置初始化失败: ${String(err)}`)
+  }
+  return from
+}
+
 async function init() {
-  const data = deepmerge<FormData>(defaultFormData, await getStorage(formDataKey, {}))
+  let from = await getStorage<Partial<FormData>>(formDataKey, {})
+  from = await formDataHandler(from) ?? from
+  const data = deepmerge<FormData>(defaultFormData, from)
   Object.assign(formData, data)
   isLoaded.value = true
 }
@@ -349,15 +397,17 @@ function confImport() {
     const reader = new FileReader()
     reader.onload = async function (e) {
       try {
-        const jsonData = JSON.parse(e.target!.result as string)
+        let jsonData: Partial<FormData> = JSON.parse(e.target!.result as string)
 
         const type = Object.prototype.toString.call(jsonData).slice(8, -1)
         if (!['Array', 'Object'].includes(type)) {
           return alert('内容非合法 JSON')
         }
-
-        await setStorage(formDataKey, jsonData)
+        jsonData.userId = undefined
+        jsonData = await formDataHandler(jsonData) ?? jsonData
+        // await setStorage(formDataKey, jsonData)
         deepmerge(formData, jsonData, { clone: false })
+        ElMessage.success('导入成功, 切记要手动保存哦')
       }
       catch (error: any) {
         return alert(`内容非合法 JSON, ${error.message}`)

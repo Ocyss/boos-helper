@@ -3,7 +3,7 @@ import type {
   RecycleScrollerInstance,
 } from 'vue-virtual-scroller'
 import { useChat } from '@/hooks/useChat'
-import { useUserInfo } from '@/hooks/useStore'
+import { userInfo } from '@/hooks/useUser'
 import { watchIgnorable } from '@vueuse/core'
 import { ElInput } from 'element-plus'
 import { ref, watch } from 'vue'
@@ -13,7 +13,6 @@ import {
 } from 'vue-virtual-scroller'
 import 'vue-virtual-scroller/dist/vue-virtual-scroller.css'
 
-const { userInfo } = useUserInfo()
 const { chatMessages, chatInput } = useChat()
 
 const messageScroller = ref<RecycleScrollerInstance>()

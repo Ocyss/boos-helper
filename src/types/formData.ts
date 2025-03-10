@@ -35,10 +35,12 @@ export interface FormData {
   record: { model?: string[], enable: boolean }
   // animation?: "frame" | "card" | "together";
   delay: ConfDelay
+  version: string
+  userId?: number | string
 }
 
 export type FormInfoData = {
-  [key in keyof Omit<FormData, 'aiGreeting' | 'aiFiltering' | 'delay'>]: {
+  [key in keyof Omit<FormData, 'aiGreeting' | 'aiFiltering' | 'delay' | 'userId' | 'version'>]: {
     'label': string
     'data-help'?: string
   };

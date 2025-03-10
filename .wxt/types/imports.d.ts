@@ -10,11 +10,13 @@ declare global {
   const RequestError: typeof import('/home/q/dev/personal/monkey-extension/boos-helper/src/utils/request')['RequestError']
   const animate: typeof import('/home/q/dev/personal/monkey-extension/boos-helper/src/utils/index')['animate']
   const browser: typeof import('wxt/browser')['browser']
+  const changeUser: typeof import('/home/q/dev/personal/monkey-extension/boos-helper/src/hooks/useUser')['changeUser']
   const computed: typeof import('vue')['computed']
   const createApp: typeof import('vue')['createApp']
   const createIframeUi: typeof import('wxt/client')['createIframeUi']
   const createIntegratedUi: typeof import('wxt/client')['createIntegratedUi']
   const createShadowRootUi: typeof import('wxt/client')['createShadowRootUi']
+  const createUser: typeof import('/home/q/dev/personal/monkey-extension/boos-helper/src/hooks/useUser')['createUser']
   const customRef: typeof import('vue')['customRef']
   const deepmerge: typeof import('/home/q/dev/personal/monkey-extension/boos-helper/src/utils/deepmerge')['default']
   const defaultFormData: typeof import('/home/q/dev/personal/monkey-extension/boos-helper/src/hooks/useConfForm')['defaultFormData']
@@ -27,6 +29,7 @@ declare global {
   const defineUnlistedScript: typeof import('wxt/sandbox')['defineUnlistedScript']
   const defineWxtPlugin: typeof import('wxt/sandbox')['defineWxtPlugin']
   const delay: typeof import('/home/q/dev/personal/monkey-extension/boos-helper/src/utils/index')['delay']
+  const deleteUser: typeof import('/home/q/dev/personal/monkey-extension/boos-helper/src/hooks/useUser')['deleteUser']
   const effectScope: typeof import('vue')['effectScope']
   const elmGetter: typeof import('/home/q/dev/personal/monkey-extension/boos-helper/src/utils/elmGetter')['default']
   const fakeBrowser: typeof import('wxt/testing')['fakeBrowser']
@@ -38,6 +41,7 @@ declare global {
   const getCurrentScope: typeof import('vue')['getCurrentScope']
   const getRootVue: typeof import('/home/q/dev/personal/monkey-extension/boos-helper/src/hooks/useVue')['getRootVue']
   const getStatistics: typeof import('/home/q/dev/personal/monkey-extension/boos-helper/src/hooks/useStatistics')['getStatistics']
+  const getUserId: typeof import('/home/q/dev/personal/monkey-extension/boos-helper/src/hooks/useUser')['getUserId']
   const h: typeof import('vue')['h']
   const inject: typeof import('vue')['inject']
   const injectScript: typeof import('wxt/client')['injectScript']
@@ -94,6 +98,7 @@ declare global {
   const useChat: typeof import('/home/q/dev/personal/monkey-extension/boos-helper/src/hooks/useChat')['useChat']
   const useCommon: typeof import('/home/q/dev/personal/monkey-extension/boos-helper/src/hooks/useCommon')['useCommon']
   const useConfFormData: typeof import('/home/q/dev/personal/monkey-extension/boos-helper/src/hooks/useConfForm')['useConfFormData']
+  const useCookieInfo: typeof import('/home/q/dev/personal/monkey-extension/boos-helper/src/hooks/useUser')['useCookieInfo']
   const useCssModule: typeof import('vue')['useCssModule']
   const useCssVars: typeof import('vue')['useCssVars']
   const useHookVueData: typeof import('/home/q/dev/personal/monkey-extension/boos-helper/src/hooks/useVue')['useHookVueData']
@@ -103,7 +108,8 @@ declare global {
   const useSlots: typeof import('vue')['useSlots']
   const useStatistics: typeof import('/home/q/dev/personal/monkey-extension/boos-helper/src/hooks/useStatistics')['useStatistics']
   const useTemplateRef: typeof import('vue')['useTemplateRef']
-  const useUserInfo: typeof import('/home/q/dev/personal/monkey-extension/boos-helper/src/hooks/useStore')['useUserInfo']
+  const userInfo: typeof import('/home/q/dev/personal/monkey-extension/boos-helper/src/hooks/useUser')['userInfo']
+  const userInfoInit: typeof import('/home/q/dev/personal/monkey-extension/boos-helper/src/hooks/useUser')['userInfoInit']
   const watch: typeof import('vue')['watch']
   const watchEffect: typeof import('vue')['watchEffect']
   const watchPostEffect: typeof import('vue')['watchPostEffect']
@@ -143,11 +149,13 @@ declare module 'vue' {
     readonly RequestError: UnwrapRef<typeof import('/home/q/dev/personal/monkey-extension/boos-helper/src/utils/request')['RequestError']>
     readonly animate: UnwrapRef<typeof import('/home/q/dev/personal/monkey-extension/boos-helper/src/utils/index')['animate']>
     readonly browser: UnwrapRef<typeof import('wxt/browser')['browser']>
+    readonly changeUser: UnwrapRef<typeof import('/home/q/dev/personal/monkey-extension/boos-helper/src/hooks/useUser')['changeUser']>
     readonly computed: UnwrapRef<typeof import('vue')['computed']>
     readonly createApp: UnwrapRef<typeof import('vue')['createApp']>
     readonly createIframeUi: UnwrapRef<typeof import('wxt/client')['createIframeUi']>
     readonly createIntegratedUi: UnwrapRef<typeof import('wxt/client')['createIntegratedUi']>
     readonly createShadowRootUi: UnwrapRef<typeof import('wxt/client')['createShadowRootUi']>
+    readonly createUser: UnwrapRef<typeof import('/home/q/dev/personal/monkey-extension/boos-helper/src/hooks/useUser')['createUser']>
     readonly customRef: UnwrapRef<typeof import('vue')['customRef']>
     readonly deepmerge: UnwrapRef<typeof import('/home/q/dev/personal/monkey-extension/boos-helper/src/utils/deepmerge')['default']>
     readonly defaultFormData: UnwrapRef<typeof import('/home/q/dev/personal/monkey-extension/boos-helper/src/hooks/useConfForm')['defaultFormData']>
@@ -160,6 +168,7 @@ declare module 'vue' {
     readonly defineUnlistedScript: UnwrapRef<typeof import('wxt/sandbox')['defineUnlistedScript']>
     readonly defineWxtPlugin: UnwrapRef<typeof import('wxt/sandbox')['defineWxtPlugin']>
     readonly delay: UnwrapRef<typeof import('/home/q/dev/personal/monkey-extension/boos-helper/src/utils/index')['delay']>
+    readonly deleteUser: UnwrapRef<typeof import('/home/q/dev/personal/monkey-extension/boos-helper/src/hooks/useUser')['deleteUser']>
     readonly effectScope: UnwrapRef<typeof import('vue')['effectScope']>
     readonly elmGetter: UnwrapRef<typeof import('/home/q/dev/personal/monkey-extension/boos-helper/src/utils/elmGetter')['default']>
     readonly fakeBrowser: UnwrapRef<typeof import('wxt/testing')['fakeBrowser']>
@@ -171,6 +180,7 @@ declare module 'vue' {
     readonly getCurrentScope: UnwrapRef<typeof import('vue')['getCurrentScope']>
     readonly getRootVue: UnwrapRef<typeof import('/home/q/dev/personal/monkey-extension/boos-helper/src/hooks/useVue')['getRootVue']>
     readonly getStatistics: UnwrapRef<typeof import('/home/q/dev/personal/monkey-extension/boos-helper/src/hooks/useStatistics')['getStatistics']>
+    readonly getUserId: UnwrapRef<typeof import('/home/q/dev/personal/monkey-extension/boos-helper/src/hooks/useUser')['getUserId']>
     readonly h: UnwrapRef<typeof import('vue')['h']>
     readonly inject: UnwrapRef<typeof import('vue')['inject']>
     readonly injectScript: UnwrapRef<typeof import('wxt/client')['injectScript']>
@@ -227,6 +237,7 @@ declare module 'vue' {
     readonly useChat: UnwrapRef<typeof import('/home/q/dev/personal/monkey-extension/boos-helper/src/hooks/useChat')['useChat']>
     readonly useCommon: UnwrapRef<typeof import('/home/q/dev/personal/monkey-extension/boos-helper/src/hooks/useCommon')['useCommon']>
     readonly useConfFormData: UnwrapRef<typeof import('/home/q/dev/personal/monkey-extension/boos-helper/src/hooks/useConfForm')['useConfFormData']>
+    readonly useCookieInfo: UnwrapRef<typeof import('/home/q/dev/personal/monkey-extension/boos-helper/src/hooks/useUser')['useCookieInfo']>
     readonly useCssModule: UnwrapRef<typeof import('vue')['useCssModule']>
     readonly useCssVars: UnwrapRef<typeof import('vue')['useCssVars']>
     readonly useHookVueData: UnwrapRef<typeof import('/home/q/dev/personal/monkey-extension/boos-helper/src/hooks/useVue')['useHookVueData']>
@@ -236,7 +247,8 @@ declare module 'vue' {
     readonly useSlots: UnwrapRef<typeof import('vue')['useSlots']>
     readonly useStatistics: UnwrapRef<typeof import('/home/q/dev/personal/monkey-extension/boos-helper/src/hooks/useStatistics')['useStatistics']>
     readonly useTemplateRef: UnwrapRef<typeof import('vue')['useTemplateRef']>
-    readonly useUserInfo: UnwrapRef<typeof import('/home/q/dev/personal/monkey-extension/boos-helper/src/hooks/useStore')['useUserInfo']>
+    readonly userInfo: UnwrapRef<typeof import('/home/q/dev/personal/monkey-extension/boos-helper/src/hooks/useUser')['userInfo']>
+    readonly userInfoInit: UnwrapRef<typeof import('/home/q/dev/personal/monkey-extension/boos-helper/src/hooks/useUser')['userInfoInit']>
     readonly watch: UnwrapRef<typeof import('vue')['watch']>
     readonly watchEffect: UnwrapRef<typeof import('vue')['watchEffect']>
     readonly watchPostEffect: UnwrapRef<typeof import('vue')['watchPostEffect']>

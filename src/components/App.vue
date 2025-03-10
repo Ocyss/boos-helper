@@ -6,7 +6,7 @@ import logVue from '@/components/conf/log.vue'
 
 import storeVue from '@/components/conf/store.vue'
 import userVue from '@/components/conf/user.vue'
-import { useUserInfo } from '@/hooks/useStore'
+import { userInfoInit } from '@/hooks/useUser'
 import { logger } from '@/utils/logger'
 import { getStorage, setStorage } from '@/utils/message/storage'
 import {
@@ -21,7 +21,6 @@ import { onMounted, ref } from 'vue'
 
 logger.info('BoosHelper挂载成功')
 ElMessage('BoosHelper挂载成功!')
-const { userInfoInit } = useUserInfo()
 
 const confBox = ref(false)
 
