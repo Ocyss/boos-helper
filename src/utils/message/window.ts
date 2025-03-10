@@ -1,5 +1,5 @@
-import { deserializeError, serializeError } from 'serialize-error'
 import type { MaybePromise } from './types'
+import { deserializeError, serializeError } from 'serialize-error'
 import { uid } from 'uid'
 
 // 定义消息类型
@@ -36,10 +36,10 @@ export function defineWindowMessaging<T extends ProtocolMap>(config: WindowMessa
 
       // 设置响应监听器
       const handleResponse = (response: ReturnType<T[K]>) => {
-        if ((response as any )instanceof Error) {
+        if ((response as any) instanceof Error) {
           reject(response)
-        } 
-        else if ((response && typeof response === 'object' && "_QError" in response && response._QError)){
+        }
+        else if ((response != null && typeof response === 'object' && '_QError' in response && response._QError != null)) {
           reject(deserializeError(response._QError))
         }
         else {
@@ -76,6 +76,7 @@ export function defineWindowMessaging<T extends ProtocolMap>(config: WindowMessa
   }
 
   // 设置消息监听器
+  // eslint-disable-next-line ts/no-misused-promises
   window.addEventListener('message', async (event) => {
     const { data } = event
     // 处理请求消息
@@ -87,7 +88,7 @@ export function defineWindowMessaging<T extends ProtocolMap>(config: WindowMessa
         try {
           const response = await handler(data.message.data)
           window.postMessage(
-              {
+            {
               type: RESPONSE_TYPE,
               namespace,
               messageId: data.messageId,
@@ -96,7 +97,7 @@ export function defineWindowMessaging<T extends ProtocolMap>(config: WindowMessa
             event.origin,
           )
         }
-        catch (error) {          
+        catch (error) {
           window.postMessage(
             {
               type: RESPONSE_TYPE,

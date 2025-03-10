@@ -84,23 +84,22 @@ export default defineBackground({
       console.log('request', args)
       const signal = AbortSignal.timeout(args.timeout * 1000)
 
-        const res = await fetch(args.url, { ...args.data, signal, mode: 'cors', credentials: 'include' }).then(async (res) => {
-          console.log('request res', res)
+      const res = await fetch(args.url, { ...args.data, signal, mode: 'cors', credentials: 'include' }).then(async (res) => {
+        console.log('request res', res)
 
-          if (!res.ok || res.status >= 400) {
-            const errorText = await res.text()
-            throw new Error(`状态码: ${res.status}: ${errorText}`)
-          }
+        if (!res.ok || res.status >= 400) {
+          const errorText = await res.text()
+          throw new Error(`状态码: ${res.status}: ${errorText}`)
+        }
 
-          const result
+        const result
               = args.responseType === 'json'
                 ? await res.json()
                 : await res.text()
 
-          return result
-        })
-        return res
-      
+        return result
+      })
+      return res
     })
 
     onBrowserMessage('notify', async ({ title, message, type, iconUrl }) => {

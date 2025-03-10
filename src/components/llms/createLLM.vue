@@ -4,10 +4,10 @@ import { llms, useModel } from '@/hooks/useModel'
 import deepmerge, { jsonClone } from '@/utils/deepmerge'
 import { logger } from '@/utils/logger'
 import { reactiveComputed } from '@vueuse/core'
-import { computed, ref } from 'vue'
 import {
   ElMessage,
 } from 'element-plus'
+import { computed, ref } from 'vue'
 
 const props = defineProps<{
   model?: modelData
@@ -139,23 +139,22 @@ async function test() {
 
   const gpt = getGpt(data, testIn.value)
   testOut.value = ''
-  try{
-  logger.group('LLMTest')
-  const msg = await gpt.message({
-    data: {},
-    onStream: (d) => {
-      logger.debug('TestResStream', d)
-      testOut.value += d
-    },
-  })
-  if (msg.reasoning_content) {
-    testOut.value = `思考过程: ${msg.reasoning_content}\n\n${msg.content}`
-  }
-  else {
-    testOut.value = msg.content || ''
-  }
+  try {
+    logger.group('LLMTest')
+    const msg = await gpt.message({
+      data: {},
+      onStream: (d) => {
+        logger.debug('TestResStream', d)
+        testOut.value += d
+      },
+    })
+    if (msg.reasoning_content) {
+      testOut.value = `思考过程: ${msg.reasoning_content}\n\n${msg.content}`
+    }
+    else {
+      testOut.value = msg.content || ''
+    }
     logger.debug('TestRes', msg)
-
   }
   catch (err: any) {
     ElMessage.error(err.message)

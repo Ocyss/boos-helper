@@ -7,7 +7,6 @@ export function isPlainObject(
     return false
   }
 
-  // eslint-disable-next-line ts/no-unsafe-assignment
   const prototype = Object.getPrototypeOf(item)
   return (
     (prototype === null

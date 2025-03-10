@@ -293,7 +293,7 @@ export const activityFilter: handleCFn = h =>
 export const customGreeting: handleCFn = (h) => {
   const template = miTem.compile(formData.customGreeting.value)
   const uid = getUserId()
-  if (!uid) {
+  if (uid == null) {
     ElMessage.error('没有获取到uid,请刷新重试')
     throw new GreetError('没有获取到uid')
   }
@@ -346,7 +346,7 @@ export const aiGreeting: handleCFn = (h) => {
   }
   const gpt = getGpt(model, formData.aiGreeting.prompt)
   const uid = getUserId()
-  if (!uid) {
+  if (uid == null) {
     ElMessage.error('没有获取到uid,请刷新重试')
     throw new GreetError('没有获取到uid')
   }

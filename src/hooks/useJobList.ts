@@ -29,7 +29,7 @@ export class JobList {
     }, new Set<EncryptJobId>())
 
     this._list.value.push(
-      ...v.filter(item => item.encryptJobId && !jobSet.has(item.encryptJobId)).map((item) => {
+      ...v.filter(item => item.encryptJobId != null && !jobSet.has(item.encryptJobId)).map((item) => {
         const val: MyJobListData = {
           ...item,
           status: {

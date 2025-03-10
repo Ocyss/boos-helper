@@ -2,7 +2,7 @@
 import type { MyJobListData } from '@/hooks/useJobList'
 import type { prompt } from '@/hooks/useModel/type'
 import type { FormInfoAi } from '@/types/formData'
-import type { CheckboxValueType, TableTooltipData } from 'element-plus'
+import type { CheckboxValueType } from 'element-plus'
 import JobCard from '@/components/JobCard.vue'
 import { formInfoData, useConfFormData } from '@/hooks/useConfForm'
 import { jobList } from '@/hooks/useJobList'

@@ -50,7 +50,7 @@ export const mqtt = {
   }): Uint8Array {
     const utf8 = new TextEncoder()
     const variableHeader = [...encodeUTF8String('chat', utf8)]
-    if (packet.messageId) {
+    if (packet.messageId != null) {
       variableHeader.push(packet.messageId >> 8, packet.messageId & 0xFF)
     }
     let { payload } = packet

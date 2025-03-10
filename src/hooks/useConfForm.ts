@@ -9,9 +9,8 @@ import { getStorage, setStorage } from '@/utils/message/storage'
 
 import { watchThrottled } from '@vueuse/core'
 import { ElMessage } from 'element-plus'
-import { uid } from 'uid'
 import { reactive, ref, toRaw } from 'vue'
-import { changeUser, createUser, getUserId, useCookieInfo } from './useUser'
+import { changeUser, getUserId } from './useUser'
 
 export const formDataKey = 'local:web-geek-job-FormData'
 export const todayKey = 'local:web-geek-job-Today'

@@ -148,17 +148,14 @@ class Gpt extends llm<openaiLLMConf> {
     onPrompt(prompt)
     const stream = ''
     const ans: messageReps = { prompt }
-    let res: any
 
-    res = await this.post({
+    const res = await this.post({
       prompt: prompts,
       json,
       onStream: async (_reader) => {
       // TODO: 处理 stream 输出
       },
     })
-    
-
 
     if (!this.conf.advanced.stream) {
       const msg = (res.choices as any[]).pop()

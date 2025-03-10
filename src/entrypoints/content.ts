@@ -21,8 +21,8 @@ export default defineContentScript({
     })
 
     onMessage('storage:set', async ({ key, value }) => {
-        await storage.setItem(genKey(key), value)
-        return true
+      await storage.setItem(genKey(key), value)
+      return true
     })
 
     onMessage('contentScript:test', async ({ type }) => {
@@ -51,6 +51,6 @@ export default defineContentScript({
 
 export function forwardMessage<T extends keyof ProtocolCommonMap>(type: T) {
   onMessage(type, async (data) => {
-      return await sendBrowserMessage(type, data)
+    return sendBrowserMessage(type, data)
   })
 }
