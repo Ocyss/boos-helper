@@ -4,18 +4,25 @@ import { ref } from 'vue'
 const page = ref({ page: 1, pageSize: 30 })
 const pageChange = ref((_v: number) => {})
 
-const initPage = useHookVueData('#wrap .page-job-wrapper', 'pageVo', page)
+const initPage = useHookVueData('#wrap .page-job-wrapper,.job-recommend-main', 'pageVo', page)
+
 const initChange = useHookVueFn('#wrap .page-job-wrapper', 'pageChangeAction')
+const initSearch = useHookVueFn('#wrap .page-job-wrapper,.job-recommend-main', 'searchJobAction')
 
 function next() {
-  if (page.value.page >= 10)
-    return
+  if (page.value.page >= 10) {
+    return false
+  }
   pageChange.value(page.value.page + 1)
+  return true
 }
+
 function prev() {
-  if (page.value.page <= 1)
-    return
+  if (page.value.page <= 1) {
+    return false
+  }
   pageChange.value(page.value.page - 1)
+  return true
 }
 
 export function usePager() {
@@ -26,7 +33,7 @@ export function usePager() {
     prev,
     initPager: () => {
       initPage()
-      pageChange.value = initChange()
+      pageChange.value = location.href.includes('/web/geek/job-recommend') ? initSearch() : initChange()
     },
   }
 }

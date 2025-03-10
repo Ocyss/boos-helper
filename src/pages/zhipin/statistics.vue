@@ -76,14 +76,24 @@ async function startBatch() {
   deliverStop.value = false
   try {
     logger.debug('start batch', page)
+    let oldLen = 0
     while (page.value.page <= 10 && !deliverStop.value) {
       await delay(formData.delay.deliveryStarts)
+      if (jobList._list.value.length === 0) {
+        break
+      }
+      else if (location.href.includes('/web/geek/job-recommend') && oldLen === jobList._list.value.length) {
+        break
+      }
+      oldLen = jobList._list.value.length
       await jobListHandle()
       if (deliverStop.value) {
         break
       }
       await delay(formData.delay.deliveryPageNext)
-      next()
+      if (!next()) {
+        break
+      }
     }
   }
   catch (e) {
@@ -96,9 +106,7 @@ async function startBatch() {
     if (formData.notification.value) {
       await notification('投递结束')
     }
-    else {
-      ElMessage.info('投递结束')
-    }
+    ElMessage.info('投递结束')
     deliverLock.value = false
   }
 }

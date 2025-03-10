@@ -72,17 +72,29 @@ function findHelp(dom: HTMLElement | null) {
 onMounted(() => {
   jobList.initJobList()
   initPager()
-  elmGetter
-    .get([
-      '.job-search-wrapper .job-search-box.clearfix',
-      '.job-search-wrapper .search-condition-wrapper.clearfix',
-    ])
-    .then(([searchEl, conditionEl]) => {
-      searchRef.value.$el.appendChild(searchEl)
-      searchRef.value.$el.appendChild(conditionEl)
-      // 搜索栏去APP
-      elmGetter.rm('.job-search-scan', searchEl)
-    })
+  if (location.href.includes('/web/geek/job-recommend')) {
+    elmGetter
+      .get<HTMLDivElement>(
+        '.job-recommend-search',
+      )
+      .then((searchEl) => {
+        searchEl.style.position = 'unset'
+        searchRef.value.$el.appendChild(searchEl)
+      })
+  }
+  else {
+    elmGetter
+      .get([
+        '.job-search-wrapper .job-search-box.clearfix',
+        '.job-search-wrapper .search-condition-wrapper.clearfix',
+      ])
+      .then(([searchEl, conditionEl]) => {
+        searchRef.value.$el.appendChild(searchEl)
+        searchRef.value.$el.appendChild(conditionEl)
+        // 搜索栏去APP
+        elmGetter.rm('.job-search-scan', searchEl)
+      })
+  }
 })
 
 function tagOpen(url: string) {

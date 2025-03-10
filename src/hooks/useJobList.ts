@@ -20,31 +20,39 @@ export class JobList {
   _list = ref<Array<MyJobListData>>([])
   _map = reactive<Record<EncryptJobId, MyJobListData>>({})
 
-  initJobList = useHookVueData('#wrap .page-job-wrapper', 'jobList', this._vue_jobList, (v) => {
+  initJobList = useHookVueData('#wrap .page-job-wrapper,.job-recommend-main', 'jobList', this._vue_jobList, (v) => {
     logger.info('初始化岗位列表', v)
-    this._list.value = v.map((item) => {
-      const val: MyJobListData = {
-        ...item,
-        status: {
-          status: 'pending',
-          msg: '未开始',
-          setStatus: (status: JobStatus, msg?: string) => {
-            this._map[item.encryptJobId].status.status = status
-            this._map[item.encryptJobId].status.msg = msg ?? ''
+
+    const jobSet = this._list.value.reduce((acc, item) => {
+      acc.add(item.encryptJobId)
+      return acc
+    }, new Set<EncryptJobId>())
+
+    this._list.value.push(
+      ...v.filter(item => item.encryptJobId && !jobSet.has(item.encryptJobId)).map((item) => {
+        const val: MyJobListData = {
+          ...item,
+          status: {
+            status: 'pending',
+            msg: '未开始',
+            setStatus: (status: JobStatus, msg?: string) => {
+              this._map[item.encryptJobId].status.status = status
+              this._map[item.encryptJobId].status.msg = msg ?? ''
+            },
           },
-        },
-        getCard: async () => {
-          const cardResp = await requestCard({
-            lid: item.lid,
-            securityId: item.securityId,
-          })
-          this._map[item.encryptJobId].card = cardResp.data.zpData.jobCard
-          return cardResp.data.zpData.jobCard
-        },
-      }
-      this._map[item.encryptJobId] = val
-      return val
-    })
+          getCard: async () => {
+            const cardResp = await requestCard({
+              lid: item.lid,
+              securityId: item.securityId,
+            })
+            this._map[item.encryptJobId].card = cardResp.data.zpData.jobCard
+            return cardResp.data.zpData.jobCard
+          },
+        }
+        this._map[item.encryptJobId] = val
+        return val
+      }),
+    )
   })
 
   get(encryptJobId: EncryptJobId): MyJobListData | undefined {
