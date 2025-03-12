@@ -24,13 +24,19 @@ export class JobList {
     logger.info('初始化岗位列表', v)
 
     const jobSet = this._list.value.reduce((acc, item) => {
-      acc.add(item.encryptJobId)
+      acc.set(item.encryptJobId, item)
       return acc
-    }, new Set<EncryptJobId>())
+    }, new Map<EncryptJobId, MyJobListData>())
 
-    this._list.value.push(
-      ...v.filter(item => item.encryptJobId != null && !jobSet.has(item.encryptJobId)).map((item) => {
-        const val: MyJobListData = {
+    Object.assign(this._map, {})
+
+    this._list.value = v.map((item) => {
+      let val: MyJobListData
+      if (jobSet.has(item.encryptJobId)) {
+        val = jobSet.get(item.encryptJobId)!
+      }
+      else {
+        val = {
           ...item,
           status: {
             status: 'pending',
@@ -49,10 +55,10 @@ export class JobList {
             return cardResp.data.zpData.jobCard
           },
         }
-        this._map[item.encryptJobId] = val
-        return val
-      }),
-    )
+      }
+      this._map[item.encryptJobId] = val
+      return val
+    })
   })
 
   get(encryptJobId: EncryptJobId): MyJobListData | undefined {
