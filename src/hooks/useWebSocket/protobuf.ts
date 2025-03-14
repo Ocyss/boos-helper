@@ -1,16 +1,22 @@
 import type { TechwolfChatProtocol } from './type'
+import { ElMessage } from 'element-plus'
 import { AwesomeMessage } from './type'
+
+interface MessageArgs {
+  form_uid: string
+  to_uid: string
+  to_name: string // encryptBossId  擦,是boos的id不是岗位的
+  content?: string
+  image?: string // url
+}
 
 export class Message {
   msg: Uint8Array
   hex: string
-  constructor(args: {
-    form_uid: string
-    to_uid: string
-    to_name: string // encryptBossId  擦,是boos的id不是岗位的
-    content?: string
-    image?: string // url
-  }) {
+  args: MessageArgs
+
+  constructor(args: MessageArgs) {
+    this.args = args
     const r = new Date().getTime()
     const d = r + 68256432452609
     const data: TechwolfChatProtocol = {
@@ -52,6 +58,31 @@ export class Message {
   }
 
   send() {
-    window.ChatWebsocket.send(this)
+    if (window.ChatWebsocket != null) {
+      window.ChatWebsocket.send(this)
+    }
+    else if (window.EventBus != null) {
+      window.EventBus.publish('CHAT_SEND_TEXT', {
+        uid: this.args.to_uid,
+        encryptUid: this.args.to_name,
+        message: this.args.content,
+        msg: this.args.content,
+      }, () => {
+        logger.debug('消息发送成功', this)
+      }, () => {
+        logger.debug('消息发送失败', this)
+      })
+    }
+    else if (window.__q_chatSend != null) {
+      // 当无渠道时，从网络加载临时补丁
+      window.__q_chatSend.call(this).then(() => {
+        logger.debug('消息发送成功', this)
+      }, () => {
+        logger.debug('消息发送失败', this)
+      })
+    }
+    else {
+      ElMessage.error('无可用发送渠道，请等待作者修复。可暂时关闭招呼语功能')
+    }
   }
 }
