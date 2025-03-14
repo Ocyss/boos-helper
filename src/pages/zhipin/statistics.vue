@@ -137,6 +137,7 @@ onMounted(() => {
 </script>
 
 <template>
+  <ElAlert style="margin-bottom: 10px" title="数据并不完全准确，投递上限根据自身情况调整，过高的上限也许会适得其反" type="warning" />
   <ElRow :gutter="20">
     <ElCol :span="5">
       <ElStatistic

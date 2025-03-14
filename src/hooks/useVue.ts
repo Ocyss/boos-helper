@@ -41,6 +41,7 @@ export function useHookVueData<T = any>(selectors: string, key: string, data: Re
     const jobVue = document.querySelector<any>(selectors)?.__vue__
 
     data.value = jobVue[key]
+    update?.(toValue(jobVue[key] as T))
     // eslint-disable-next-line no-restricted-properties, ts/no-unsafe-call
     const originalSet = jobVue.__lookupSetter__(key)
     // eslint-disable-next-line accessor-pairs

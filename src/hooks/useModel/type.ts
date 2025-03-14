@@ -8,9 +8,9 @@ import type {
 import { miTem } from 'mitem'
 
 export interface llmMessageData {
-  data?: JobListData
-  boos?: BoosData
-  card?: JobCard
+  data?: boosZpJobItemData
+  boos?: boosZpBoosData
+  card?: boosZpCardData
 }
 
 export interface llmMessageArgs {

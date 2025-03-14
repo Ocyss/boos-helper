@@ -9,6 +9,7 @@ import { jobList } from '@/hooks/useJobList'
 import { getGpt, useModel } from '@/hooks/useModel'
 import {
   ElMessage,
+  ElMessageBox,
   ElText,
 } from 'element-plus'
 import { ref } from 'vue'
@@ -185,8 +186,38 @@ async function savePrompt() {
   formData[props.data].model = model.value
   formData[props.data].prompt = message.value
   await confSaving()
-  ElMessage.success('保存成功')
+  // ElMessage.success('保存成功')
   // show.value = false
+}
+
+async function copyOnlineResume() {
+  const resume = await getUserResumeString({})
+
+  await ElMessageBox({
+    title: '在线简历',
+    message: () => {
+      return (
+        <el-input
+          style="width: 100%"
+          model-value={resume}
+          readonly={true}
+          autosize={{ minRows: 4, maxRows: 8 }}
+          type="textarea"
+        >
+        </el-input>
+      )
+    },
+    customStyle: {
+      width: '100%',
+    },
+    showCancelButton: true,
+    confirmButtonText: '复制到剪切板',
+    cancelButtonText: '取消',
+  }).then(() => {
+    return navigator.clipboard.writeText(resume)
+  }).catch(() => {
+
+  })
 }
 </script>
 
@@ -208,9 +239,14 @@ async function savePrompt() {
         <el-radio-button label="单对话模式" :value="true" />
         <el-radio-button label="多对话模式" :value="false" />
       </el-radio-group>
-      <ElButton @click="inputExample">
-        填入示例值
-      </ElButton>
+      <el-space>
+        <ElButton @click="inputExample">
+          填入示例值
+        </ElButton>
+        <ElButton @click="copyOnlineResume">
+          复制在线简历
+        </ElButton>
+      </el-space>
       <ElSelectV2
         v-model="model"
         :options="modelData"
@@ -230,7 +266,7 @@ async function savePrompt() {
         mitem
       </el-link>
       来渲染模板。在多对话模式下，只有最后的消息会使用模板。
-      <ElLink type="primary" href="#" target="_blank">
+      <ElLink type="primary" href="https://github.com/Ocyss/boos-helper/blob/master/src/types/boosData.d.ts" target="_blank">
         变量表
       </ElLink>
       <br>

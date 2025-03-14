@@ -71,7 +71,7 @@ function change(v: Partial<FormDataAi>) {
   <div style="margin-top: 15px">
     <ElButton
       type="primary"
-      data-help="有那么多功能，当然要分等级了，不然岂不是浪费了这么多的模型（主要缺钱）"
+      data-help="配置需要使用的LLM大模型"
       @click="aiConfBoxShow = true"
     >
       模型配置

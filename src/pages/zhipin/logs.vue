@@ -10,7 +10,7 @@ import {
 import { ref } from 'vue'
 
 const tableRef = ref<TableV2Instance>()
-const { data, columns, dialogData } = useLog()
+const { filterData, columns, dialogData } = useLog()
 
 const aiFilterActiveNames = ref('response')
 const aiGreetActiveNames = ref('response')
@@ -26,7 +26,7 @@ const aiGreetActiveNames = ref('response')
       <ElTableV2
         ref="tableRef"
         :columns="columns"
-        :data="data"
+        :data="filterData"
         :height="360"
         :width
       />

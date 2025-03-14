@@ -57,12 +57,15 @@ export async function updateStatistics() {
   const g = (await getStorage(todayKey, curData))
   logger.debug('统计数据:', date, g)
   if (g.date === date) {
+    deepmerge(todayData, g, { clone: false })
     return g
   }
 
   const statistics = await getStorage(statisticsKey, [])
-  await setStorage(statisticsKey, [g, ...statistics])
+  const newStatistics = [g, ...statistics]
+  await setStorage(statisticsKey, newStatistics)
   await setStorage(todayKey, curData)
+  statisticsData.value = newStatistics
 }
 
 export function useStatistics() {

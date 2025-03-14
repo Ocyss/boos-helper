@@ -4,7 +4,7 @@ import { ref, watchEffect } from 'vue'
 import { useDeliver } from './hooks/useDeliver'
 
 const { current } = useDeliver()
-const jobListRef = ref<HTMLElement[]>()
+const jobListRef = useTemplateRef('jobListRef')
 const autoScroll = ref(true)
 const cards = ref<HTMLDivElement>()
 
@@ -21,7 +21,7 @@ function scroll(e: any) {
 watchEffect(() => {
   const d = jobListRef.value
   if (autoScroll.value && d && d.length > current.value) {
-    d[current.value].scrollIntoView({
+    d?.[current.value]?.$el.scrollIntoView({
       behavior: 'smooth',
       block: 'nearest',
       inline: 'center',
@@ -33,7 +33,7 @@ watchEffect(() => {
 <template>
   <div style="order: -1" class="boos-helper-card">
     <div ref="cards" class="card-grid" @wheel.stop="scroll">
-      <JobCard v-for="job in jobList.list" :key="job.encryptJobId" :job="job" hover />
+      <JobCard v-for="job in jobList.list" ref="jobListRef" :key="job.encryptJobId" :job="job" hover />
     </div>
     <ElSwitch
       v-model="autoScroll"

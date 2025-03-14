@@ -17,6 +17,7 @@ import {
   HrPositionError,
   JobDescriptionError,
   JobTitleError,
+  RepeatError,
   SalaryError,
 } from '@/types/deliverError'
 
@@ -33,19 +34,13 @@ const { modelData, getGpt } = useModel()
 const { formData } = useConfFormData()
 const { todayData } = useStatistics()
 
-export const communicated: handleCFn = (_h) => {
-  //   h.push(async ({ data }) => {
-  //     try {
-  //       const text = getElText(".start-chat-btn", el);
-  //       if (!text) throw new RepeatError("沟通按钮为空");
-  //       if (!text.includes("立即沟通"))
-  //         throw new RepeatError(`已经沟通过,按钮状态为 [${text}]`);
-  //     } catch (e: any) {
-  //       todayData.repeat++;
-  //       throw new RepeatError(e.message);
-  //     }
-  //   }
-  // )
+export const communicated: handleCFn = (h) => {
+  h.push(async ({ data }) => {
+    if (data.contact) {
+      throw new RepeatError(`已经沟通过`)
+    }
+  },
+  )
 }
 
 export const jobTitle: handleCFn = h =>
@@ -299,9 +294,10 @@ export const customGreeting: handleCFn = (h) => {
   }
   h.push(async (args, ctx) => {
     try {
-      const boosData = await requestBossData(ctx.listData.card!)
-      ctx.boosData = boosData
-
+      if (ctx.boosData == null) {
+        const boosData = await requestBossData(ctx.listData.card!)
+        ctx.boosData = boosData
+      }
       let msg = formData.customGreeting.value
       if (formData.greetingVariable.value && ctx.listData.card) {
         msg = template({ card: ctx.listData.card })
@@ -311,8 +307,8 @@ export const customGreeting: handleCFn = (h) => {
 
       const buf = new Message({
         form_uid: uid.toString(),
-        to_uid: boosData.data.bossId.toString(),
-        to_name: boosData.data.encryptBossId, // encryptUserId
+        to_uid: ctx.boosData.data.bossId.toString(),
+        to_name: ctx.boosData.data.encryptBossId, // encryptUserId
         content: msg,
       })
 
@@ -353,7 +349,10 @@ export const aiGreeting: handleCFn = (h) => {
   h.push(async (args, ctx) => {
     const chatInput = chatInputInit(model)
     try {
-      const boosData = await requestBossData(ctx.listData.card!)
+      if (ctx.boosData == null) {
+        const boosData = await requestBossData(ctx.listData.card!)
+        ctx.boosData = boosData
+      }
       const { content, prompt, reasoning_content } = await gpt.message({
         data: {
           data: ctx.listData,
@@ -373,8 +372,8 @@ export const aiGreeting: handleCFn = (h) => {
       chatInput.end(content)
       const buf = new Message({
         form_uid: uid.toString(),
-        to_uid: boosData.data.bossId.toString(),
-        to_name: boosData.data.encryptBossId, // encryptUserId
+        to_uid: ctx.boosData.data.bossId.toString(),
+        to_name: ctx.boosData.data.encryptBossId, // encryptUserId
         content,
       })
       buf.send()

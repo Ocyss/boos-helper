@@ -9,7 +9,7 @@ export async function requestCard(params: { securityId: string, lid: string }) {
     code: number
     message: string
     zpData: {
-      jobCard: JobCard
+      jobCard: boosZpCardData
     }
   }>('https://www.zhipin.com/wapi/zpgeek/job/card.json', {
     params,
@@ -18,7 +18,7 @@ export async function requestCard(params: { securityId: string, lid: string }) {
 }
 
 export async function sendPublishReq(
-  data: JobListData,
+  data: boosZpJobItemData,
   errorMsg?: string,
   retries = 3,
 ) {
@@ -65,10 +65,10 @@ export async function sendPublishReq(
 }
 
 export async function requestBossData(
-  card: JobCard,
+  card: boosZpCardData,
   errorMsg?: string,
   retries = 3,
-): Promise<BoosData> {
+): Promise<boosZpBoosData> {
   if (retries === 0) {
     throw new GreetError(errorMsg ?? '重试多次失败')
   }
@@ -87,7 +87,7 @@ export async function requestBossData(
     const res = await axios<{
       code: number
       message: string
-      zpData: BoosData
+      zpData: boosZpBoosData
     }>({
       url,
       data,

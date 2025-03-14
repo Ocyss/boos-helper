@@ -10,6 +10,7 @@ import {
   ElFormItem,
   ElInput,
 } from 'element-plus'
+import aiVue from './ai.vue'
 
 const { formData, confDelete, confExport, confImport, confReload, confSaving }
   = useConfFormData()
@@ -18,6 +19,15 @@ const { deliverLock } = useCommon()
 </script>
 
 <template>
+  <ElAlert style="margin-bottom: 10px" show-icon title="进行配置前都请先阅读完整的帮助文档，再进行配置，如有bug请反馈" type="success" />
+  <ElAlert style="margin-bottom: 10px" type="success" show-icon>
+    <template #title>
+      使用自定义招呼语前 推荐禁用boos直聘自带招呼语
+      <el-link href="https://www.zhipin.com/web/geek/notify-set?type=greetSet" target="_blank" type="warning">
+        点我前往设置
+      </el-link>
+    </template>
+  </ElAlert>
   <ElForm
     inline
     label-position="left"
@@ -29,6 +39,7 @@ const { deliverLock } = useCommon()
       <el-collapse-item title="筛选配置" name="1">
         <el-alert title="复选框打钩才会启用，别忘记打钩启用哦" type="success" show-icon style="margin: 10px 0;" />
         <el-alert title="排除和包含可点击切换，混合模式适用性过低不会考虑开发" type="success" show-icon style="margin: 10px 0;" />
+
         <el-space wrap style="width: 100%">
           <form-item
             v-bind="formInfoData.company"
@@ -99,6 +110,11 @@ const { deliverLock } = useCommon()
         </el-space>
         <div>
           <ElCheckbox
+            v-bind="formInfoData.greetingVariable"
+            v-model="formData.greetingVariable.value"
+            border
+          />
+          <ElCheckbox
             v-bind="formInfoData.activityFilter"
             v-model="formData.activityFilter.value"
             border
@@ -115,7 +131,10 @@ const { deliverLock } = useCommon()
           />
         </div>
       </el-collapse-item>
-      <el-collapse-item title="延迟配置" name="2">
+      <el-collapse-item title="AI配置" name="2">
+        <aiVue />
+      </el-collapse-item>
+      <el-collapse-item title="延迟配置" name="3">
         <ElFormItem
           v-for="(item, key) in formInfoData.delay"
           :key
@@ -133,12 +152,6 @@ const { deliverLock } = useCommon()
     </el-collapse>
 
     <div style="margin-top: 20px; display: flex">
-      <ElCheckbox
-        v-bind="formInfoData.greetingVariable"
-        v-model="formData.greetingVariable.value"
-        border
-      />
-
       <ElCheckbox
         v-bind="formInfoData.notification"
         v-model="formData.notification.value"

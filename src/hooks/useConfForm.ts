@@ -78,13 +78,16 @@ export const formInfoData: FormInfoData = {
 \`\`\`
 
 \`\`\`
-## 岗位信息:
-\`\`\`
-岗位名:{{ card.jobName }}
-岗位描述:{{ card.postDescription }}
-经验要求:{{ card.experienceName }}
-相关标签:{{ card.jobLabels }}
-\`\`\`
+## 待处理的岗位信息:
+<岗位信息>
+岗位名:{{ card.jobName }}   薪资: {{ card.salaryDesc }}
+学历要求: {{ card.degreeName }}
+技能要求: {{ data.skills }}
+岗位标签:{{ card.jobLabels }}
+  <岗位描述>
+  {{ card.postDescription }}
+  <岗位描述/>
+</岗位信息>
 `,
       [
         {
@@ -106,10 +109,15 @@ export const formInfoData: FormInfoData = {
         {
           role: 'user',
           content: `### 待处理的岗位信息:\`\`\`
-岗位名:{{ card.jobName }}
-岗位描述:{{ card.postDescription }}
-经验要求:{{ card.experienceName }}
-相关标签:{{ card.jobLabels }}
+<岗位信息>
+岗位名:{{ card.jobName }}   薪资: {{ card.salaryDesc }}
+学历要求: {{ card.degreeName }}
+技能要求: {{ data.skills }}
+岗位标签:{{ card.jobLabels }}
+  <岗位描述>
+  {{ card.postDescription }}
+  <岗位描述/>
+</岗位信息>
 \`\`\``,
         },
       ],
@@ -123,13 +131,19 @@ export const formInfoData: FormInfoData = {
 ## 要求:
 - 加分: 双休,早九晚五,新技术,机会多,年轻人多 每个加分项 10分
 - 扣分: 需要上门,福利少,需要和客户交流,需要推销 每个扣分项 10分
-## 是岗位相关信息:
-\`\`\`
-岗位描述:{{ card.postDescription}}
-薪酬:{{card.salaryDesc}}
-经验要求:{{card.experienceName}},学历要求:{{card.degreeName}}
-相关标签:{{card.jobLabels}},公司福利：{{data.welfareList}}
-\`\`\`
+
+## 待处理的岗位信息:
+<岗位信息>
+岗位名:{{ card.jobName }}   薪资: {{ card.salaryDesc }}
+学历要求: {{ card.degreeName }}    工作经验要求: {{ card.experienceName }}
+福利列表: {{ data.welfareList }}
+技能要求: {{ data.skills }}
+岗位标签:{{ card.jobLabels }}
+  <岗位描述>
+  {{ card.postDescription }}
+  <岗位描述/>
+</岗位信息>
+
 ## 输出
 
 总是输出以下Json格式
@@ -170,11 +184,17 @@ interface aiFiltering {
         },
         {
           role: 'user',
-          content: `### 待处理的岗位信息:\`\`\`
-岗位描述:{{ card.postDescription}}
-相关标签:{{card.jobLabels}}
-公司福利：{{data.welfareList}}
-\`\`\``,
+          content: `## 待处理的岗位信息:
+<岗位信息>
+岗位名:{{ card.jobName }}   薪资: {{ card.salaryDesc }}
+学历要求: {{ card.degreeName }}    工作经验要求: {{ card.experienceName }}
+福利列表: {{ data.welfareList }}
+技能要求: {{ data.skills }}
+岗位标签:{{ card.jobLabels }}
+  <岗位描述>
+  {{ card.postDescription }}
+  <岗位描述/>
+</岗位信息>`,
         },
       ],
     ],

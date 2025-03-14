@@ -6,7 +6,7 @@ import { useMouse, useMouseInElement } from '@vueuse/core'
 import { ElCheckbox, ElTabPane, ElTabs, ElTooltip } from 'element-plus'
 import { computed, onMounted, ref } from 'vue'
 import aboutVue from './about.vue'
-import aiVue from './ai.vue'
+
 import cardVue from './card.vue'
 import configVue from './config.vue'
 import { useDeliver } from './hooks/useDeliver'
@@ -17,6 +17,9 @@ import statisticsVue from './statistics.vue'
 const { initPager } = usePager()
 const { x, y } = useMouse({ type: 'client' })
 const { total, current } = useDeliver()
+const { todayData } = useStatistics()
+const { formData } = useConfFormData()
+
 const helpVisible = ref(false)
 const searchRef = ref()
 const tabsRef = ref()
@@ -116,8 +119,12 @@ const VITE_VERSION = __APP_VERSION__
         v{{ VITE_VERSION }}
       </el-tag>
     </el-badge>
-
-    <span v-if="total > 0">{{ current + 1 }}/{{ total }}</span>
+    <el-text v-if="todayData.total > 0" style="margin-right: 15px;">
+      今日: {{ todayData.success }}/{{ formData.deliveryLimit.value }}
+    </el-text>
+    <el-text v-if="total > 0">
+      当前页面: {{ current + 1 }}/{{ total }}
+    </el-text>
   </h2>
   <div
     style="
@@ -151,22 +158,17 @@ const VITE_VERSION = __APP_VERSION__
   </ElTooltip>
   <ElTabs ref="tabsRef" data-help="鼠标移到对应元素查看提示">
     <ElTabPane label="统计" data-help="失败是成功她妈">
-      <ElAlert style="margin-bottom: 10px" title="数据并不完全准确，投递上限根据自身情况调整，过高的上限也许会适得其反" type="warning" />
       <statisticsVue />
     </ElTabPane>
     <ElTabPane
       ref="searchRef"
-      label="搜索"
-      data-help="boos直聘原搜索, 可能出现空白bug"
-    >
-      <ElAlert style="margin-bottom: 10px" title="如果卡片数据为空不完整，请点击任意的boos原筛选功能来手动刷新下。" type="info" />
-    </ElTabPane>
-    <ElTabPane label="筛选" data-help="好好看，好好学">
-      <ElAlert style="margin-bottom: 10px" title="每一个配置都请先阅读完整的帮助文档，再进行配置" type="warning" />
+      label="筛选"
+    />
+    <ElTabPane label="配置" data-help="好好看，好好学">
       <configVue />
     </ElTabPane>
     <ElTabPane label="AI" data-help="AI时代，脚本怎么能落伍!">
-      <aiVue />
+      消息!
     </ElTabPane>
     <ElTabPane label="日志" data-help="反正你也不看">
       <logsVue />

@@ -8,6 +8,7 @@ declare global {
   const MatchPattern: typeof import('wxt/sandbox')['MatchPattern']
   const MigrationError: typeof import('wxt/storage')['MigrationError']
   const RequestError: typeof import('/home/q/dev/personal/monkey-extension/boos-helper/src/utils/request')['RequestError']
+  const UserResumeStringOptions: typeof import('/home/q/dev/personal/monkey-extension/boos-helper/src/hooks/useUser')['UserResumeStringOptions']
   const animate: typeof import('/home/q/dev/personal/monkey-extension/boos-helper/src/utils/index')['animate']
   const browser: typeof import('wxt/browser')['browser']
   const changeUser: typeof import('/home/q/dev/personal/monkey-extension/boos-helper/src/hooks/useUser')['changeUser']
@@ -43,6 +44,8 @@ declare global {
   const getRootVue: typeof import('/home/q/dev/personal/monkey-extension/boos-helper/src/hooks/useVue')['getRootVue']
   const getStatistics: typeof import('/home/q/dev/personal/monkey-extension/boos-helper/src/hooks/useStatistics')['getStatistics']
   const getUserId: typeof import('/home/q/dev/personal/monkey-extension/boos-helper/src/hooks/useUser')['getUserId']
+  const getUserResumeData: typeof import('/home/q/dev/personal/monkey-extension/boos-helper/src/hooks/useUser')['getUserResumeData']
+  const getUserResumeString: typeof import('/home/q/dev/personal/monkey-extension/boos-helper/src/hooks/useUser')['getUserResumeString']
   const h: typeof import('vue')['h']
   const importJson: typeof import('/home/q/dev/personal/monkey-extension/boos-helper/src/utils/jsonImportExport')['importJson']
   const inject: typeof import('vue')['inject']
@@ -149,6 +152,7 @@ declare module 'vue' {
     readonly MatchPattern: UnwrapRef<typeof import('wxt/sandbox')['MatchPattern']>
     readonly MigrationError: UnwrapRef<typeof import('wxt/storage')['MigrationError']>
     readonly RequestError: UnwrapRef<typeof import('/home/q/dev/personal/monkey-extension/boos-helper/src/utils/request')['RequestError']>
+    readonly UserResumeStringOptions: UnwrapRef<typeof import('/home/q/dev/personal/monkey-extension/boos-helper/src/hooks/useUser')['UserResumeStringOptions']>
     readonly animate: UnwrapRef<typeof import('/home/q/dev/personal/monkey-extension/boos-helper/src/utils/index')['animate']>
     readonly browser: UnwrapRef<typeof import('wxt/browser')['browser']>
     readonly changeUser: UnwrapRef<typeof import('/home/q/dev/personal/monkey-extension/boos-helper/src/hooks/useUser')['changeUser']>
@@ -184,6 +188,8 @@ declare module 'vue' {
     readonly getRootVue: UnwrapRef<typeof import('/home/q/dev/personal/monkey-extension/boos-helper/src/hooks/useVue')['getRootVue']>
     readonly getStatistics: UnwrapRef<typeof import('/home/q/dev/personal/monkey-extension/boos-helper/src/hooks/useStatistics')['getStatistics']>
     readonly getUserId: UnwrapRef<typeof import('/home/q/dev/personal/monkey-extension/boos-helper/src/hooks/useUser')['getUserId']>
+    readonly getUserResumeData: UnwrapRef<typeof import('/home/q/dev/personal/monkey-extension/boos-helper/src/hooks/useUser')['getUserResumeData']>
+    readonly getUserResumeString: UnwrapRef<typeof import('/home/q/dev/personal/monkey-extension/boos-helper/src/hooks/useUser')['getUserResumeString']>
     readonly h: UnwrapRef<typeof import('vue')['h']>
     readonly importJson: UnwrapRef<typeof import('/home/q/dev/personal/monkey-extension/boos-helper/src/utils/jsonImportExport')['importJson']>
     readonly inject: UnwrapRef<typeof import('vue')['inject']>
