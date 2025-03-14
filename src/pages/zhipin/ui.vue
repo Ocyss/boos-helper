@@ -168,7 +168,7 @@ const VITE_VERSION = __APP_VERSION__
       <configVue />
     </ElTabPane>
     <ElTabPane label="AI" data-help="AI时代，脚本怎么能落伍!">
-      消息!
+      AI配置移动到《配置》当中，更加符合常理。当前页面保留日后使用
     </ElTabPane>
     <ElTabPane label="日志" data-help="反正你也不看">
       <logsVue />
