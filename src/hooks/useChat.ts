@@ -7,7 +7,7 @@ export type ChatMessages = ChatMessage[]
 
 export interface ChatMessage {
   id: number
-  role: 'boos' | 'user' | 'assistant'
+  role: 'boss' | 'user' | 'assistant'
   name?: string
   content: string
   date: [string, string]

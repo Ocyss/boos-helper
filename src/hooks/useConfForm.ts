@@ -73,7 +73,7 @@ export const formInfoData: FormInfoData = {
     'label': 'AI招呼语',
     'data-help': '即使前面招呼语开了也不会发送，只会发送AI生成的招呼语，让gpt来打招呼真是太棒了，毕竟开场白很重要。',
     'example': [
-      `我现在需要求职，所以请你来写求职招呼语来向boos或hr打招呼，你需要代入我的身份也就是一名求职者.
+      `我现在需要求职，所以请你来写求职招呼语来向boss或hr打招呼，你需要代入我的身份也就是一名求职者.
 ## 我的简历:
 \`\`\`
 
@@ -290,6 +290,7 @@ export const defaultFormData: FormData = {
   aiFiltering: {
     enable: false,
     prompt: '',
+    score: 10,
   },
   aiReply: {
     enable: false,

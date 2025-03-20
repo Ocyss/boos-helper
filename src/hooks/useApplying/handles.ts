@@ -23,13 +23,12 @@ import {
 
 import { getCurDay, getCurTime } from '@/utils'
 
-import { parseGptJson } from '@/utils/parse'
-
 import { ElMessage } from 'element-plus'
 import { miTem } from 'mitem'
-import { rangeMatch, requestBossData } from './utils'
+import { SignedKeyLLM } from '../useModel/signedKey'
+import { parseFiltering, rangeMatch, requestBossData } from './utils'
 
-const { chatInputInit, chatMessages } = useChat()
+const { chatMessages } = useChat()
 const { modelData, getGpt } = useModel()
 const { formData } = useConfFormData()
 const { todayData } = useStatistics()
@@ -213,60 +212,45 @@ export const aiFiltering: handleCFn = (h) => {
   const model = modelData.value.find(
     v => formData.aiFiltering.model === v.key,
   )
-  if (!model) {
+  if (!model && !formData.aiFiltering.vip) {
     throw new AIFilteringError('没有找到AI筛选的模型')
   }
-  const gpt = getGpt(model, formData.aiFiltering.prompt)
+  const gpt = getGpt(model!, formData.aiFiltering.prompt, formData.aiFiltering.vip)
+  if (gpt instanceof SignedKeyLLM) {
+    void gpt.checkResume()
+  }
   h.push(async (_, ctx) => {
-    const chatInput = chatInputInit(model)
+    // const chatInput = chatInputInit(model)
     try {
       const { content, prompt, reasoning_content } = await gpt.message({
         data: {
           data: ctx.listData,
-          boos: ctx.boosData,
-          card: ctx.listData.card,
+          boss: ctx.bossData,
+          card: ctx.listData.card!,
         },
-        onStream: chatInput.handle,
-        onPrompt: s => chatBoosMessage(ctx, s),
-      })
+        json: true,
+        // onStream: chatInput.handle,
+        onPrompt: s => chatBossMessage(ctx, s),
+      }, 'aiFiltering')
+
       ctx.aiFilteringQ = prompt
       if (content == null) {
         return
       }
-      interface Item {
-        reason: string
-        score: number
-      }
-      const res = parseGptJson<{
-        negative: Item[]
-        positive: Item[]
-      }>(content)
+      const { res, message, rating } = parseFiltering(content)
 
       ctx.aiFilteringAjson = res || {}
-
-      const hand = (acc: { score: number, reason: string }, curr: Item) => ({
-        score: acc.score + Math.abs(curr.score),
-        reason: `${acc.reason}\n${curr.reason}/(${Math.abs(curr.score)}分)`,
-      })
-      const data = {
-        negative: res?.negative?.reduce(hand, { score: 0, reason: '' }),
-        positive: res?.positive?.reduce(hand, { score: 0, reason: '' }),
-      }
-
-      const rating = (data?.positive?.score ?? 0) - (data?.negative?.score ?? 0)
-
-      const mg = `分数${rating}\n消极:${data?.negative?.reason}\n\n积极:${data?.positive?.reason}`
-
-      ctx.aiFilteringAtext = mg
+      ctx.aiFilteringAtext = message
       ctx.aiFilteringR = reasoning_content
-      chatInput.end(mg)
-      if (rating < 10) {
-        throw new AIFilteringError(mg)
+
+      // chatInput.end(message)
+      if (rating < (formData.aiFiltering.score ?? 10)) {
+        throw new AIFilteringError(message)
       }
     }
     catch (e) {
       todayData.jobContent++
-      chatInput.end('Err~')
+      // chatInput.end('Err~')
       throw new AIFilteringError(errorHandle(e))
     }
   })
@@ -294,9 +278,9 @@ export const customGreeting: handleCFn = (h) => {
   }
   h.push(async (args, ctx) => {
     try {
-      if (ctx.boosData == null) {
-        const boosData = await requestBossData(ctx.listData.card!)
-        ctx.boosData = boosData
+      if (ctx.bossData == null) {
+        const bossData = await requestBossData(ctx.listData.card!)
+        ctx.bossData = bossData
       }
       let msg = formData.customGreeting.value
       if (formData.greetingVariable.value && ctx.listData.card) {
@@ -307,8 +291,8 @@ export const customGreeting: handleCFn = (h) => {
 
       const buf = new Message({
         form_uid: uid.toString(),
-        to_uid: ctx.boosData.data.bossId.toString(),
-        to_name: ctx.boosData.data.encryptBossId, // encryptUserId
+        to_uid: ctx.bossData.data.bossId.toString(),
+        to_name: ctx.bossData.data.encryptBossId, // encryptUserId
         content: msg,
       })
 
@@ -320,11 +304,11 @@ export const customGreeting: handleCFn = (h) => {
   })
 }
 
-function chatBoosMessage(ctx: logData, msg: string) {
+function chatBossMessage(ctx: logData, msg: string) {
   const d = new Date()
   chatMessages.value.push({
     id: d.getTime(),
-    role: 'boos',
+    role: 'boss',
     content: msg,
     date: [getCurDay(d), getCurTime(d)],
     name: ctx.listData.brandName,
@@ -336,32 +320,35 @@ export const aiGreeting: handleCFn = (h) => {
   const model = modelData.value.find(
     v => formData.aiGreeting.model === v.key,
   )
-  if (!model) {
+  if (!model && !formData.aiGreeting.vip) {
     ElMessage.warning('没有找到招呼语的模型')
     return
   }
-  const gpt = getGpt(model, formData.aiGreeting.prompt)
+  const gpt = getGpt(model!, formData.aiGreeting.prompt, formData.aiGreeting.vip)
+  if (gpt instanceof SignedKeyLLM) {
+    void gpt.checkResume()
+  }
   const uid = getUserId()
   if (uid == null) {
     ElMessage.error('没有获取到uid,请刷新重试')
     throw new GreetError('没有获取到uid')
   }
   h.push(async (args, ctx) => {
-    const chatInput = chatInputInit(model)
+    // const chatInput = chatInputInit(model)
     try {
-      if (ctx.boosData == null) {
-        const boosData = await requestBossData(ctx.listData.card!)
-        ctx.boosData = boosData
+      if (ctx.bossData == null) {
+        const bossData = await requestBossData(ctx.listData.card!)
+        ctx.bossData = bossData
       }
       const { content, prompt, reasoning_content } = await gpt.message({
         data: {
           data: ctx.listData,
-          boos: ctx.boosData,
-          card: ctx.listData.card,
+          boss: ctx.bossData,
+          card: ctx.listData.card!,
         },
-        onStream: chatInput.handle,
-        onPrompt: s => chatBoosMessage(ctx, s),
-      })
+        // onStream: chatInput.handle,
+        onPrompt: s => chatBossMessage(ctx, s),
+      }, 'aiGreeting')
       ctx.aiGreetingQ = prompt
       if (content == null) {
         return
@@ -369,17 +356,17 @@ export const aiGreeting: handleCFn = (h) => {
       ctx.message = content
       ctx.aiGreetingA = content
       ctx.aiGreetingR = reasoning_content
-      chatInput.end(content)
+      // chatInput.end(content)
       const buf = new Message({
         form_uid: uid.toString(),
-        to_uid: ctx.boosData.data.bossId.toString(),
-        to_name: ctx.boosData.data.encryptBossId, // encryptUserId
+        to_uid: ctx.bossData.data.bossId.toString(),
+        to_name: ctx.bossData.data.encryptBossId, // encryptUserId
         content,
       })
       buf.send()
     }
     catch (e) {
-      chatInput.end('Err~')
+      // chatInput.end('Err~')
       throw new GreetError(errorHandle(e))
     }
   })

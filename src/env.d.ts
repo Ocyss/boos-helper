@@ -44,9 +44,12 @@ interface Window {
   __q_getUserResumeString: any
   __q_sendMessage: any
   __q_onMessage: any
+  __q_netNotification: any
   __q_notify: any
   __q_jobList: JobList
   __q_chatSend?: (this: any) => Promise<void>
+  __q_openStore?: () => void
+  __q_netConf?: () => NetConf | undefined
 }
 
 declare const __APP_VERSION__: string

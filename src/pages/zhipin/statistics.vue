@@ -101,8 +101,7 @@ async function startBatch() {
     ElMessage.error(`获取失败! - ${e}`)
   }
   finally {
-    logger.debug(log.data)
-
+    logger.debug('日志信息', log.data)
     if (formData.notification.value) {
       await notification('投递结束')
     }

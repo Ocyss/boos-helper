@@ -6,13 +6,13 @@ import './index.scss'
 
 async function mountVue() {
   const jobSearchWrapper = await elmGetter.get('.job-search-wrapper,.job-recommend-main')
-  if (document.querySelector('#boos-helper-job')) {
+  if (document.querySelector('#boss-helper-job')) {
     return
   }
   // eslint-disable-next-line ts/no-unsafe-argument
   const app = createApp(uiVue)
   const jobEl = document.createElement('div')
-  jobEl.id = 'boos-helper-job'
+  jobEl.id = 'boss-helper-job'
 
   jobSearchWrapper.setAttribute('help', '出界了哇!')
 
@@ -23,7 +23,7 @@ async function mountVue() {
       padding: 24px 24px 16px;
     `
     const jobWarpEl = document.createElement('div')
-    jobWarpEl.id = 'boos-helper-job-warp'
+    jobWarpEl.id = 'boss-helper-job-warp'
     jobWarpEl.style.cssText = `
       width: 85%;
       max-width: 870px;

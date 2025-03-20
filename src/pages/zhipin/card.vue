@@ -1,10 +1,10 @@
 <script lang="ts" setup>
 import { jobList } from '@/hooks/useJobList'
-import { ref, watchEffect } from 'vue'
+import { ref } from 'vue'
 import { useDeliver } from './hooks/useDeliver'
 
-const { current } = useDeliver()
-const jobListRef = useTemplateRef('jobListRef')
+const { currentData } = useDeliver()
+const jobSetRef = ref<Record<EncryptJobId, Element | ComponentPublicInstance | null>>({})
 const autoScroll = ref(true)
 const cards = ref<HTMLDivElement>()
 
@@ -18,10 +18,23 @@ function scroll(e: any) {
   autoScroll.value = false
 }
 
-watchEffect(() => {
-  const d = jobListRef.value
-  if (autoScroll.value && d && d.length > current.value) {
-    d?.[current.value]?.$el.scrollIntoView({
+watch(currentData, () => {
+  if (!autoScroll.value || !currentData.value?.encryptJobId) {
+    return
+  }
+  const d = jobSetRef.value[currentData.value?.encryptJobId]
+  if (!d) {
+    return
+  }
+  if ('scrollIntoView' in d) {
+    d.scrollIntoView({
+      behavior: 'smooth',
+      block: 'nearest',
+      inline: 'center',
+    })
+  }
+  else if ('$el' in d) {
+    d?.$el.scrollIntoView({
       behavior: 'smooth',
       block: 'nearest',
       inline: 'center',
@@ -31,9 +44,9 @@ watchEffect(() => {
 </script>
 
 <template>
-  <div style="order: -1" class="boos-helper-card">
+  <div style="order: -1" class="boss-helper-card">
     <div ref="cards" class="card-grid" @wheel.stop="scroll">
-      <JobCard v-for="job in jobList.list" ref="jobListRef" :key="job.encryptJobId" :job="job" hover />
+      <JobCard v-for="job in jobList.list" :ref="(ref) => { jobSetRef[job.encryptJobId] = ref }" :key="job.encryptJobId" :job="job" hover />
     </div>
     <ElSwitch
       v-model="autoScroll"

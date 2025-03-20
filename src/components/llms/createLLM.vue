@@ -1,5 +1,6 @@
 <script lang="ts" setup>
 import type { modelData } from '@/hooks/useModel'
+import type { llm } from '@/hooks/useModel/type'
 import { llms, useModel } from '@/hooks/useModel'
 import deepmerge, { jsonClone } from '@/utils/deepmerge'
 import { logger } from '@/utils/logger'
@@ -137,17 +138,18 @@ async function test() {
   data.data.mode = selectLLM.value
   logger.debug(data)
 
-  const gpt = getGpt(data, testIn.value)
+  const gpt = getGpt(data, testIn.value) as llm<any>
   testOut.value = ''
   try {
     logger.group('LLMTest')
     const msg = await gpt.message({
       data: {},
-      onStream: (d) => {
+      test: true,
+      onStream: (d: string) => {
         logger.debug('TestResStream', d)
         testOut.value += d
       },
-    })
+    }, 'aiFiltering')
     if (msg.reasoning_content) {
       testOut.value = `思考过程: ${msg.reasoning_content}\n\n${msg.content}`
     }

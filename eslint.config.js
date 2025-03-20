@@ -18,5 +18,6 @@ export default antfu({
     'ts/no-unsafe-assignment': 'off',
     'ts/no-unsafe-member-access': 'off',
     'ts/no-unsafe-return': 'off',
+    'ts/strict-boolean-expressions': 'off',
   },
 })

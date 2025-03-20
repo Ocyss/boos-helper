@@ -58,7 +58,7 @@ function inputMsgUpdate(v: string) {
           :size-dependencies="[item.content]"
           :data-index="index"
           class="message"
-          :class="{ self: item.role !== 'boos' }"
+          :class="{ self: item.role !== 'boss' }"
         >
           <div class="message-wrapper">
             <div class="message-content">

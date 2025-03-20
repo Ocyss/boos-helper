@@ -148,6 +148,7 @@ export const UserResumeStringOptions = {
   项目经历: true,
   教育经历: true,
   资格证书: true,
+  志愿者经历: true,
 }
 
 export async function getUserResumeString(options: Partial<typeof UserResumeStringOptions>) {
@@ -157,88 +158,8 @@ export async function getUserResumeString(options: Partial<typeof UserResumeStri
   }
 
   const data = await getUserResumeData()
-
-  let template = ''
-  if (typeof options.基本信息 === 'object') {
-    template += `## 基本信息
-${options.基本信息.姓名 ? `- 姓名: {{zpData.baseInfo.nickName}}` : ''}
-${options.基本信息.年龄 ? `- 年龄: {{zpData.baseInfo.age}}` : ''}
-${options.基本信息.性别 ? `- 性别: {{zpData.baseInfo.gender | genUserResumeGender}}` : ''}
-${options.基本信息.学历 ? `- 学历: {{zpData.baseInfo.degreeCategory}}` : ''}
-${options.基本信息.工作年限 ? `- 工作年限: {{zpData.baseInfo.workYearDesc}}` : ''}
-${options.基本信息.求职状态 ? `- 求职状态: {{zpData.applyStatus | genUserResumeStatus}}` : ''}
-`.replaceAll(/^\s*$/gm, '')
-  }
-
-  if (options.期望职位) {
-    template += `
-
-## 期望职位
-{% for item in zpData.expectList %}- {{item.positionName}} {{item.salaryDesc}}
-{% endfor %}`
-  }
-  if (options.个人优势) {
-    template += `
-
-## 个人优势
-
-<个人优势>
-{{zpData.userDesc}}
-</个人优势>`
-  }
-  if (options.工作经历) {
-    template += `
-
-## 工作经历
-{% for item in zpData.workExpList %}
-### {{item.companyName}} ({{item.positionName}}) {{item.startDate}}-{{item.endDate}}
-相关技能: {% for emphasi in item.emphasis %} \`{{emphasi}}\` {% endfor %}
-<工作内容>
-{{item.workContent}}
-</工作内容>
-<工作业绩>
-{{item.workPerformance}}
-</工作业绩>
-
-{% endfor %}
-`
-  }
-  if (options.项目经历) {
-    template += `
-
-## 项目经历
-{% for item in zpData.projectExpList %}
-### {{item.name}} ({{item.roleName}}) {{item.startDate}}-{{item.endDate}}
-<项目描述>
-{{item.projectDesc}}
-</项目描述>
-<项目业绩>
-{{item.performance}}
-</项目业绩>
-
-{% endfor %}
-`
-  }
-  if (options.教育经历) {
-    template += `
-
-## 教育经历
-{% for item in zpData.educationExpList %}- {{item.school}} {{item.startYear}}-{{item.endYear}}
-    {{item.degreeName}}
-{% endfor %}`
-  }
-  if (options.资格证书) {
-    template += `
-## 资格证书:
-{% for item in zpData.certificationList %}- {{item.certName}}
-{% endfor %}`
-  }
-
-  miTem.filters.genUserResumeGender = function () {
-    return this === 1 ? '男' : '女'
-  }
-  miTem.filters.genUserResumeStatus = function () {
-    switch (this) {
+  const genUserResumeStatus = function (v: number) {
+    switch (v) {
       case 0:
         return '离职-随时到岗'
       case 1:
@@ -251,20 +172,100 @@ ${options.基本信息.求职状态 ? `- 求职状态: {{zpData.applyStatus | ge
         return '未知'
     }
   }
+  let template = ''
+  if (typeof options.基本信息 === 'object') {
+    template += `## 基本信息`
+    if (options.基本信息.姓名 && data.baseInfo?.nickName) {
+      template += `\n- 姓名: ${data.baseInfo.nickName}`
+    }
+    if (options.基本信息.年龄 && data.baseInfo?.age) {
+      template += `\n- 年龄: ${data.baseInfo.age}`
+    }
+    if (options.基本信息.性别 && data.baseInfo?.gender) {
+      template += `\n- 性别: ${data.baseInfo.gender === 1 ? '男' : '女'}`
+    }
+    if (options.基本信息.学历 && data.baseInfo?.degreeCategory) {
+      template += `\n- 学历: ${data.baseInfo.degreeCategory}`
+    }
+    if (options.基本信息.工作年限 && data.baseInfo?.workYearDesc) {
+      template += `\n- 工作年限: ${data.baseInfo.workYearDesc}`
+    }
+    if (options.基本信息.求职状态 && data.applyStatus) {
+      template += `\n- 求职状态: ${genUserResumeStatus(data.applyStatus ?? 0)}`
+    }
+  }
+  const expectList = data.expectList?.filter(item => item?.positionType === 0)
+  if (options.期望职位 && expectList && expectList.length > 0) {
+    template += `\n\n## 期望职位
+${expectList?.map(item => `- ${item?.positionName} ${item?.salaryDesc}`).join('\n')}`
+  }
+  if (options.个人优势 && data.userDesc) {
+    template += `\n\n## 个人优势
 
-  logger.debug('getUserResumeString模板', { template, data })
+<个人优势>
+${data.userDesc}
+</个人优势>`
+  }
+  if (options.工作经历 && data.workExpList != null && data.workExpList.length > 0) {
+    template += `\n\n## 工作经历
+${data.workExpList?.map(item => `
+### ${item?.companyName} (${item?.positionName}) ${item?.startDate}-${item?.endDate}
 
-  return miTem.compile(template)({ data, zpData: data })
+相关技能: ${item?.emphasis?.map(e => `\`${e}\``).join(' ')}
+${item?.workContent
+  ? `<工作内容>
+${item.workContent}
+</工作内容>`
+  : ''}
+${item?.workPerformance
+  ? `<工作业绩>
+${item.workPerformance}
+</工作业绩>`
+  : ''}
+`).join('\n')}`
+  }
+  if (options.项目经历 && data.projectExpList && data.projectExpList.length > 0) {
+    template += `\n\n## 项目经历
+${data.projectExpList?.map(item => `
+### ${item?.name} (${item?.roleName}) ${item?.startDate}-${item?.endDate}
+<项目描述>
+${item?.projectDesc}
+</项目描述>
+<项目业绩>
+${item?.performance}
+</项目业绩>
+`).join('\n')}`
+  }
+  if (options.教育经历 && data.educationExpList && data.educationExpList.length > 0) {
+    template += `\n## 教育经历
+${data.educationExpList?.map(item => `- ${item?.school} ${item?.startYear}-${item?.endYear}
+    ${item?.degreeName}`).join('\n')}`
+  }
+  if (options.资格证书 && data.certificationList && data.certificationList.length > 0) {
+    template += `\n## 资格证书:
+${data.certificationList?.map(item => `- ${item?.certName}`).join('\n')}
+`
+  }
+  if (options.志愿者经历 && data.volunteerExpList && data.volunteerExpList.length > 0) {
+    template += `\n## 志愿者经历:
+${data.volunteerExpList?.map(item => `- ${item?.name} ${item?.serviceLength}
+    ${item?.volunteerDesc ?? item?.volunteerDescription}`).join('\n')}`
+  }
+
+  template = template.replaceAll('undefined', '')
+  logger.debug('getUserResumeString', { template, data })
+  return template
 }
 
 window.__q_getUserResumeString = getUserResumeString
 
-let resumeData: boosZpResumeData | null = null
+let resumeData: bossZpResumeData | null = null
 
-export async function getUserResumeData() {
-  if (resumeData != null) {
+export async function getUserResumeData(forceRefresh = false) {
+  if (resumeData != null && !forceRefresh) {
     return resumeData
   }
+
   const token = window?.Cookie.get('bst')
   const res = await fetch(`https://www.zhipin.com/wapi/zpgeek/resume/geek/preview/data.json?_=${Date.now()}`, {
     headers: {
@@ -274,7 +275,7 @@ export async function getUserResumeData() {
   const data = await res.json() as {
     code: number
     message: string
-    zpData: boosZpResumeData
+    zpData: bossZpResumeData
   }
   if (data.code !== 0) {
     ElMessage.error(`获取简历数据失败: ${data.message}`)

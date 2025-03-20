@@ -1,18 +1,21 @@
 <script lang="ts" setup>
 import { jobList } from '@/hooks/useJobList'
+import { useSignedKey } from '@/hooks/useSignedKey'
 import { netConf } from '@/utils/conf'
 import elmGetter from '@/utils/elmGetter'
 import { useMouse, useMouseInElement } from '@vueuse/core'
 import { ElCheckbox, ElTabPane, ElTabs, ElTooltip } from 'element-plus'
 import { computed, onMounted, ref } from 'vue'
 import aboutVue from './about.vue'
-
 import cardVue from './card.vue'
 import configVue from './config.vue'
 import { useDeliver } from './hooks/useDeliver'
 import { usePager } from './hooks/usePager'
 import logsVue from './logs.vue'
+import serviceVue from './service.vue'
 import statisticsVue from './statistics.vue'
+
+const { refreshSignedKeyInfo, initSignedKey } = useSignedKey()
 
 const { initPager } = usePager()
 const { x, y } = useMouse({ type: 'client' })
@@ -73,6 +76,7 @@ function findHelp(dom: HTMLElement | null) {
 }
 
 onMounted(() => {
+  void initSignedKey()
   jobList.initJobList()
   initPager()
   if (location.href.includes('/web/geek/job-recommend')) {
@@ -98,25 +102,39 @@ onMounted(() => {
         elmGetter.rm('.job-search-scan', searchEl)
       })
   }
+  const t = setInterval(() => {
+    void refreshSignedKeyInfo()
+  }, 1000 * 60 * 3)
+  onUnmounted(() => {
+    clearInterval(t)
+  })
 })
 
 function tagOpen(url: string) {
   window.open(url)
 }
 const VITE_VERSION = __APP_VERSION__
+
+const isDot = computed(() => {
+  return (netConf.value?.version ?? '0') > VITE_VERSION
+})
+
+function openStore() {
+  window.__q_openStore?.()
+}
 </script>
 
 <template>
   <h2 style="display: flex; align-items: center">
     Boos-Helper
     <el-badge
-      :is-dot="(netConf?.version ?? '0') > VITE_VERSION"
+      :is-dot="isDot"
       :offset="[-2, 7]"
       style="cursor: pointer; display: inline-flex; margin: 0 4px"
-      @click="tagOpen('https://greasyfork.org/zh-CN/scripts/491340')"
+      @click="openStore"
     >
       <el-tag type="primary">
-        v{{ VITE_VERSION }}
+        v{{ VITE_VERSION }} {{ isDot ? ' 有更新' : '' }}
       </el-tag>
     </el-badge>
     <el-text v-if="todayData.total > 0" style="margin-right: 15px;">
@@ -168,7 +186,7 @@ const VITE_VERSION = __APP_VERSION__
       <configVue />
     </ElTabPane>
     <ElTabPane label="AI" data-help="AI时代，脚本怎么能落伍!">
-      AI配置移动到《配置》当中，更加符合常理。当前页面保留日后使用
+      <serviceVue />
     </ElTabPane>
     <ElTabPane label="日志" data-help="反正你也不看">
       <logsVue />
@@ -202,7 +220,7 @@ const VITE_VERSION = __APP_VERSION__
       </template>
     </ElTabPane>
   </ElTabs>
-  <Teleport to="#boos-helper-job-warp,.page-job-inner .page-job-content">
+  <Teleport to="#boss-helper-job-warp,.page-job-inner .page-job-content">
     <cardVue />
   </Teleport>
   <!-- <Teleport to=".page-job-wrapper">
@@ -222,7 +240,7 @@ const VITE_VERSION = __APP_VERSION__
 </template>
 
 <style lang="scss">
-#boos-helper-job {
+#boss-helper-job {
   margin-bottom: 8px;
   * {
     user-select: none;

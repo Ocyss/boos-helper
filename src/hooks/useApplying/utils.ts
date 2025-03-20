@@ -9,7 +9,7 @@ export async function requestCard(params: { securityId: string, lid: string }) {
     code: number
     message: string
     zpData: {
-      jobCard: boosZpCardData
+      jobCard: bossZpCardData
     }
   }>('https://www.zhipin.com/wapi/zpgeek/job/card.json', {
     params,
@@ -18,7 +18,7 @@ export async function requestCard(params: { securityId: string, lid: string }) {
 }
 
 export async function sendPublishReq(
-  data: boosZpJobItemData,
+  data: bossZpJobItemData,
   errorMsg?: string,
   retries = 3,
 ) {
@@ -65,10 +65,10 @@ export async function sendPublishReq(
 }
 
 export async function requestBossData(
-  card: boosZpCardData,
+  card: bossZpCardData,
   errorMsg?: string,
   retries = 3,
-): Promise<boosZpBoosData> {
+): Promise<bossZpBossData> {
   if (retries === 0) {
     throw new GreetError(errorMsg ?? '重试多次失败')
   }
@@ -87,7 +87,7 @@ export async function requestBossData(
     const res = await axios<{
       code: number
       message: string
-      zpData: boosZpBoosData
+      zpData: bossZpBossData
     }>({
       url,
       data,
@@ -154,4 +154,30 @@ export function rangeMatch(
 
   // 其他情况均视为不匹配
   return [false, err]
+}
+
+export function parseFiltering(content: string) {
+  interface Item {
+    reason: string
+    score: number
+  }
+  const res = parseGptJson<{
+    negative: Item[]
+    positive: Item[]
+  }>(content)
+
+  const hand = (acc: { score: number, reason: string }, curr: Item) => ({
+    score: acc.score + Math.abs(curr.score),
+    reason: `${acc.reason}\n${curr.reason}/(${Math.abs(curr.score)}分)`,
+  })
+  const data = {
+    negative: res?.negative?.reduce(hand, { score: 0, reason: '' }),
+    positive: res?.positive?.reduce(hand, { score: 0, reason: '' }),
+  }
+
+  const rating = (data?.positive?.score ?? 0) - (data?.negative?.score ?? 0)
+
+  const message = `分数${rating}\n消极:${data?.negative?.reason}\n\n积极:${data?.positive?.reason}`
+
+  return { res, message, rating, data }
 }

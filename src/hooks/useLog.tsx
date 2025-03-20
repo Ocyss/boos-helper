@@ -27,16 +27,16 @@ export type logErr =
 export interface logData {
   listData: MyJobListData
   el?: Element
-  boosData?: boosZpBoosData
+  bossData?: bossZpBossData
   message?: string
   state?: string
   err?: string
   aiFilteringQ?: string
-  aiFilteringR?: string
+  aiFilteringR?: string | null
   aiFilteringAjson?: object
   aiFilteringAtext?: string
   aiGreetingQ?: string
-  aiGreetingR?: string
+  aiGreetingR?: string | null
   aiGreetingA?: string
 }
 

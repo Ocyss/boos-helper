@@ -2,20 +2,20 @@ import { requestCard } from '@/hooks/useApplying'
 import { useHookVueData } from '@/hooks/useVue'
 import { ref } from 'vue'
 
-export type EncryptJobId = boosZpJobItemData['encryptJobId']
+export type EncryptJobId = bossZpJobItemData['encryptJobId']
 export type JobStatus = 'pending' | 'wait' | 'running' | 'success' | 'error' | 'warn'
-export type MyJobListData = boosZpJobItemData & {
-  card?: boosZpCardData
+export type MyJobListData = bossZpJobItemData & {
+  card?: bossZpCardData
   status: {
     status: JobStatus
     msg: string
     setStatus: (status: JobStatus, msg?: string) => void
   }
-  getCard: () => Promise<boosZpCardData>
+  getCard: () => Promise<bossZpCardData>
 }
 
 export class JobList {
-  private _vue_jobList = ref<boosZpJobItemData[]>([])
+  private _vue_jobList = ref<bossZpJobItemData[]>([])
 
   _list = ref<Array<MyJobListData>>([])
   _map = reactive<Record<EncryptJobId, MyJobListData>>({})

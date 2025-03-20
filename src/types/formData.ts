@@ -30,7 +30,7 @@ export interface FormData {
   goldHunterFilter: FormDataCheckbox
   notification: FormDataCheckbox
   aiGreeting: FormDataAi
-  aiFiltering: FormDataAi
+  aiFiltering: FormDataAi & { score: number }
   aiReply: FormDataAi
   record: { model?: string[], enable: boolean }
   // animation?: "frame" | "card" | "together";
@@ -78,6 +78,7 @@ export interface FormDataCheckbox {
 
 export interface FormDataAi {
   model?: string
+  vip?: boolean
   prompt: string | prompt
   enable: boolean
 }

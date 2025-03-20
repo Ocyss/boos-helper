@@ -80,6 +80,9 @@ function importllm() {
     destroy-on-close
     :z-index="20"
   >
+    <el-alert title="注意" type="warning">
+      会员模型暂时不支持输出 思考过程, 比如deepseekR1，但是不影响模型能力
+    </el-alert>
     <el-table :data="modelData" style="width: 100%" table-layout="auto">
       <el-table-column label="模型">
         <template #default="scope">
@@ -88,40 +91,47 @@ function importllm() {
               :size="30"
               :style="{ '--el-avatar-bg-color': scope.row.color }"
             >
-              <el-icon v-html="llmsIcons[scope.row.data.mode]" />
+              <el-icon v-html="scope.row.vip != null ? llmsIcons.vip : llmsIcons[scope.row.data.mode]" />
             </el-avatar>
-
             <span style="margin-left: 8px">{{ scope.row.name }}</span>
           </div>
         </template>
       </el-table-column>
-      <el-table-column prop="data.url" label="url" />
+      <el-table-column label="描述">
+        <template #default="scope">
+          <el-text line-clamp="1">
+            {{ scope.row.vip == null ? scope.row.data.url : scope.row.vip.description }}
+          </el-text>
+        </template>
+      </el-table-column>
       <el-table-column label="管理">
         <template #default="scope">
-          <el-button
-            link
-            type="primary"
-            size="small"
-            @click="() => del(scope.row)"
-          >
-            删除
-          </el-button>
-          <el-button
-            link
-            type="primary"
-            size="small"
-            @click="() => copy(scope.row)"
-          >
-            复制
-          </el-button>
-          <el-button
-            link
-            type="primary"
-            size="small"
-            @click="() => edit(scope.row)"
-          >
-            编辑
-          </el-button>
+          <div v-if="scope.row.vip == null" style="width: 200px;">
+            <el-button
+              link
+              type="primary"
+              size="small"
+              @click="() => del(scope.row)"
+            >
+              删除
+            </el-button>
+            <el-button
+              link
+              type="primary"
+              size="small"
+              @click="() => copy(scope.row)"
+            >
+              复制
+            </el-button>
+            <el-button
+              link
+              type="primary"
+              size="small"
+              @click="() => edit(scope.row)"
+            >
+              编辑
+            </el-button>
+          </div>
         </template>
       </el-table-column>
     </el-table>

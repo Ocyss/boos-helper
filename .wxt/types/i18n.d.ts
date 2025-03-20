@@ -73,7 +73,7 @@ declare module "wxt/browser" {
       options?: GetMessageOptions,
     ): string;
     /**
-     * "boos-helper-直聘AI求职助手"
+     * "boss-helper-直聘AI求职助手"
      */
     getMessage(
       messageName: "extName",
@@ -81,7 +81,7 @@ declare module "wxt/browser" {
       options?: GetMessageOptions,
     ): string;
     /**
-     * "Boos直聘助手, 皆在减少投递简历的麻烦, 和提高投递简历的效率。支持丰富的筛选规则和AI集成，不但能筛选还能自动打招呼。支持 DeepSeek-R1 深度思考"
+     * "Boss直聘助手, 皆在减少投递简历的麻烦, 和提高投递简历的效率。支持丰富的筛选规则和AI集成，不但能筛选还能自动打招呼。支持 DeepSeek-R1 深度思考"
      */
     getMessage(
       messageName: "extDescription",

@@ -1,4 +1,4 @@
-interface boosZpBoosData {
+interface bossZpBossData {
   data: {
     bossFreezeStatus: number
     companyName: string
@@ -41,7 +41,7 @@ interface boosZpBoosData {
  * 职位信息,在模板中通常使用 data 获取
  * 如 {{ data.jobName }} 获取工作名称
  */
-interface boosZpJobItemData {
+interface bossZpJobItemData {
   /** 安全标识符，例如：'MkH058uX...' */
   securityId: string
   /** 招聘者头像的URL，例如：'https://img.bosszhipin.com/boss/avatar.png' */
@@ -140,7 +140,7 @@ interface boosZpJobItemData {
  * 职位卡片信息,在模板中通常使用 card 获取
  * 如 {{ card.activeTimeDesc }} 获取活跃时间描述
  */
-interface boosZpCardData {
+interface bossZpCardData {
   /** 职位名称，例如："电脑技术员" */
   jobName: string
   /** 岗位描述，例如："测试电脑配件" */
@@ -195,10 +195,14 @@ interface boosZpCardData {
   login: boolean
 }
 
+type DeepPartial<T> = T extends object ? {
+  [P in keyof T]?: DeepPartial<T[P]>;
+} : T
+
 /**
  * 简历数据
  */
-interface boosZpResumeData {
+type bossZpResumeData = DeepPartial<{
   baseInfo: {
     name: string
     nickName: string
@@ -329,7 +333,18 @@ interface boosZpResumeData {
     endYearStr: string
   }>
   socialContactList: any
-  volunteerExpList: any
+  volunteerExpList: Array<{
+    id: string
+    name: string
+    serviceLength: string
+    startDate: string
+    endDate: string
+    volunteerDesc: string
+    garbageFieldList: any
+    endDateStr: string
+    volunteerDescription: string
+    startDateStr: string
+  }>
   certificationList: Array<{
     certId: string
     certName: string
@@ -399,4 +414,4 @@ interface boosZpResumeData {
     stuMultiExpectChoose: number
   }
   virtualPartTimeCombineExpect: any
-}
+}>

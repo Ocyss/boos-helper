@@ -6,7 +6,7 @@
 
 # 项目介绍
 
-Boos直聘助手, 皆在减少投递简历的麻烦, 和提高投递简历的效率,技术栈使用VIte + Vue3 + element-plus, 代码由 Vite 打包无加密混淆最小化, 开源在 Github 欢迎前来Pr
+Boss直聘助手, 皆在减少投递简历的麻烦, 和提高投递简历的效率,技术栈使用VIte + Vue3 + element-plus, 代码由 Vite 打包无加密混淆最小化, 开源在 Github 欢迎前来Pr
 
 ## 相关链接
 
@@ -46,7 +46,7 @@ greasyfork地址: <https://greasyfork.org/zh-CN/scripts/491340>
   - [ ] 黑名单
   - [x] 多账号管理
   - [ ] 聊天屏蔽已读消息
-  - [ ] boos消息弹窗
+  - [ ] boss消息弹窗
 
 ## 项目预览
 

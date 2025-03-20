@@ -12,6 +12,7 @@ declare global {
   const animate: typeof import('/home/q/dev/personal/monkey-extension/boos-helper/src/utils/index')['animate']
   const browser: typeof import('wxt/browser')['browser']
   const changeUser: typeof import('/home/q/dev/personal/monkey-extension/boos-helper/src/hooks/useUser')['changeUser']
+  const client: typeof import('/home/q/dev/personal/monkey-extension/boos-helper/src/hooks/useSignedKey')['client']
   const computed: typeof import('vue')['computed']
   const createApp: typeof import('vue')['createApp']
   const createIframeUi: typeof import('wxt/client')['createIframeUi']
@@ -61,6 +62,7 @@ declare global {
   const logger: typeof import('/home/q/dev/personal/monkey-extension/boos-helper/src/utils/logger')['logger']
   const markRaw: typeof import('vue')['markRaw']
   const netConf: typeof import('/home/q/dev/personal/monkey-extension/boos-helper/src/utils/conf')['netConf']
+  const netNotification: typeof import('/home/q/dev/personal/monkey-extension/boos-helper/src/utils/conf')['netNotification']
   const nextTick: typeof import('vue')['nextTick']
   const notification: typeof import('/home/q/dev/personal/monkey-extension/boos-helper/src/utils/index')['notification']
   const onActivated: typeof import('vue')['onActivated']
@@ -88,6 +90,7 @@ declare global {
   const shallowReactive: typeof import('vue')['shallowReactive']
   const shallowReadonly: typeof import('vue')['shallowReadonly']
   const shallowRef: typeof import('vue')['shallowRef']
+  const signedKeyReqHandler: typeof import('/home/q/dev/personal/monkey-extension/boos-helper/src/hooks/useSignedKey')['signedKeyReqHandler']
   const statisticsKey: typeof import('/home/q/dev/personal/monkey-extension/boos-helper/src/hooks/useConfForm')['statisticsKey']
   const storage: typeof import('wxt/storage')['storage']
   const toRaw: typeof import('vue')['toRaw']
@@ -110,6 +113,7 @@ declare global {
   const useHookVueFn: typeof import('/home/q/dev/personal/monkey-extension/boos-helper/src/hooks/useVue')['useHookVueFn']
   const useId: typeof import('vue')['useId']
   const useModel: typeof import('vue')['useModel']
+  const useSignedKey: typeof import('/home/q/dev/personal/monkey-extension/boos-helper/src/hooks/useSignedKey')['useSignedKey']
   const useSlots: typeof import('vue')['useSlots']
   const useStatistics: typeof import('/home/q/dev/personal/monkey-extension/boos-helper/src/hooks/useStatistics')['useStatistics']
   const useTemplateRef: typeof import('vue')['useTemplateRef']
@@ -156,6 +160,7 @@ declare module 'vue' {
     readonly animate: UnwrapRef<typeof import('/home/q/dev/personal/monkey-extension/boos-helper/src/utils/index')['animate']>
     readonly browser: UnwrapRef<typeof import('wxt/browser')['browser']>
     readonly changeUser: UnwrapRef<typeof import('/home/q/dev/personal/monkey-extension/boos-helper/src/hooks/useUser')['changeUser']>
+    readonly client: UnwrapRef<typeof import('/home/q/dev/personal/monkey-extension/boos-helper/src/hooks/useSignedKey')['client']>
     readonly computed: UnwrapRef<typeof import('vue')['computed']>
     readonly createApp: UnwrapRef<typeof import('vue')['createApp']>
     readonly createIframeUi: UnwrapRef<typeof import('wxt/client')['createIframeUi']>
@@ -205,6 +210,7 @@ declare module 'vue' {
     readonly logger: UnwrapRef<typeof import('/home/q/dev/personal/monkey-extension/boos-helper/src/utils/logger')['logger']>
     readonly markRaw: UnwrapRef<typeof import('vue')['markRaw']>
     readonly netConf: UnwrapRef<typeof import('/home/q/dev/personal/monkey-extension/boos-helper/src/utils/conf')['netConf']>
+    readonly netNotification: UnwrapRef<typeof import('/home/q/dev/personal/monkey-extension/boos-helper/src/utils/conf')['netNotification']>
     readonly nextTick: UnwrapRef<typeof import('vue')['nextTick']>
     readonly notification: UnwrapRef<typeof import('/home/q/dev/personal/monkey-extension/boos-helper/src/utils/index')['notification']>
     readonly onActivated: UnwrapRef<typeof import('vue')['onActivated']>
@@ -232,6 +238,7 @@ declare module 'vue' {
     readonly shallowReactive: UnwrapRef<typeof import('vue')['shallowReactive']>
     readonly shallowReadonly: UnwrapRef<typeof import('vue')['shallowReadonly']>
     readonly shallowRef: UnwrapRef<typeof import('vue')['shallowRef']>
+    readonly signedKeyReqHandler: UnwrapRef<typeof import('/home/q/dev/personal/monkey-extension/boos-helper/src/hooks/useSignedKey')['signedKeyReqHandler']>
     readonly statisticsKey: UnwrapRef<typeof import('/home/q/dev/personal/monkey-extension/boos-helper/src/hooks/useConfForm')['statisticsKey']>
     readonly storage: UnwrapRef<typeof import('wxt/storage')['storage']>
     readonly toRaw: UnwrapRef<typeof import('vue')['toRaw']>
@@ -254,6 +261,7 @@ declare module 'vue' {
     readonly useHookVueFn: UnwrapRef<typeof import('/home/q/dev/personal/monkey-extension/boos-helper/src/hooks/useVue')['useHookVueFn']>
     readonly useId: UnwrapRef<typeof import('vue')['useId']>
     readonly useModel: UnwrapRef<typeof import('vue')['useModel']>
+    readonly useSignedKey: UnwrapRef<typeof import('/home/q/dev/personal/monkey-extension/boos-helper/src/hooks/useSignedKey')['useSignedKey']>
     readonly useSlots: UnwrapRef<typeof import('vue')['useSlots']>
     readonly useStatistics: UnwrapRef<typeof import('/home/q/dev/personal/monkey-extension/boos-helper/src/hooks/useStatistics')['useStatistics']>
     readonly useTemplateRef: UnwrapRef<typeof import('vue')['useTemplateRef']>

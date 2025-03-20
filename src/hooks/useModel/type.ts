@@ -8,9 +8,9 @@ import type {
 import { miTem } from 'mitem'
 
 export interface llmMessageData {
-  data?: boosZpJobItemData
-  boos?: boosZpBoosData
-  card?: boosZpCardData
+  data?: bossZpJobItemData
+  boss?: bossZpBossData
+  card?: bossZpCardData
 }
 
 export interface llmMessageArgs {
@@ -18,6 +18,7 @@ export interface llmMessageArgs {
   onPrompt?: (s: string) => void
   onStream?: (s: string) => void
   json?: boolean
+  test?: boolean
 }
 
 export abstract class llm<C = any> {
@@ -63,15 +64,16 @@ export abstract class llm<C = any> {
     }
   }
   abstract chat(message: string): Promise<string>
-  abstract message(args: llmMessageArgs): Promise<messageReps>
+  abstract message(args: llmMessageArgs, type: 'aiGreeting' | 'aiFiltering' | 'aiReply'): Promise<messageReps>
 }
 
 export interface messageReps<T = string> {
   content?: T
-  reasoning_content?: string
+  reasoning_content?: string | null
   prompt?: string
   usage?: { total_tokens: number, input_tokens: number, output_tokens: number }
 }
+
 export type llmConf<M extends string, T> = { mode: M } & T
 
 export type formElm =

@@ -5,7 +5,7 @@ import { AwesomeMessage } from './type'
 interface MessageArgs {
   form_uid: string
   to_uid: string
-  to_name: string // encryptBossId  擦,是boos的id不是岗位的
+  to_name: string // encryptBossId  擦,boss的id不是岗位的
   content?: string
   image?: string // url
 }

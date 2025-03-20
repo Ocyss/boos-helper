@@ -13,6 +13,7 @@ import { ref } from 'vue'
 
 const total = ref(0)
 const current = ref(0)
+const currentData = ref<MyJobListData>()
 const log = useLog()
 const { todayData } = useStatistics()
 const { deliverStop } = useCommon()
@@ -46,6 +47,7 @@ async function jobListHandle() {
 
     try {
       data.status.setStatus('running', '处理中')
+      currentData.value = data
       const ctx: logData = { listData: data }
       try {
         await h.before({ data }, ctx)
@@ -97,5 +99,6 @@ export function useDeliver() {
     jobListHandle,
     total,
     current,
+    currentData,
   }
 }

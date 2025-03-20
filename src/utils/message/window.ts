@@ -3,8 +3,8 @@ import { deserializeError, serializeError } from 'serialize-error'
 import { uid } from 'uid'
 
 // 定义消息类型
-const REQUEST_TYPE = '@wxtreq-booshelper/messaging'
-const RESPONSE_TYPE = '@wxtres-booshelper/messaging'
+const REQUEST_TYPE = '@wxtreq-bosshelper/messaging'
+const RESPONSE_TYPE = '@wxtres-bosshelper/messaging'
 
 // 消息配置接口
 interface WindowMessagingConfig {

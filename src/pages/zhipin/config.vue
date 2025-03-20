@@ -22,7 +22,7 @@ const { deliverLock } = useCommon()
   <ElAlert style="margin-bottom: 10px" show-icon title="进行配置前都请先阅读完整的帮助文档，再进行配置，如有bug请反馈" type="success" />
   <ElAlert style="margin-bottom: 10px" type="success" show-icon>
     <template #title>
-      使用自定义招呼语前 推荐禁用boos直聘自带招呼语
+      使用自定义招呼语前 推荐禁用boss直聘自带招呼语
       <el-link href="https://www.zhipin.com/web/geek/notify-set?type=greetSet" target="_blank" type="warning">
         点我前往设置
       </el-link>

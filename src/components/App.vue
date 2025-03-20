@@ -3,9 +3,9 @@ import type {
   Action,
 } from 'element-plus'
 import logVue from '@/components/conf/log.vue'
-
 import storeVue from '@/components/conf/store.vue'
 import userVue from '@/components/conf/user.vue'
+import { store } from '@/components/icon/store'
 import { userInfoInit } from '@/hooks/useUser'
 import { logger } from '@/utils/logger'
 import { getStorage, setStorage } from '@/utils/message/storage'
@@ -19,8 +19,8 @@ import {
 } from 'element-plus'
 import { onMounted, ref } from 'vue'
 
-logger.info('BoosHelper挂载成功')
-ElMessage('BoosHelper挂载成功!')
+logger.info('BossHelper挂载成功')
+ElMessage('BossHelper挂载成功!')
 
 const confBox = ref(false)
 
@@ -52,9 +52,21 @@ async function themeChange() {
 
 // console.log(monkeyWindow, window, unsafeWindow);
 
+const VITE_VERSION = __APP_VERSION__
+const storeShow = ref(false)
+
+window.__q_openStore = () => {
+  storeShow.value = true
+}
+const netConf = ref<NetConf>()
+
+function updateNetConf() {
+  netConf.value = window.__q_netConf?.()
+}
+
 onMounted(async () => {
   await userInfoInit()
-  const protocol = 'boos-protocol'
+  const protocol = 'boss-protocol'
   const protocol_val = '2025/02/21'
   const protocol_date = await getStorage(protocol)
   if (protocol_date !== protocol_val) {
@@ -119,12 +131,75 @@ greasyfork地址: <a href="https://greasyfork.org/zh-CN/scripts/491340" target="
         <ElDropdownItem @click="themeChange">
           暗黑模式（{{ dark ? "开" : "关" }}）
         </ElDropdownItem>
+        <ElDropdownItem @click="storeShow = true">
+          版本信息
+        </ElDropdownItem>
       </ElDropdownMenu>
     </template>
   </ElDropdown>
   <Teleport to="body">
     <component :is="confs[confKey].component" id="help-conf-box" v-model="confBox" />
   </Teleport>
+  <el-dialog
+    v-model="storeShow"
+    title="BossHelper扩展商店"
+    width="500"
+    @open="updateNetConf"
+  >
+    <div>
+      <div style="text-align: center;font-size: 14px;color: #606266;">
+        你的版本: {{ VITE_VERSION }}
+      </div>
+      <div style="text-align: center;font-size: 14px;color: #606266;">
+        最新版本: {{ netConf?.version ?? '暂未获取到版本信息' }}
+      </div>
+      <div style="text-align: center;font-size: 16px;color: #606266;">
+        更新内容：
+      </div>
+      <div style="text-align: center;font-size: 14px;color: #606266; white-space: pre-line;">
+        {{ netConf?.version_description ?? '暂未获取到更新日志' }}
+      </div>
+    </div>
+    <el-space wrap>
+      <a v-for="(item, key) in store" :key="key" class="store-item-a" :href="netConf?.store?.[key]?.[1] ?? item[2]" target="_blank">
+        <div class="store-item">
+          <component :is="item[0]" />
+          <el-text>{{ netConf?.store?.[key]?.[0] ?? item[1] }}</el-text>
+        </div>
+      </a>
+    </el-space>
+    <template #footer>
+      <div class="dialog-footer">
+        <el-button type="primary" @click="storeShow = false">
+          关闭
+        </el-button>
+      </div>
+    </template>
+  </el-dialog>
 </template>
 
-<style lang="scss"></style>
+<style lang="scss">
+.store-item-a{
+  .store-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-direction: column;
+    width: 140px;
+    height: 180px;
+    background: aliceblue;
+    padding: 10px;
+    border: 1px solid #f6f6f7;
+    border-radius: 12px;
+    background-color: #f6f6f7;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, .04), 0 1px 2px rgba(0, 0, 0, .06);
+    transition: border-color .25s, background-color .25s;
+}
+&:hover{
+  .store-item{
+    background-color: #bbf8fa;
+    border-color: #2fffd9;
+  }
+}
+}
+</style>
