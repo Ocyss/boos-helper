@@ -1,16 +1,17 @@
-> [!CAUTION] 免责声明
+> [!CAUTION]
 > 本项目仅供学习交流，禁止用于商业用途
 > 
 > 使用该脚本有一定风险(如黑号,封号,权重降低等)，本项目不承担任何责任
 
 # 重要提示
 
-本项目完全重构成浏览器扩展，原功能保持不变进行大量bug修复和页面优化
-预计2025年3月在chrome，edge等扩展商店上架，完全免费，欢迎打赏支持下
+本项目从0.3版本开始重构成浏览器扩展，油猴脚本不再更新，扩展等代码整理之后再开源
 
-提前参与测试：
-选择最新的 Pre-release 版本
-https://github.com/Ocyss/boos-helper/releases
+| Chrome | Crx搜搜 | Edge | FireFox | Github |
+|----------|----------|----------|----------|----------|
+| [![Chrome Web Store](https://img.shields.io/chrome-web-store/v/ogkmgjbagackkdlcibcailacnncgonbn?label=Chrome插件商店)](https://chrome.google.com/webstore/detail/ogkmgjbagackkdlcibcailacnncgonbn) |[![Crx 搜搜](https://img.shields.io/badge/Crx搜索-v%3F.%3F.%3F-EF7C3D)](https://www.crxsoso.com/webstore/detail/ogkmgjbagackkdlcibcailacnncgonbn) | [![Edge Web Store](https://img.shields.io/badge/dynamic/json?url=https%3A%2F%2Fmicrosoftedge.microsoft.com%2Faddons%2Fgetproductdetailsbycrxid%2Fjcllnbjfeamhihjpfjlclhdnjmggbgal&query=version&prefix=v&label=Edge插件商店&color=EF7C3D)](https://microsoftedge.microsoft.com/addons/detail/jcllnbjfeamhihjpfjlclhdnjmggbgal) | [![Firefox](https://img.shields.io/amo/v/boss-helper?label=Mozilla插件商店)](https://addons.mozilla.org/zh-TW/firefox/addon/boss-helper/) | [![GitHub Release](https://img.shields.io/github/v/release/Ocyss/boos-helper)](https://github.com/Ocyss/boos-helper/releases/latest/) |
+
+> **国内**: 如果无法访问 `Chrome插件商店` , 请使用 `Crx搜搜` 或 `Edge插件商店` 安装
 
 ## 项目介绍
 
@@ -60,7 +61,7 @@ greasyfork地址: <https://greasyfork.org/zh-CN/scripts/491340>
   - [ ] 黑名单
   - [x] 多账号管理
   - [ ] 聊天屏蔽已读消息
-  - [ ] boos消息弹窗
+  - [ ] boss消息弹窗
 
 
 ## 参与贡献
