@@ -10,25 +10,21 @@ export async function getRootVue(): Promise<any> {
 
   const waitVueMount = async () => {
     return new Promise((resolve, reject) => {
-      const observer = new MutationObserver((mutations, obs) => {
+      const interval = setInterval(() => {
         const wrap = document.querySelector('#wrap')
+        if (rootVue.value !== undefined) {
+          return resolve(rootVue.value)
+        }
         if (wrap && '__vue__' in wrap) {
-          obs.disconnect()
           rootVue.value = wrap.__vue__
           resolve(rootVue.value)
+          clearInterval(interval)
         }
-      })
-
-      observer.observe(document.documentElement, {
-        childList: true,
-        subtree: true,
-      })
-
-      // 5秒后超时
+      }, 300)
       setTimeout(() => {
-        observer.disconnect()
         reject(new Error('未找到vue根组件'))
-      }, 5000)
+        clearInterval(interval)
+      }, 20000)
     })
   }
 
@@ -37,8 +33,20 @@ export async function getRootVue(): Promise<any> {
 }
 
 export function useHookVueData<T = any>(selectors: string, key: string, data: Ref<T>, update?: (val: T) => void) {
-  return () => {
-    const jobVue = document.querySelector<any>(selectors)?.__vue__
+  return async () => {
+    const jobVue = await new Promise<any>((resolve, reject) => {
+      const interval = setInterval(() => {
+        const jobVue = document.querySelector<any>(selectors)?.__vue__
+        if (jobVue) {
+          resolve(jobVue)
+          clearInterval(interval)
+        }
+      }, 100)
+      setTimeout(() => {
+        reject(new Error('未找到对应元素'))
+        clearInterval(interval)
+      }, 20000)
+    })
 
     data.value = jobVue[key]
     update?.(toValue(jobVue[key] as T))
@@ -57,9 +65,20 @@ export function useHookVueData<T = any>(selectors: string, key: string, data: Re
 }
 
 export function useHookVueFn(selectors: string, key: string) {
-  return () => {
-    const jobVue = document.querySelector<any>(selectors)?.__vue__
-
+  return async () => {
+    const jobVue = await new Promise<any>((resolve, reject) => {
+      const interval = setInterval(() => {
+        const jobVue = document.querySelector<any>(selectors)?.__vue__
+        if (jobVue) {
+          resolve(jobVue)
+          clearInterval(interval)
+        }
+      }, 100)
+      setTimeout(() => {
+        reject(new Error('未找到对应元素'))
+        clearInterval(interval)
+      }, 20000)
+    })
     return jobVue[key]
   }
 }

@@ -31,9 +31,11 @@ export function usePager() {
     pageChange,
     next,
     prev,
-    initPager: () => {
-      initPage()
-      pageChange.value = location.href.includes('/web/geek/job-recommend') ? initSearch() : initChange()
+    initPager: async () => {
+      await initPage()
+      pageChange.value = location.href.includes('/web/geek/job-recommend')
+        ? (await initSearch())
+        : (await initChange())
     },
   }
 }

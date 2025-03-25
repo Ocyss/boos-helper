@@ -57,12 +57,31 @@ async function bindKey() {
             signed_key: keyValue.value,
           },
         })
-        signedKeyReqHandler(resp)
-        if (resp.error == null && resp.data != null) {
+        const errMsg = signedKeyReqHandler(resp)
+        if (errMsg == null && resp.data != null) {
           signedKey.value = resp.data.signed_key
           data.users.push(resp.data)
           signedKeyInfo.value = data
           ElMessage.success('绑定成功')
+        }
+        else if (resp.response.status === 488) {
+          const resp = await signedKeyClient.POST('/v1/key/bind_account', {
+            body: {
+              data: {
+                user_id: userID,
+                backup_user_id: userInfo.value?.encryptUserId,
+              },
+              callback: 'force_unbind',
+              signed_key: keyValue.value,
+            },
+          })
+          const errMsg = signedKeyReqHandler(resp)
+          if (errMsg == null && resp.data != null) {
+            signedKey.value = resp.data.signed_key
+            data.users.push(resp.data)
+            signedKeyInfo.value = data
+            ElMessage.success('绑定成功')
+          }
         }
       }
     }
@@ -74,7 +93,7 @@ async function bindKey() {
 
 const orderID = ref<string>()
 const orderQuerySuccess = ref(false)
-async function buy(responseFn: (userId: string, backupUserId: string) => Promise<FetchResponse<any, any, any>>, shouldAssignKey: boolean = true) {
+async function buy(responseFn: (userId: string, backupUserId?: string) => Promise<FetchResponse<any, any, any>>, shouldAssignKey: boolean = true) {
   loading.value = true
   buyResult.value = undefined
   buyQrcodeUrl.value = ''
@@ -84,12 +103,15 @@ async function buy(responseFn: (userId: string, backupUserId: string) => Promise
     buyDialogLoading.value = true
     const userId = getUserId()?.toString()
     const backupUserId = userInfo.value?.encryptUserId
-    if (userId == null || backupUserId == null) {
+    if (userId == null) {
       ElMessage.error('请先登录')
       return
     }
     const response = await responseFn(userId, backupUserId)
-    signedKeyReqHandler(response)
+    const errMsg = signedKeyReqHandler(response)
+    if (errMsg != null) {
+      return response
+    }
     const stream = events(response.response)
     for await (const event of stream) {
       if (orderQuerySuccess.value) {
@@ -164,9 +186,10 @@ async function queryOrder() {
   }
 }
 
-function buyKey() {
-  ElMessageBox.confirm(
-    `<h2 id="-">须知</h2>
+async function buyKey() {
+  try {
+    await ElMessageBox.confirm(
+      `<h2 id="-">须知</h2>
 <p>密钥购买需要充值使用，首次购买赠送5元余额</p>
 <p>密钥模型价格携带服务器/开发等成本，价格会高一些</p>
 <p>密钥购买后将自动绑定当前账号，未登录不可购买</p>
@@ -185,17 +208,50 @@ function buyKey() {
 <li>仅使用模型，仅会记录 Prompt 和 Output</li>
 <li>使用优化Prompt，才需要上传当前简历信息和岗位信息，进行Prompt优化</li>
 </ul>`,
-    '购前须知',
-    {
-      confirmButtonText: '确定',
-      cancelButtonText: '取消',
-      dangerouslyUseHTMLString: true,
-    },
-  ).then(async () => {
-    try {
-      buyDialogStatus.value = 'key'
-      buyOrderName.value = `购买密钥 ${netConf.value?.price_info?.signedKey ?? 15}元`
-      await buy(async (userId: string, backupUserId: string) => {
+      '购前须知',
+      {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        dangerouslyUseHTMLString: true,
+      },
+    )
+  }
+  catch {
+    return
+  }
+  try {
+    buyDialogStatus.value = 'key'
+    buyOrderName.value = `购买密钥 ${netConf.value?.price_info?.signedKey ?? 15}元`
+    const response = await buy(async (userId: string, backupUserId?: string) => {
+      buySignal = new AbortController()
+      const res = await signedKeyClient.POST('/v1/key/purchase_key', {
+        body: {
+          data: {
+            user_id: userId,
+            backup_user_id: backupUserId,
+          },
+        },
+        parseAs: 'stream',
+        signal: buySignal.signal,
+      })
+      return res
+    })
+    if (response != null && response.response.status === 488) {
+      try {
+        const errMsg = signedKeyReqHandler(response, false)
+        await ElMessageBox.confirm(
+          errMsg ?? '当前用户已绑定密钥，是否强制解绑?',
+          '购买失败',
+          {
+            confirmButtonText: '确定',
+            cancelButtonText: '取消',
+          },
+        )
+      }
+      catch {
+        return
+      }
+      await buy(async (userId: string, backupUserId?: string) => {
         buySignal = new AbortController()
         const res = await signedKeyClient.POST('/v1/key/purchase_key', {
           body: {
@@ -203,6 +259,7 @@ function buyKey() {
               user_id: userId,
               backup_user_id: backupUserId,
             },
+            callback: 'force_unbind',
           },
           parseAs: 'stream',
           signal: buySignal.signal,
@@ -210,12 +267,11 @@ function buyKey() {
         return res
       })
     }
-    catch (e: any) {
-      console.error(e)
-      ElMessage.error(`购买失败 ${e.message}`)
-    }
-  }).catch(() => {
-  })
+  }
+  catch (e: any) {
+    console.error(e)
+    ElMessage.error(`购买失败 ${e.message}`)
+  }
 }
 
 async function buyAccount() {

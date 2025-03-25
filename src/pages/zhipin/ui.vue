@@ -4,7 +4,7 @@ import { useSignedKey } from '@/hooks/useSignedKey'
 import { netConf } from '@/utils/conf'
 import elmGetter from '@/utils/elmGetter'
 import { useMouse, useMouseInElement } from '@vueuse/core'
-import { ElCheckbox, ElTabPane, ElTabs, ElTooltip } from 'element-plus'
+import { ElCheckbox, ElMessage, ElTabPane, ElTabs, ElTooltip } from 'element-plus'
 import { computed, onMounted, ref } from 'vue'
 import aboutVue from './about.vue'
 import cardVue from './card.vue'
@@ -75,10 +75,16 @@ function findHelp(dom: HTMLElement | null) {
   return findHelp(dom.parentElement)
 }
 
-onMounted(() => {
+onMounted(async () => {
   void initSignedKey()
-  jobList.initJobList()
-  initPager()
+  try {
+    await jobList.initJobList()
+  }
+  catch (e) {
+    logger.error('初始化职位列表失败', { error: e })
+    ElMessage.error(`列表初始失败: ${e instanceof Error ? e.message : '未知错误'}`)
+  }
+
   if (location.href.includes('/web/geek/job-recommend')) {
     elmGetter
       .get<HTMLDivElement>(
@@ -102,6 +108,12 @@ onMounted(() => {
         elmGetter.rm('.job-search-scan', searchEl)
       })
   }
+
+  initPager().catch((e) => {
+    logger.error('初始化分页器失败', { error: e })
+    ElMessage.error(`分页器初始失败: ${e instanceof Error ? e.message : '未知错误'}`)
+  })
+
   const t = setInterval(() => {
     void refreshSignedKeyInfo()
   }, 1000 * 60 * 3)

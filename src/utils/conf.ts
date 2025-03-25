@@ -4,6 +4,8 @@ import { ref } from 'vue'
 
 export const netConf = ref<NetConf>()
 
+const netNotificationMap = new Map<string, boolean>()
+
 export async function netNotification(item:
   | NotificationAlert
   | NotificationMessage
@@ -11,6 +13,10 @@ export async function netNotification(item:
   if (now !== 0 && now < await getStorage(`local:netConf-${item.key}`, 0)) {
     return
   }
+  if (netNotificationMap.has(item.key)) {
+    return
+  }
+  netNotificationMap.set(item.key, true)
   if (item.type === 'message') {
     void ElMessageBox.alert(item.data.content, item.data.title ?? 'message', {
       ...item.data,
@@ -50,7 +56,7 @@ export interface NetConf {
     | NotificationMessage
     | NotificationNotification
   )[]
-  store?: Record<string, [string, string]>
+  store?: Record<string, [string, string, string]>
   price_info?: {
     signedKey: number
     account: number
@@ -60,19 +66,19 @@ export interface NetConf {
 }
 
 export interface NotificationAlert {
-  key?: string
+  key: string
   type: 'alert'
   data: import('element-plus').AlertProps
 }
 
 export interface NotificationMessage {
-  key?: string
+  key: string
   type: 'message'
   data: { title?: string, content: string, duration?: number }
 }
 
 export interface NotificationNotification {
-  key?: string
+  key: string
   type: 'notification'
   data: import('element-plus').NotificationProps & {
     url?: string

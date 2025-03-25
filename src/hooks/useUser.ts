@@ -3,7 +3,6 @@ import { logger } from '@/utils/logger'
 import { clearCookie, deleteCookie, getCookieInfo, saveCookie, switchCookie } from '@/utils/message/cookie'
 import { setStorage } from '@/utils/message/storage'
 import { ElMessage } from 'element-plus'
-import { miTem } from 'mitem'
 import { ref } from 'vue'
 import { getRootVue } from './useVue'
 
@@ -41,9 +40,20 @@ export function getUserId(): number | string | null {
 
 export async function userInfoInit() {
   const v = await getRootVue()
-  const store = v?.$store?.state
-  userInfo.value = store?.userInfo
-  logger.debug('userInfo: ', userInfo.value)
+  const interval = setInterval(() => {
+    const info = v?.$store?.state?.userInfo
+    if (info) {
+      userInfo.value = info
+      logger.debug('用户信息获取成功: ', userInfo.value)
+      clearInterval(interval)
+    }
+  }, 400)
+  setTimeout(() => {
+    if (!userInfo.value) {
+      logger.error('获取用户信息失败', { root: v })
+    }
+    clearInterval(interval)
+  }, 20000)
 }
 
 export function useCookieInfo() {

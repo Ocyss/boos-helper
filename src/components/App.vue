@@ -164,6 +164,7 @@ greasyfork地址: <a href="https://greasyfork.org/zh-CN/scripts/491340" target="
       <a v-for="(item, key) in store" :key="key" class="store-item-a" :href="netConf?.store?.[key]?.[1] ?? item[2]" target="_blank">
         <div class="store-item">
           <component :is="item[0]" />
+          <img :src="netConf?.store?.[key]?.[2] ?? item[2]" alt="store" style="width: 100px; height: 100px;">
           <el-text>{{ netConf?.store?.[key]?.[0] ?? item[1] }}</el-text>
         </div>
       </a>
