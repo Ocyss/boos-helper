@@ -18,8 +18,8 @@ function scroll(e: any) {
   autoScroll.value = false
 }
 
-watch(currentData, () => {
-  if (!autoScroll.value || !currentData.value?.encryptJobId) {
+function scrollHandler() {
+  if (!currentData.value?.encryptJobId) {
     return
   }
   const d = jobSetRef.value[currentData.value?.encryptJobId]
@@ -40,6 +40,12 @@ watch(currentData, () => {
       inline: 'center',
     })
   }
+}
+
+watch(currentData, () => {
+  if (autoScroll.value) {
+    scrollHandler()
+  }
 })
 </script>
 
@@ -53,6 +59,11 @@ watch(currentData, () => {
       inline-prompt
       active-text="自动滚动"
       inactive-text="自动滚动"
+      @change="(v) => {
+        if (v) {
+          scrollHandler()
+        }
+      }"
     />
   </div>
 </template>
