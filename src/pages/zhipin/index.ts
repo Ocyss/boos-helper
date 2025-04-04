@@ -50,6 +50,15 @@ function removeAd() {
   void elmGetter.rm('.go-login-btn')
   // 底部页脚
   // elmGetter.rm("#footer-wrapper");
+
+  // 新版: 微信扫码
+  void elmGetter.rm('.c-subscribe-weixin')
+  // 新版: 求职工具
+  void elmGetter.rm('.c-job-tools.job-tools')
+  // 新版: 热门职位
+  void elmGetter.rm('.c-hot-link.hot-link')
+  // 新版: 面包屑
+  void elmGetter.rm('.c-breadcrumb')
 }
 
 export async function run() {

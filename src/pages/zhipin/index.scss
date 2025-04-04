@@ -250,12 +250,33 @@ html.dark {
   .c-expect-select .part-time-expect:not(.active),
   .c-expect-select .synthesis:not(.active) {
     color: #0f0f0f !important;
+    &:hover {
+      color: #0d9ea3 !important;
+    }
   }
   .c-filter-condition {
     width: 100% !important;
+    flex-wrap: wrap;
+    gap: 10px;
   }
   .page-jobs-main.is-scroll .filter-condition{
     background: transparent !important;
+  }
+  .c-search-input, .c-expect-select{
+    width: 100% !important;
+  }
+  .c-expect-select .expect-list{
+    max-width: unset !important;
+    .expect-item {
+      flex: unset !important;
+    }
+  }
+  .c-search-input .related-result-wrapper {
+    z-index: 1000 !important;
+  }
+  .c-filter-condition .filter-city-area {
+    z-index: 10 !important;
+    width: 100% !important;
   }
 }
 
