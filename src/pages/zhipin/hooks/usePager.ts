@@ -4,10 +4,10 @@ import { ref } from 'vue'
 const page = ref({ page: 1, pageSize: 30 })
 const pageChange = ref((_v: number) => {})
 
-const initPage = useHookVueData('#wrap .page-job-wrapper,.job-recommend-main', 'pageVo', page)
+const initPage = useHookVueData('#wrap .page-job-wrapper,.job-recommend-main,.page-jobs-main', 'pageVo', page)
 
 const initChange = useHookVueFn('#wrap .page-job-wrapper', 'pageChangeAction')
-const initSearch = useHookVueFn('#wrap .page-job-wrapper,.job-recommend-main', 'searchJobAction')
+const initSearch = useHookVueFn('#wrap .page-job-wrapper,.job-recommend-main,.page-jobs-main', ['searchJobAction', 'onSearch'])
 
 function next() {
   if (page.value.page >= 10) {
@@ -33,9 +33,12 @@ export function usePager() {
     prev,
     initPager: async () => {
       await initPage()
-      pageChange.value = location.href.includes('/web/geek/job-recommend')
+      pageChange.value = (location.href.includes('/web/geek/job-recommend') || location.href.includes('/web/geek/jobs'))
         ? (await initSearch())
         : (await initChange())
+      if (!pageChange.value) {
+        throw new Error('pageChange is undefined')
+      }
     },
   }
 }

@@ -20,7 +20,7 @@ export class JobList {
   _list = ref<Array<MyJobListData>>([])
   _map = reactive<Record<EncryptJobId, MyJobListData>>({})
 
-  initJobList = useHookVueData('#wrap .page-job-wrapper,.job-recommend-main', 'jobList', this._vue_jobList, (v) => {
+  initJobList = useHookVueData('#wrap .page-job-wrapper,.job-recommend-main,.page-jobs-main', 'jobList', this._vue_jobList, (v) => {
     logger.info('初始化岗位列表', v)
 
     const jobSet = this._list.value.reduce((acc, item) => {

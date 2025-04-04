@@ -64,7 +64,7 @@ export function useHookVueData<T = any>(selectors: string, key: string, data: Re
   }
 }
 
-export function useHookVueFn(selectors: string, key: string) {
+export function useHookVueFn(selectors: string, key: string | string[]) {
   return async () => {
     const jobVue = await new Promise<any>((resolve, reject) => {
       const interval = setInterval(() => {
@@ -79,6 +79,15 @@ export function useHookVueFn(selectors: string, key: string) {
         clearInterval(interval)
       }, 20000)
     })
-    return jobVue[key]
+    if (Array.isArray(key)) {
+      for (const k of key) {
+        if (jobVue[k]) {
+          return jobVue[k]
+        }
+      }
+    }
+    else {
+      return jobVue[key]
+    }
   }
 }

@@ -15,6 +15,7 @@ async function main(router: any) {
   switch (router.path) {
     case '/web/geek/job':
     case '/web/geek/job-recommend':
+    case '/web/geek/jobs':
       module = await import('@/pages/zhipin')
       break
   }

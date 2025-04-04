@@ -95,6 +95,25 @@ onMounted(async () => {
         searchRef.value.$el.appendChild(searchEl)
       })
   }
+  else if (location.href.includes('/web/geek/jobs')) {
+    const div = document.createElement('div')
+    div.style.cssText = 'display: flex;flex-direction: column;gap: 15px;'
+    searchRef.value.$el.appendChild(div)
+    elmGetter
+      .get<HTMLDivElement>(
+        ['.page-jobs-main .expect-and-search', '.page-jobs-main .filter-condition'],
+      )
+      .then(([searchEl, conditionEl]) => {
+        searchEl.style.position = 'static'
+        conditionEl.style.position = 'static'
+        div.appendChild(conditionEl)
+        elmGetter.get(['.c-search-input', '.c-expect-select'], searchEl).then(([searchInputEl, expectSelectEl]) => {
+          div.insertBefore(searchInputEl, conditionEl)
+          div.insertBefore(expectSelectEl, conditionEl)
+          searchEl.style.display = 'none'
+        })
+      })
+  }
   else {
     elmGetter
       .get([

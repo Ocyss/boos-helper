@@ -130,15 +130,15 @@
     }
   }
 
-  .job-detail-container{
+  .job-detail-container {
     display: flex;
     justify-content: center;
     align-items: center;
     flex-direction: column;
-    .boss-helper-card{
+    .boss-helper-card {
       flex: 1;
     }
-    .job-detail-box{
+    .job-detail-box {
       overflow-y: auto;
     }
   }
@@ -242,4 +242,23 @@ html.dark {
 
 #footer-wrapper {
   width: 100%;
+}
+
+.page-jobs#wrap {
+  padding-top: 50px !important;
+  .c-expect-select .expect-list .expect-item:not(.active),
+  .c-expect-select .part-time-expect:not(.active),
+  .c-expect-select .synthesis:not(.active) {
+    color: #0f0f0f !important;
+  }
+  .c-filter-condition {
+    width: 100% !important;
+  }
+  .page-jobs-main.is-scroll .filter-condition{
+    background: transparent !important;
+  }
+}
+
+.page-jobs-main.is-fixed-filter {
+  padding-top: unset !important;
 }

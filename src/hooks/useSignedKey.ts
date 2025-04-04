@@ -10,7 +10,7 @@ import createClient from 'openapi-fetch'
 import { useModel } from './useModel'
 import { getUserId } from './useUser'
 
-export const client = createClient<paths>({ baseUrl: import.meta.env.PROD ? 'https://boss-helper.ocyss.icu' : 'http://localhost:8002' })
+export const client = createClient<paths>({ baseUrl: (import.meta.env.PROD || import.meta.env.TEST) ? 'https://boss-helper.ocyss.icu' : 'http://localhost:8002' })
 
 type SignedKeyInfo = components['schemas']['KeyInfo']
 

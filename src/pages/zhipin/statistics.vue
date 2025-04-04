@@ -82,7 +82,7 @@ async function startBatch() {
       if (jobList._list.value.length === 0) {
         break
       }
-      else if (location.href.includes('/web/geek/job-recommend') && oldLen === jobList._list.value.length) {
+      else if ((location.href.includes('/web/geek/job-recommend') || location.href.includes('/web/geek/jobs')) && oldLen === jobList._list.value.length) {
         break
       }
       oldLen = jobList._list.value.length
