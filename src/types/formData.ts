@@ -27,6 +27,8 @@ export interface FormData {
   greetingVariable: FormDataCheckbox
   activityFilter: FormDataCheckbox
   friendStatus: FormDataCheckbox
+  sameCompanyFilter: FormDataCheckbox
+  sameHrFilter: FormDataCheckbox
   goldHunterFilter: FormDataCheckbox
   notification: FormDataCheckbox
   aiGreeting: FormDataAi

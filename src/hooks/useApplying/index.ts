@@ -11,7 +11,7 @@ export interface handleArgs {
 }
 
 export type handleFn = (args: handleArgs, ctx: logData) => Promise<void>
-export type handleCFn = (handles: handleFn[]) => void
+export type handleCFn = (handles: handleFn[], handlesAfter?: handleFn[]) => void
 
 const { formData } = useConfFormData()
 
@@ -29,6 +29,12 @@ export function createHandle(): {
 
   // 已沟通过滤
   h.communicated(handles)
+  // 相同公司过滤
+  if (formData.sameCompanyFilter.value)
+    h.SameCompanyFilter(handlesRes, handlesAfter)
+  // 相同hr过滤
+  if (formData.sameHrFilter.value)
+    h.SameHrFilter(handlesRes, handlesAfter)
   // 岗位名筛选
   if (formData.jobTitle.enable)
     h.jobTitle(handles)

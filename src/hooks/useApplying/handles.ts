@@ -23,10 +23,11 @@ import {
 
 import { getCurDay, getCurTime } from '@/utils'
 
+import { getStorage, setStorage } from '@/utils/message/storage'
 import { ElMessage } from 'element-plus'
 import { miTem } from 'mitem'
 import { SignedKeyLLM } from '../useModel/signedKey'
-import { parseFiltering, rangeMatch, requestBossData } from './utils'
+import { parseFiltering, rangeMatch, requestBossData, sameCompanyKey, sameHrKey } from './utils'
 
 const { chatMessages } = useChat()
 const { modelData, getGpt } = useModel()
@@ -40,6 +41,72 @@ export const communicated: handleCFn = (h) => {
     }
   },
   )
+}
+
+export const SameCompanyFilter: handleCFn = (h, hAfter) => {
+  let someSet: Set<string> | null = null
+  let count = 0
+  const uid = getUserId()
+  if (uid == null) {
+    throw new RepeatError('没有获取到uid')
+  }
+  h.push(async ({ data }) => {
+    if (someSet == null) {
+      someSet = new Set<string>()
+      const data = await getStorage<Record<string, string[]>>(sameCompanyKey, {})
+      for (const id of (data[uid] ?? [])) {
+        someSet.add(id)
+      }
+    }
+    const id = data.encryptBrandId
+    if (id != null && someSet.has(id)) {
+      throw new RepeatError('相同公司已投递')
+    }
+  })
+  hAfter?.push(async ({ data }) => {
+    someSet?.add(data.encryptBrandId)
+    count++
+    if (count > 3) {
+      await setStorage(sameCompanyKey, {
+        ...data,
+        [uid]: Array.from(someSet ?? []),
+      })
+      count = 0
+    }
+  })
+}
+
+export const SameHrFilter: handleCFn = (h, hAfter) => {
+  let someSet: Set<string> | null = null
+  let count = 0
+  const uid = getUserId()
+  if (uid == null) {
+    throw new RepeatError('没有获取到uid')
+  }
+  h.push(async ({ data }) => {
+    if (someSet == null) {
+      someSet = new Set<string>()
+      const data = await getStorage<Record<string, string[]>>(sameHrKey, {})
+      for (const id of (data[uid] ?? [])) {
+        someSet.add(id)
+      }
+    }
+    const id = data.encryptBossId
+    if (id != null && someSet.has(id)) {
+      throw new RepeatError('相同hr已投递')
+    }
+  })
+  hAfter?.push(async ({ data }) => {
+    someSet?.add(data.encryptBossId)
+    count++
+    if (count > 3) {
+      await setStorage(sameHrKey, {
+        ...data,
+        [uid]: Array.from(someSet ?? []),
+      })
+      count = 0
+    }
+  })
 }
 
 export const jobTitle: handleCFn = h =>

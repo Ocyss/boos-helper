@@ -40,7 +40,7 @@ const { deliverLock } = useCommon()
         <el-alert title="复选框打钩才会启用，别忘记打钩启用哦" type="success" show-icon style="margin: 10px 0;" />
         <el-alert title="排除和包含可点击切换，混合模式适用性过低不会考虑开发" type="success" show-icon style="margin: 10px 0;" />
 
-        <el-space wrap style="width: 100%">
+        <el-space class="config-input" wrap style="width: 100%">
           <form-item
             v-bind="formInfoData.company"
             v-model:enable="formData.company.enable"
@@ -108,7 +108,7 @@ const { deliverLock } = useCommon()
             />
           </form-item>
         </el-space>
-        <div>
+        <el-space wrap>
           <ElCheckbox
             v-bind="formInfoData.greetingVariable"
             v-model="formData.greetingVariable.value"
@@ -129,7 +129,17 @@ const { deliverLock } = useCommon()
             v-model="formData.friendStatus.value"
             border
           />
-        </div>
+          <ElCheckbox
+            v-bind="formInfoData.sameCompanyFilter"
+            v-model="formData.sameCompanyFilter.value"
+            border
+          />
+          <ElCheckbox
+            v-bind="formInfoData.sameHrFilter"
+            v-model="formData.sameHrFilter.value"
+            border
+          />
+        </el-space>
       </el-collapse-item>
       <el-collapse-item title="AI配置" name="2">
         <aiVue />
@@ -200,7 +210,7 @@ const { deliverLock } = useCommon()
 </template>
 
 <style lang="scss" scoped>
-.el-space :deep(.el-space__item) {
+.el-space.config-input :deep(.el-space__item) {
   width: 48%;
 }
 </style>

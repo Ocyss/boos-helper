@@ -61,6 +61,14 @@ export const formInfoData: FormInfoData = {
     'label': '好友过滤(已聊)',
     'data-help': '判断和hr是否建立过聊天，理论上能过滤的同hr，但是不同岗位的工作',
   },
+  sameCompanyFilter: {
+    'label': '相同公司过滤',
+    'data-help': '投递过的公司id存储到浏览器本地，避免多次向同公司投递，即使岗位不同hr不同',
+  },
+  sameHrFilter: {
+    'label': '相同Hr过滤',
+    'data-help': '投递过的hr存储到浏览器本地，避免多次向同hr投递。',
+  },
   notification: {
     'label': '发送通知',
     'data-help': '可以在网站管理中打开通知权限,当停止时会自动发送桌面端通知提醒。',
@@ -275,6 +283,12 @@ export const defaultFormData: FormData = {
     value: true,
   },
   friendStatus: {
+    value: true,
+  },
+  sameCompanyFilter: {
+    value: false,
+  },
+  sameHrFilter: {
     value: true,
   },
   goldHunterFilter: {

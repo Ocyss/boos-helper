@@ -4,6 +4,9 @@ import { ElMessage } from 'element-plus'
 
 // const { userInfo } = useStore()
 
+export const sameCompanyKey = 'local:sameCompany'
+export const sameHrKey = 'local:sameHr'
+
 export async function requestCard(params: { securityId: string, lid: string }) {
   return axios.get<{
     code: number
