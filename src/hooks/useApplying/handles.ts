@@ -67,8 +67,9 @@ export const SameCompanyFilter: handleCFn = (h, hAfter) => {
     someSet?.add(data.encryptBrandId)
     count++
     if (count > 3) {
+      const oldData = await getStorage<Record<string, string[]>>(sameCompanyKey, {})
       await setStorage(sameCompanyKey, {
-        ...data,
+        ...oldData,
         [uid]: Array.from(someSet ?? []),
       })
       count = 0
@@ -100,8 +101,9 @@ export const SameHrFilter: handleCFn = (h, hAfter) => {
     someSet?.add(data.encryptBossId)
     count++
     if (count > 3) {
+      const oldData = await getStorage<Record<string, string[]>>(sameHrKey, {})
       await setStorage(sameHrKey, {
-        ...data,
+        ...oldData,
         [uid]: Array.from(someSet ?? []),
       })
       count = 0
