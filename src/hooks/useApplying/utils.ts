@@ -26,8 +26,7 @@ export function rangeMatch(
     }
 
     // 如果输入有两个数字的情况
-    let inputReg = /^(\d+)(?:-(\d+))?/;
-    let inputMatch = input.match(inputReg);
+    let inputMatch = input.match(reg);
     if (inputMatch) {
       let inputStart = parseInt(inputMatch[1]);
       let inputEnd = parseInt(inputMatch[2] || inputMatch[1]);
