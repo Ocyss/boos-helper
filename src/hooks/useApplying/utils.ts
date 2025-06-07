@@ -15,12 +15,12 @@ export function rangeMatch(
     err = match[0];
   }
   if (match && input) {
-    let start = parseInt(match[1]);
-    let end = parseInt(match[2] || match[1]);
+    let start = +match[1];
+    let end = +(match[2] || match[1]);
 
     // 如果输入只有一个数字的情况
     if (/^\d+$/.test(input)) {
-      let number = parseInt(input);
+      let number = +input;
 
       return [number >= start && number <= end, err];
     }
@@ -29,8 +29,8 @@ export function rangeMatch(
     let inputReg = /^(\d+)(?:-(\d+))?/;
     let inputMatch = input.match(inputReg);
     if (inputMatch) {
-      let inputStart = parseInt(inputMatch[1]);
-      let inputEnd = parseInt(inputMatch[2] || inputMatch[1]);
+      let inputStart = +inputMatch[1];
+      let inputEnd = +(inputMatch[2] || inputMatch[1]);
       return [
         // start-end: 15-29 用户输入: inputStart-inputEnd 16-20
         mode == "subset"
