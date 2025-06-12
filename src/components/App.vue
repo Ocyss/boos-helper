@@ -1,7 +1,5 @@
 <script lang="ts" setup>
-import type {
-  Action,
-} from 'element-plus'
+import type { Action } from 'element-plus'
 import logVue from '@/components/conf/log.vue'
 import storeVue from '@/components/conf/store.vue'
 import userVue from '@/components/conf/user.vue'
@@ -10,10 +8,7 @@ import { userInfoInit } from '@/hooks/useUser'
 import { logger } from '@/utils/logger'
 import { getStorage, setStorage } from '@/utils/message/storage'
 import {
-  ElAvatar,
-  ElDropdown,
-  ElDropdownItem,
-  ElDropdownMenu,
+
   ElMessage,
   ElMessageBox,
 } from 'element-plus'
@@ -104,79 +99,81 @@ greasyfork地址: <a href="https://greasyfork.org/zh-CN/scripts/491340" target="
 </script>
 
 <template>
-  <ElDropdown trigger="click">
-    <ElAvatar
-      :size="30"
-      src="https://avatars.githubusercontent.com/u/68412205?v=4"
+  <el-config-provider namespace="ehp">
+    <ElDropdown trigger="click">
+      <ElAvatar
+        :size="30"
+        src="https://avatars.githubusercontent.com/u/68412205?v=4"
+      >
+        H
+      </ElAvatar>
+      <template #dropdown>
+        <ElDropdownMenu>
+          <ElDropdownItem disabled>
+            BossHelp配置项
+          </ElDropdownItem>
+          <ElDropdownItem divided disabled />
+          <ElDropdownItem
+            v-for="(v, k) in confs"
+            :key="k"
+            :disabled="v.disabled"
+            @click="
+              confKey = k;
+              confBox = true;
+            "
+          >
+            {{ v.name }}
+          </ElDropdownItem>
+          <ElDropdownItem @click="themeChange">
+            暗黑模式（{{ dark ? "开" : "关" }}）
+          </ElDropdownItem>
+          <ElDropdownItem @click="storeShow = true">
+            版本信息
+          </ElDropdownItem>
+        </ElDropdownMenu>
+      </template>
+    </ElDropdown>
+    <Teleport to="body">
+      <component :is="confs[confKey].component" id="help-conf-box" v-model="confBox" />
+    </Teleport>
+    <el-dialog
+      v-model="storeShow"
+      title="BossHelper扩展商店"
+      width="500"
+      @open="updateNetConf"
     >
-      H
-    </ElAvatar>
-    <template #dropdown>
-      <ElDropdownMenu>
-        <ElDropdownItem disabled>
-          BossHelp配置项
-        </ElDropdownItem>
-        <ElDropdownItem divided disabled />
-        <ElDropdownItem
-          v-for="(v, k) in confs"
-          :key="k"
-          :disabled="v.disabled"
-          @click="
-            confKey = k;
-            confBox = true;
-          "
-        >
-          {{ v.name }}
-        </ElDropdownItem>
-        <ElDropdownItem @click="themeChange">
-          暗黑模式（{{ dark ? "开" : "关" }}）
-        </ElDropdownItem>
-        <ElDropdownItem @click="storeShow = true">
-          版本信息
-        </ElDropdownItem>
-      </ElDropdownMenu>
-    </template>
-  </ElDropdown>
-  <Teleport to="body">
-    <component :is="confs[confKey].component" id="help-conf-box" v-model="confBox" />
-  </Teleport>
-  <el-dialog
-    v-model="storeShow"
-    title="BossHelper扩展商店"
-    width="500"
-    @open="updateNetConf"
-  >
-    <div>
-      <div style="text-align: center;font-size: 14px;color: #606266;">
-        你的版本: {{ VITE_VERSION }}
-      </div>
-      <div style="text-align: center;font-size: 14px;color: #606266;">
-        最新版本: {{ netConf?.version ?? '暂未获取到版本信息' }}
-      </div>
-      <div style="text-align: center;font-size: 16px;color: #606266;">
-        更新内容：
-      </div>
-      <div style="text-align: center;font-size: 14px;color: #606266; white-space: pre-line;">
-        {{ netConf?.version_description ?? '暂未获取到更新日志' }}
-      </div>
-    </div>
-    <el-space wrap>
-      <a v-for="(item, key) in store" :key="key" class="store-item-a" :href="netConf?.store?.[key]?.[1] ?? item[2]" target="_blank">
-        <div class="store-item">
-          <component :is="item[0]" />
-          <img :src="netConf?.store?.[key]?.[2] ?? item[3]" alt="store" style="height: 20px;">
-          <el-text>{{ netConf?.store?.[key]?.[0] ?? item[1] }}</el-text>
+      <div>
+        <div style="text-align: center;font-size: 14px;color: #606266;">
+          你的版本: {{ VITE_VERSION }}
         </div>
-      </a>
-    </el-space>
-    <template #footer>
-      <div class="dialog-footer">
-        <el-button type="primary" @click="storeShow = false">
-          关闭
-        </el-button>
+        <div style="text-align: center;font-size: 14px;color: #606266;">
+          最新版本: {{ netConf?.version ?? '暂未获取到版本信息' }}
+        </div>
+        <div style="text-align: center;font-size: 16px;color: #606266;">
+          更新内容：
+        </div>
+        <div style="text-align: center;font-size: 14px;color: #606266; white-space: pre-line;">
+          {{ netConf?.version_description ?? '暂未获取到更新日志' }}
+        </div>
       </div>
-    </template>
-  </el-dialog>
+      <el-space wrap>
+        <a v-for="(item, key) in store" :key="key" class="store-item-a" :href="netConf?.store?.[key]?.[1] ?? item[2]" target="_blank">
+          <div class="store-item">
+            <component :is="item[0]" />
+            <img :src="netConf?.store?.[key]?.[2] ?? item[3]" alt="store" style="height: 20px;">
+            <el-text>{{ netConf?.store?.[key]?.[0] ?? item[1] }}</el-text>
+          </div>
+        </a>
+      </el-space>
+      <template #footer>
+        <div class="dialog-footer">
+          <el-button type="primary" @click="storeShow = false">
+            关闭
+          </el-button>
+        </div>
+      </template>
+    </el-dialog>
+  </el-config-provider>
 </template>
 
 <style lang="scss">

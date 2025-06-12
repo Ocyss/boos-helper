@@ -615,7 +615,7 @@ onMounted(() => {
 </style>
 
 <style>
-.el-radio .el-input-number.is-without-controls .el-input__wrapper{
+.ehp-radio .ehp-input-number.is-without-controls .ehp-input__wrapper{
   padding: 0px;
 }
 </style>

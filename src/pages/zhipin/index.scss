@@ -1,3 +1,5 @@
+
+
 #wrap {
   min-width: unset !important;
   .inner {
@@ -154,7 +156,7 @@ html {
   }
 }
 
-.el-input .el-input__inner {
+.ehp-input .ehp-input__inner {
   background-color: unset !important;
   border: unset !important;
 }
@@ -202,8 +204,8 @@ html.dark {
   .city-area-select .city-area-tab li,
   .subway-select-wrapper .subway-line-list li,
   .condition-filter-select .current-select,
-  .el-vl__wrapper,
-  .el-checkbox__label,
+  .ehp-vl__wrapper,
+  .ehp-checkbox__label,
   .placeholder-text,
   #boss-helper-job h2 {
     color: #cfd3dc !important;

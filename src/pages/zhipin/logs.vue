@@ -3,10 +3,6 @@ import type {
   TableV2Instance,
 } from 'element-plus'
 import { useLog } from '@/hooks/useLog'
-import {
-  ElAutoResizer,
-  ElTableV2,
-} from 'element-plus'
 import { ref } from 'vue'
 
 const tableRef = ref<TableV2Instance>()
@@ -97,11 +93,11 @@ const aiGreetActiveNames = ref('response')
 </template>
 
 <style lang="scss">
-.el-table-v2__row-depth-0 {
+.ehp-table-v2__row-depth-0 {
   height: 50px;
 }
 
-.el-table-v2__cell-text {
+.ehp-table-v2__cell-text {
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
@@ -152,8 +148,8 @@ const aiGreetActiveNames = ref('response')
     line-height: 1.5;
     }
 
-    .el-collapse-item.active {
-    .el-collapse-item__header {
+    .ehp-collapse-item.active {
+    .ehp-collapse-item__header {
     border-bottom-color: transparent;
     }
     }

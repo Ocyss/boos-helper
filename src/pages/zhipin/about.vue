@@ -1,5 +1,4 @@
 <script lang="ts" setup>
-import { ElImage, ElLink } from 'element-plus'
 </script>
 
 <template>

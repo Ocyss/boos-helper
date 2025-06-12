@@ -2,9 +2,9 @@ import type { ProtocolCommonMap } from '@/utils/message/types'
 import type { StorageItemKey } from 'wxt/storage'
 import { onMessage } from '@/utils/message'
 import { sendBrowserMessage } from '@/utils/message/browser'
-import 'element-plus/dist/index.css'
-import 'element-plus/theme-chalk/dark/css-vars.css'
-import './main.css'
+// import 'element-plus/dist/index.css'
+// import 'element-plus/theme-chalk/dark/css-vars.css'
+import './main.scss'
 
 function genKey(key: string): StorageItemKey {
   const prefixes = ['local:', 'session:', 'sync:', 'managed:']

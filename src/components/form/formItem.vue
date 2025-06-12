@@ -1,6 +1,4 @@
 <script lang="ts" setup>
-import { ElCheckbox, ElFormItem, ElLink } from 'element-plus'
-
 defineProps<{
   label: string
   help?: string
@@ -19,7 +17,7 @@ const enable = defineModel<boolean>('enable', { required: true })
     <template #label>
       <ElCheckbox v-model="enable" :label size="small" />
       <ElLink
-        v-if="includeOnly != null || include != null"
+        v-if="includeOnly != null && include != null"
         :type="(includeOnly ?? include) ? 'primary' : 'warning'"
         size="small"
         :disabled

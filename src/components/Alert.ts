@@ -17,7 +17,7 @@ export default defineComponent({
     },
   },
   setup(props: ExtendedAlertProps, { slots }): () => VNode | null {
-    const storageKey = computed(() => `alert:${props.id}`)
+    const storageKey = computed(() => `local:alert:${props.id}`)
     const isVisible = ref(true)
 
     onMounted(async () => {

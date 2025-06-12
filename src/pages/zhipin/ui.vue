@@ -4,7 +4,7 @@ import { useSignedKey } from '@/hooks/useSignedKey'
 import { netConf } from '@/utils/conf'
 import elmGetter from '@/utils/elmGetter'
 import { useMouse, useMouseInElement } from '@vueuse/core'
-import { ElCheckbox, ElMessage, ElTabPane, ElTabs, ElTooltip } from 'element-plus'
+import { ElMessage } from 'element-plus'
 import { computed, onMounted, ref } from 'vue'
 import aboutVue from './about.vue'
 import cardVue from './card.vue'
@@ -153,107 +153,110 @@ const isDot = computed(() => {
 function openStore() {
   window.__q_openStore?.()
 }
+
+const { signedKey } = useSignedKey()
 </script>
 
 <template>
-  <h2 style="display: flex; align-items: center">
-    Boos-Helper
-    <el-badge
-      :is-dot="isDot"
-      :offset="[-2, 7]"
-      style="cursor: pointer; display: inline-flex; margin: 0 4px"
-      @click="openStore"
-    >
-      <el-tag type="primary">
-        v{{ VITE_VERSION }} {{ isDot ? ' 有更新' : '' }}
-      </el-tag>
-    </el-badge>
-    <el-text v-if="todayData.total > 0" style="margin-right: 15px;">
-      今日: {{ todayData.success }}/{{ formData.deliveryLimit.value }}
-    </el-text>
-    <el-text v-if="total > 0">
-      当前页面: {{ current + 1 }}/{{ total }}
-    </el-text>
-  </h2>
-  <div
-    style="
+  <el-config-provider namespace="ehp">
+    <h2 style="display: flex; align-items: center">
+      Boos-Helper
+      <el-badge
+        :is-dot="isDot"
+        :offset="[-2, 7]"
+        style="cursor: pointer; display: inline-flex; margin: 0 4px"
+        @click="openStore"
+      >
+        <el-tag type="primary">
+          v{{ VITE_VERSION }} {{ isDot ? ' 有更新' : '' }}
+        </el-tag>
+      </el-badge>
+      <el-text v-if="todayData.total > 0" style="margin-right: 15px;">
+        今日: {{ todayData.success }}/{{ formData.deliveryLimit.value }}
+      </el-text>
+      <el-text v-if="total > 0">
+        当前页面: {{ current + 1 }}/{{ total }}
+      </el-text>
+    </h2>
+    <div
+      style="
       z-index: 999;
       position: fixed;
       pointer-events: none;
       border-width: 1px;
     "
-    :style="boxStyles"
-  />
-  <div v-if="netConf && netConf.notification" class="netAlerts">
-    <template
-      v-for="item in netConf.notification.filter(
-        (item) => item.type === 'alert',
-      )"
-      :key="item.key ?? item.data.title"
-    >
+      :style="boxStyles"
+    />
+    <div v-if="netConf && netConf.notification" class="netAlerts">
+      <template
+        v-for="item in netConf.notification.filter(
+          (item) => item.type === 'alert',
+        )"
+        :key="item.key ?? item.data.title"
+      >
       <!-- <el-alert
         v-if="now > GM_getValue(`netConf-${item.key}`, 0)"
         v-bind="item.data"
         @close="GM_setValue(`netConf-${item.key}`, now + 259200000)"
       /> -->
-    </template>
-  </div>
-  <ElTooltip :visible="helpVisible && !isOutside" :virtual-ref="triggerRef">
-    <template #content>
-      <div :style="`width: auto;max-width:${boxStyles.width};font-size:17px;`">
-        {{ helpContent }}
-      </div>
-    </template>
-  </ElTooltip>
-  <ElTabs ref="tabsRef" data-help="鼠标移到对应元素查看提示">
-    <ElTabPane label="统计" data-help="失败是成功她妈">
-      <statisticsVue />
-    </ElTabPane>
-    <ElTabPane
-      ref="searchRef"
-      label="筛选"
-    />
-    <ElTabPane label="配置" data-help="好好看，好好学">
-      <configVue />
-    </ElTabPane>
-    <ElTabPane label="AI" data-help="AI时代，脚本怎么能落伍!">
-      <serviceVue />
-    </ElTabPane>
-    <ElTabPane label="日志" data-help="反正你也不看">
-      <logsVue />
-    </ElTabPane>
-    <ElTabPane
-      label="关于&赞赏"
-      class="hp-about-box"
-      data-help="项目是写不完美的,但总要去追求完美"
-    >
-      <aboutVue />
-    </ElTabPane>
-    <ElTabPane v-if="netConf && netConf.feedback">
-      <template #label>
-        <el-link
-          size="large"
-          style="height: 100%"
-          @click.stop="tagOpen(netConf.feedback)"
-        >
-          反馈
-        </el-link>
       </template>
-    </ElTabPane>
-    <ElTabPane>
-      <template #label>
-        <ElCheckbox
-          v-model="helpVisible"
-          label="帮助"
-          size="large"
-          @click.stop=""
-        />
+    </div>
+    <ElTooltip :visible="helpVisible && !isOutside" :virtual-ref="triggerRef">
+      <template #content>
+        <div :style="`width: auto;max-width:${boxStyles.width};font-size:17px;`">
+          {{ helpContent }}
+        </div>
       </template>
-    </ElTabPane>
-  </ElTabs>
-  <Teleport to="#boss-helper-job-warp,.page-job-inner .page-job-content">
-    <cardVue />
-  </Teleport>
+    </ElTooltip>
+    <ElTabs ref="tabsRef" data-help="鼠标移到对应元素查看提示">
+      <ElTabPane label="统计" data-help="失败是成功她妈">
+        <statisticsVue />
+      </ElTabPane>
+      <ElTabPane
+        ref="searchRef"
+        label="筛选"
+      />
+      <ElTabPane label="配置" data-help="好好看，好好学">
+        <configVue />
+      </ElTabPane>
+      <ElTabPane v-if="signedKey" label="AI" data-help="AI时代，脚本怎么能落伍!">
+        <serviceVue />
+      </ElTabPane>
+      <ElTabPane label="日志" data-help="反正你也不看">
+        <logsVue />
+      </ElTabPane>
+      <ElTabPane
+        label="关于&赞赏"
+        class="hp-about-box"
+        data-help="项目是写不完美的,但总要去追求完美"
+      >
+        <aboutVue />
+      </ElTabPane>
+      <ElTabPane v-if="netConf && netConf.feedback">
+        <template #label>
+          <el-link
+            size="large"
+            style="height: 100%"
+            @click.stop="tagOpen(netConf.feedback)"
+          >
+            反馈
+          </el-link>
+        </template>
+      </ElTabPane>
+      <ElTabPane>
+        <template #label>
+          <ElCheckbox
+            v-model="helpVisible"
+            label="帮助"
+            size="large"
+            @click.stop=""
+          />
+        </template>
+      </ElTabPane>
+    </ElTabs>
+    <Teleport to="#boss-helper-job-warp,.page-job-inner .page-job-content">
+      <cardVue />
+    </Teleport>
   <!-- <Teleport to=".page-job-wrapper">
     <chatVue
       style="
@@ -268,6 +271,7 @@ function openStore() {
       "
     />
   </Teleport> -->
+  </el-config-provider>
 </template>
 
 <style lang="scss">
@@ -289,29 +293,29 @@ function openStore() {
   }
 }
 
-.el-checkbox {
+.ehp-checkbox {
   color: #5e5e5e;
-  &.is-checked .el-checkbox__label {
+  &.is-checked .ehp-checkbox__label {
     color: #000000 !important;
   }
-  .dark &.is-checked .el-checkbox__label {
+  .dark &.is-checked .ehp-checkbox__label {
     color: #cfd3dc !important;
   }
 }
 
-.el-form {
-  .el-link {
+.ehp-form {
+  .ehp-link {
     font-size: 12px;
   }
-  .el-form-item__label {
+  .ehp-form-item__label {
     display: flex;
     align-items: center;
   }
-  .el-checkbox__label {
+  .ehp-checkbox__label {
     padding-left: 4px;
   }
 }
-.el-tabs__content {
+.ehp-tabs__content {
   overflow: unset !important;
 }
 </style>

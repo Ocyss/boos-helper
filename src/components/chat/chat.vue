@@ -1,11 +1,11 @@
 <script lang="ts" setup>
+import type { ElInput } from 'element-plus'
 import type {
   RecycleScrollerInstance,
 } from 'vue-virtual-scroller'
 import { useChat } from '@/hooks/useChat'
 import { userInfo } from '@/hooks/useUser'
 import { watchIgnorable } from '@vueuse/core'
-import { ElInput } from 'element-plus'
 import { ref, watch } from 'vue'
 import {
   DynamicScroller,
@@ -170,7 +170,7 @@ function inputMsgUpdate(v: string) {
       margin-left: 0.3125rem;
       margin-right: 0.3125rem;
     }
-    .el-avatar {
+    .ehp-avatar {
       margin-top: -1.25rem;
       height: 2.25rem;
       width: 2.25rem;
@@ -228,8 +228,8 @@ function inputMsgUpdate(v: string) {
   align-items: flex-end;
   margin-top: 10px;
   position: relative;
-  .el-textarea {
-    :deep(.el-textarea__inner) {
+  .ehp-textarea {
+    :deep(.ehp-textarea__inner) {
       padding-right: 70px;
     }
   }

@@ -40,13 +40,18 @@ export default defineConfig({
         resolvers: [ElementPlusResolver()],
       }),
       Components({
-        resolvers: [ElementPlusResolver()],
+        resolvers: [ElementPlusResolver({
+          importStyle: 'sass',
+        })],
       }),
     ],
     css: {
       preprocessorOptions: {
         scss: {
           api: 'modern-compiler', // or 'modern'
+          additionalData: `@forward 'element-plus/theme-chalk/src/mixins/config.scss' with (
+  $namespace: 'ehp'
+);`,
         },
       },
     },

@@ -2,19 +2,8 @@
 import type { CookieInfo } from '@/utils/message/cookie'
 import { changeUser, createUser, deleteUser, getUserId, useCookieInfo } from '@/hooks/useUser'
 import { logger } from '@/utils/logger'
-import {
-  ElAlert,
-  ElAvatar,
-  ElButton,
-  ElDialog,
-  ElMessage,
-  ElMessageBox,
-  ElPopconfirm,
-  ElTable,
-  ElTableColumn,
-  ElTag,
-} from 'element-plus'
 
+import { ElMessage, ElMessageBox } from 'element-plus'
 import { ref } from 'vue'
 
 const { data, tableData } = useCookieInfo()

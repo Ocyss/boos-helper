@@ -1,6 +1,4 @@
 <script lang="ts" setup>
-import { ElButton, ElDialog } from 'element-plus'
-
 const show = defineModel<boolean>({ required: true })
 </script>
 

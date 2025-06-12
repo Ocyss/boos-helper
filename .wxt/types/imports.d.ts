@@ -10,6 +10,8 @@ declare global {
   const MigrationError: typeof import('wxt/storage')['MigrationError']
   const RequestError: typeof import('F:/extension/boos-helper/src/utils/request')['RequestError']
   const UserResumeStringOptions: typeof import('F:/extension/boos-helper/src/hooks/useUser')['UserResumeStringOptions']
+  const amapDistance: typeof import('F:/extension/boos-helper/src/utils/amap')['amapDistance']
+  const amapGeocode: typeof import('F:/extension/boos-helper/src/utils/amap')['amapGeocode']
   const animate: typeof import('F:/extension/boos-helper/src/utils/index')['animate']
   const browser: typeof import('wxt/browser')['browser']
   const changeUser: typeof import('F:/extension/boos-helper/src/hooks/useUser')['changeUser']
@@ -140,6 +142,9 @@ declare global {
   export type { EncryptJobId, JobStatus, MyJobListData } from 'F:/extension/boos-helper/src/hooks/useJobList'
   import('F:/extension/boos-helper/src/hooks/useJobList')
   // @ts-ignore
+  export type { AmapError, AmapGeocode, AmapDistance } from 'F:/extension/boos-helper/src/utils/amap'
+  import('F:/extension/boos-helper/src/utils/amap')
+  // @ts-ignore
   export type { NetConf, NotificationAlert, NotificationMessage, NotificationNotification } from 'F:/extension/boos-helper/src/utils/conf'
   import('F:/extension/boos-helper/src/utils/conf')
   // @ts-ignore
@@ -162,6 +167,8 @@ declare module 'vue' {
     readonly MigrationError: UnwrapRef<typeof import('wxt/storage')['MigrationError']>
     readonly RequestError: UnwrapRef<typeof import('F:/extension/boos-helper/src/utils/request')['RequestError']>
     readonly UserResumeStringOptions: UnwrapRef<typeof import('F:/extension/boos-helper/src/hooks/useUser')['UserResumeStringOptions']>
+    readonly amapDistance: UnwrapRef<typeof import('F:/extension/boos-helper/src/utils/amap')['amapDistance']>
+    readonly amapGeocode: UnwrapRef<typeof import('F:/extension/boos-helper/src/utils/amap')['amapGeocode']>
     readonly animate: UnwrapRef<typeof import('F:/extension/boos-helper/src/utils/index')['animate']>
     readonly browser: UnwrapRef<typeof import('wxt/browser')['browser']>
     readonly changeUser: UnwrapRef<typeof import('F:/extension/boos-helper/src/hooks/useUser')['changeUser']>

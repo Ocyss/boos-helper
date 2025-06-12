@@ -86,11 +86,11 @@ const { el, defaultConf } = getComponent(props.value.type)
 </template>
 
 <style>
-.el-input__wrapper {
+.ehp-input__wrapper {
   width: 100%;
 }
 
-.el-slider .el-slider__input {
+.ehp-slider .ehp-slider__input {
   width: 200px !important;
 }
 </style>

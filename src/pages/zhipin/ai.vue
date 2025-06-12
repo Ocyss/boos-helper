@@ -3,7 +3,6 @@ import type { FormDataAi } from '@/types/formData'
 import formSwitch from '@/components/form/formSwitch.vue'
 import { useCommon } from '@/hooks/useCommon'
 import { formInfoData, useConfFormData } from '@/hooks/useConfForm'
-import { ElButton, ElSpace } from 'element-plus'
 import { ref } from 'vue'
 
 const { formData, confSaving } = useConfFormData()
@@ -88,9 +87,9 @@ function change(v: Partial<FormDataAi>) {
 </template>
 
 <style lang="scss">
-.el-space .el-button-group {
+.ehp-space .ehp-button-group {
   display: flex;
-  .el-button:first-child {
+  .ehp-button:first-child {
     flex: 1;
   }
 }

@@ -19,5 +19,6 @@ export default antfu({
     'ts/no-unsafe-member-access': 'off',
     'ts/no-unsafe-return': 'off',
     'ts/strict-boolean-expressions': 'off',
+    'vue/component-definition-name-casing': ['error', 'PascalCase'],
   },
 })

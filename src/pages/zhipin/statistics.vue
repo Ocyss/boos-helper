@@ -6,19 +6,8 @@ import { useLog } from '@/hooks/useLog'
 import { useStatistics } from '@/hooks/useStatistics'
 import { delay, notification } from '@/utils'
 import { logger } from '@/utils/logger'
-import {
-  ElButton,
-  ElButtonGroup,
-  ElCol,
-  ElDropdown,
-  ElDropdownItem,
-  ElDropdownMenu,
-  ElIcon,
-  ElMessage,
-  ElProgress,
-  ElRow,
-  ElStatistic,
-} from 'element-plus'
+
+import { ElMessage } from 'element-plus'
 import { computed, ref } from 'vue'
 import { useDeliver } from './hooks/useDeliver'
 import { usePager } from './hooks/usePager'

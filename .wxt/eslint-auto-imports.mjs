@@ -1,5 +1,8 @@
 const globals = {
   "Alert": true,
+  "AmapDistance": true,
+  "AmapError": true,
+  "AmapGeocode": true,
   "ChatAvatar": true,
   "ChatInput": true,
   "ChatMessage": true,
@@ -38,6 +41,8 @@ const globals = {
   "UserResumeStringOptions": true,
   "VNode": true,
   "WritableComputedRef": true,
+  "amapDistance": true,
+  "amapGeocode": true,
   "animate": true,
   "browser": true,
   "changeUser": true,

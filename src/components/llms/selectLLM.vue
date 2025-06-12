@@ -11,7 +11,6 @@ import { getGpt, llmsIcons, useModel } from '@/hooks/useModel'
 import {
   ElMessage,
   ElMessageBox,
-  ElText,
 } from 'element-plus'
 import { ref } from 'vue'
 
@@ -334,7 +333,7 @@ async function copyOnlineResume() {
       的提示词文档学习 ( 示例提示词写的并不好,欢迎AI大佬来提pr )
     </ElText>
     <ElText v-else style="margin: 20px 0" tag="div">
-      仅需输入自然语言作为额外要求，其余Prompt将由后台全自动生成. 比如:
+      !(暂时不开放了，已有key用户不受影响)! 仅需输入自然语言作为额外要求，其余Prompt将由后台全自动生成. 比如:
       <br>
       <template v-if="data === 'aiGreeting'">
         使用“你好”作为开头, 稍微幽默风趣一些
@@ -484,8 +483,8 @@ async function copyOnlineResume() {
 </template>
 
 <style>
-.el-alert--info.is-light,
-.el-alert--info.is-light .el-alert__description {
+.ehp-alert--info.is-light,
+.ehp-alert--info.is-light .ehp-alert__description {
   white-space: pre-line;
 }
 .select-form-box {
@@ -530,17 +529,17 @@ async function copyOnlineResume() {
   text-overflow: ellipsis;
   white-space: nowrap;
 }
-.el-table-v2__row-depth-0 {
+.ehp-table-v2__row-depth-0 {
   height: 50px;
 }
 
-.el-table-v2__cell-text {
+.ehp-table-v2__cell-text {
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
 }
 
-.el-message-box__message{
+.ehp-message-box__message{
   width: 100%;
 }
 </style>
