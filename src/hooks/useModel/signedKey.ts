@@ -119,11 +119,12 @@ export class SignedKeyLLM {
       boss?: bossZpBossData
       card: bossZpCardData
     }
+    amap?:string
   }): Promise<messageReps> {
     const res = await client.POST('/v1/llm/invoke/filter', {
       body: {
         test_mode: data.test ?? false,
-        user_request: this.user_request,
+        user_request: this.user_request + data.amap,
         jd: {
           data: data.data.data as any,
           card: data.data.card as any,
@@ -148,6 +149,7 @@ export class SignedKeyLLM {
       boss?: bossZpBossData
       card: bossZpCardData
     }
+    amap?:string
   }, type: 'aiGreeting' | 'aiFiltering' | 'aiReply'): Promise<messageReps> {
     if (type === 'aiGreeting') {
       return this.greetings(data)

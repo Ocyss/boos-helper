@@ -12,7 +12,7 @@ import type { HeaderCellRendererParams } from 'element-plus/es/components/table-
 import type { MyJobListData } from './useJobList'
 import { ElButton, ElCheckbox, ElCheckboxGroup, ElIcon, ElPopover, ElTag } from 'element-plus'
 import { ref } from 'vue'
-
+import type { amapGeocode,amapDistance } from '@/utils/amap'
 export type logErr =
   | null
   | undefined
@@ -27,6 +27,10 @@ export type logErr =
 export interface logData {
   listData: MyJobListData
   el?: Element
+  amap?: {
+    geocode?: Awaited<ReturnType<typeof amapGeocode>>
+    distance?: Awaited<ReturnType<typeof amapDistance>>
+  }
   bossData?: bossZpBossData
   message?: string
   state?: string

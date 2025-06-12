@@ -10,6 +10,7 @@ export interface Statistics {
   hrPosition: number
   jobAddress: number
   salaryRange: number
+  amap: number
   companySizeRange: number
   activityFilter: number
   goldHunterFilter: number
@@ -36,6 +37,16 @@ export interface FormData {
   aiGreeting: FormDataAi
   aiFiltering: FormDataAi & { score: number }
   aiReply: FormDataAi
+  amap: {
+    key: string
+    origins: string
+    straightDistance: number
+    drivingDistance: number
+    drivingDuration: number
+    walkingDistance: number
+    walkingDuration: number
+    enable: boolean
+  }
   record: { model?: string[], enable: boolean }
   // animation?: "frame" | "card" | "together";
   delay: ConfDelay
@@ -44,7 +55,7 @@ export interface FormData {
 }
 
 export type FormInfoData = {
-  [key in keyof Omit<FormData, 'aiGreeting' | 'aiFiltering' | 'delay' | 'userId' | 'version'>]: {
+  [key in keyof Omit<FormData, 'aiGreeting' | 'aiFiltering' | 'delay' | 'userId' | 'version' | 'amap'>]: {
     'label': string
     'data-help'?: string
   };
@@ -52,6 +63,12 @@ export type FormInfoData = {
   aiGreeting: FormInfoAi
   aiFiltering: FormInfoAi
   delay: ConfInfoDelay
+  amap: {
+    [key in keyof FormData['amap']]: {
+      'label': string
+      'data-help'?: string
+    }
+  }
 }
 
 export interface FormInfoAi {

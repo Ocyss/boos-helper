@@ -11,6 +11,7 @@ export interface llmMessageData {
   data?: bossZpJobItemData
   boss?: bossZpBossData
   card?: bossZpCardData
+  amap?:any
 }
 
 export interface llmMessageArgs {

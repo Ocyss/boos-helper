@@ -116,7 +116,7 @@ export async function request<TContext, TResponseType extends ResponseType = 'js
   const {
     method = 'POST',
     url = '',
-    data = '',
+    data,
     headers = {},
     timeout = 18000,
     responseType = 'json' as TResponseType,

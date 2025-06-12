@@ -1,6 +1,6 @@
 import type { MyJobListData } from '@/hooks/useJobList'
 import type { logData } from '../useLog'
-import { errMap, UnknownError } from '@/types/deliverError'
+import { errMap, JobAddressError, UnknownError } from '@/types/deliverError'
 import { useConfFormData } from '../useConfForm'
 import * as h from './handles'
 
@@ -24,6 +24,10 @@ export function createHandle(): {
   const handles: handleFn[] = []
   // 需要调用接口
   const handlesRes: handleFn[] = []
+  // 需要调用amap接口
+  const handlesAmapRes: handleFn[] = []
+  // 需要amap之后筛选接口, AI 筛选
+  const handlesAmapAfter: handleFn[] = []
   // 投递后调用
   const handlesAfter: handleFn[] = []
 
@@ -66,9 +70,50 @@ export function createHandle(): {
   // 工作内容筛选
   if (formData.jobContent.enable)
     h.jobContent(handlesRes)
+
+
+  // 高德地图
+  if (formData.amap.enable) {
+    const amapHandler = (id:string,distance:boolean,duration:boolean,amap?:{ok:boolean,distance:number,duration:number})=>{
+      if (!amap || amap.ok == false) {
+          throw new JobAddressError('高德地图未初始化')
+        }
+          if (distance && amap.distance > formData.amap.straightDistance*1000) {
+            throw new JobAddressError(`${id}距离超标: ${amap.distance/1000} 设定: ${formData.amap.straightDistance}`)
+          }
+          if (duration && amap.duration > formData.amap.drivingDuration*60){
+            throw new JobAddressError(`${id}时间超标: ${amap.duration/60} 设定: ${formData.amap.drivingDuration}`)
+          }
+    }
+    if (formData.amap.straightDistance > 0) {
+      handlesAmapRes.push(async (_,ctx)=>{
+        if (ctx.amap == null || ctx.amap.distance == null ) {
+          throw new JobAddressError('高德地图未初始化')
+        }
+        amapHandler('直线',true,false,ctx.amap.distance.straight)
+      })
+    }
+    if (formData.amap.drivingDistance > 0 || formData.amap.drivingDuration > 0) {
+      handlesAmapRes.push(async (_,ctx)=>{
+        if (ctx.amap == null || ctx.amap.distance == null) {
+          throw new JobAddressError('高德地图未初始化')
+        }
+        amapHandler('驾车',formData.amap.drivingDistance > 0,formData.amap.drivingDuration > 0,ctx.amap.distance.driving)
+      })
+    }
+    if (formData.amap.walkingDistance > 0 || formData.amap.walkingDuration > 0) {
+      handlesAmapRes.push(async (_,ctx)=>{
+        if (ctx.amap == null || ctx.amap.distance == null) {
+          throw new JobAddressError('高德地图未初始化')
+        }
+        amapHandler('步行',formData.amap.walkingDistance > 0,formData.amap.walkingDuration > 0,ctx.amap.distance.walking)
+      })
+    }
+  }
+  
   // AI过滤
   if (formData.aiFiltering.enable)
-    h.aiFiltering(handlesRes)
+    h.aiFiltering(handlesAmapAfter)
 
   if (formData.aiGreeting.enable) {
     // AI招呼语
@@ -88,6 +133,21 @@ export function createHandle(): {
         }
         await args.data.getCard()
         for (const handle of handlesRes) {
+          await handle(args, ctx)
+        }
+        if (formData.amap.enable) {
+          ctx.amap ??={}
+          ctx.amap.geocode = await amapGeocode(args.data.card?.address ?? '')
+          if (ctx.amap.geocode && ctx.amap.geocode?.location){
+            ctx.amap.distance = await amapDistance(ctx.amap.geocode.location)
+          }else{
+            throw new JobAddressError('高德地图未初始化')
+          }
+          for (const handle of handlesAmapRes) {
+            await handle(args, ctx)
+          }
+        }
+        for (const handle of handlesAmapAfter) {
           await handle(args, ctx)
         }
       }
