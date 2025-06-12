@@ -33,6 +33,10 @@ export const formInfoData: FormInfoData = {
     'label': 'Hr职位',
     'data-help': 'Hr职位一定包含/排除在集合中，精确匹配, 不在内置中可手动输入,能实现只向经理等进行投递，毕竟人事干的不一定是人事',
   },
+  jobAddress: {
+    'label': '工作地址',
+    'data-help': '工作地址包含，即投递工作地址当中必须包含当前内容中的任意一项，否则排除',
+  },
   salaryRange: {
     'label': '薪资范围',
     'data-help': '投递工作的薪资范围, 交集匹配, 使用-连接范围, 单位: k。例如：【12-20】',
@@ -259,6 +263,11 @@ export const defaultFormData: FormData = {
     include: true,
     value: [],
     options: ['经理', '主管', '法人', '人力资源主管', 'hr', '招聘专员'],
+    enable: false,
+  },
+  jobAddress: {
+    value: [],
+    options: [],
     enable: false,
   },
   salaryRange: {

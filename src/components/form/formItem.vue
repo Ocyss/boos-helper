@@ -5,6 +5,7 @@ defineProps<{
   label: string
   help?: string
   disabled?: boolean
+  includeOnly?: boolean
 }>()
 
 const include = defineModel<boolean | undefined>('include', {
@@ -18,13 +19,13 @@ const enable = defineModel<boolean>('enable', { required: true })
     <template #label>
       <ElCheckbox v-model="enable" :label size="small" />
       <ElLink
-        v-if="include !== undefined"
-        :type="include ? 'primary' : 'warning'"
+        v-if="includeOnly != null || include != null"
+        :type="(includeOnly ?? include) ? 'primary' : 'warning'"
         size="small"
         :disabled
         @click.stop="include = !include"
       >
-        {{ include ? "包含" : "排除" }}
+        {{ (includeOnly ?? include) ? "包含" : "排除" }}
       </ElLink>
     </template>
     <slot />

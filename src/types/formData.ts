@@ -8,6 +8,7 @@ export interface Statistics {
   jobTitle: number
   jobContent: number
   hrPosition: number
+  jobAddress: number
   salaryRange: number
   companySizeRange: number
   activityFilter: number
@@ -20,6 +21,7 @@ export interface FormData {
   jobTitle: FormDataSelect
   jobContent: FormDataSelect
   hrPosition: FormDataSelect
+  jobAddress: Omit<FormDataSelect, 'include'>
   salaryRange: FormDataInput
   companySizeRange: FormDataInput
   customGreeting: FormDataInput

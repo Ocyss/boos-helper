@@ -57,6 +57,9 @@ export function createHandle(): {
   // Hr职位筛选
   if (formData.hrPosition.enable)
     h.hrPosition(handlesRes)
+  // 工作地址筛选
+  if (formData.jobAddress.enable)
+    h.jobAddress(handlesRes)
   // 好友状态过滤
   if (formData.friendStatus.value)
     h.jobFriendStatus(handlesRes)

@@ -15,6 +15,7 @@ import {
   GoldHunterError,
   GreetError,
   HrPositionError,
+  JobAddressError,
   JobDescriptionError,
   JobTitleError,
   RepeatError,
@@ -265,6 +266,26 @@ export const hrPosition: handleCFn = h =>
     catch (e) {
       todayData.hrPosition++
       throw new HrPositionError(errorHandle(e))
+    }
+  })
+
+export const jobAddress: handleCFn = h =>
+  h.push(async (_, ctx) => {
+    try {
+      const content = ctx.listData.card?.address.trim()
+      for (const x of formData.jobAddress.value) {
+        if (!x) {
+          continue
+        }
+        if (content?.includes(x)) {
+          return
+        }
+      }
+      throw new JobAddressError(`工作地址不包含关键词: ${content}`)
+    }
+    catch (e) {
+      todayData.jobAddress++
+      throw new JobAddressError(errorHandle(e))
     }
   })
 
