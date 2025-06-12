@@ -307,9 +307,9 @@ async function copyOnlineResume() {
     </div>
 
     <ElText v-if="singleMode !== 'vip'" style="margin: 20px 0" tag="div">
-      <el-alert v-if="model?.startsWith('vip-')" title="注意" type="warning">
+      <Alert v-if="model?.startsWith('vip-')" id="vip-alert" title="注意" type="warning">
         会员模型暂时不支持输出 思考过程, 比如deepseekR1，但是不影响模型能力
-      </el-alert>
+      </Alert>
       使用
       <el-link
         type="primary"

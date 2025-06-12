@@ -1,5 +1,6 @@
 <script lang="ts" setup>
 import type { modelData } from '@/hooks/useModel'
+import Alert from '@/components/Alert'
 import { llmsIcons, useModel } from '@/hooks/useModel'
 import deepmerge from '@/utils/deepmerge'
 import { exportJson, importJson } from '@/utils/jsonImportExport'
@@ -80,9 +81,9 @@ function importllm() {
     destroy-on-close
     :z-index="20"
   >
-    <el-alert title="注意" type="warning">
+    <Alert id="llm-config-alert" title="注意" type="warning">
       会员模型暂时不支持输出 思考过程, 比如deepseekR1，但是不影响模型能力
-    </el-alert>
+    </Alert>
     <el-table :data="modelData" style="width: 100%" table-layout="auto">
       <el-table-column label="模型">
         <template #default="scope">

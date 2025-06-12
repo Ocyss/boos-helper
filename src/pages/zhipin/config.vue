@@ -1,4 +1,5 @@
 <script lang="ts" setup>
+import Alert from '@/components/Alert'
 import formItem from '@/components/form/formItem.vue'
 import formSelect from '@/components/form/formSelect.vue'
 import { useCommon } from '@/hooks/useCommon'
@@ -19,15 +20,15 @@ const { deliverLock } = useCommon()
 </script>
 
 <template>
-  <ElAlert style="margin-bottom: 10px" show-icon title="进行配置前都请先阅读完整的帮助文档，再进行配置，如有bug请反馈" type="success" />
-  <ElAlert style="margin-bottom: 10px" type="success" show-icon>
+  <Alert id="config-alert-1" style="margin-bottom: 10px" show-icon title="进行配置前都请先阅读完整的帮助文档，再进行配置，如有bug请反馈" type="success" />
+  <Alert id="config-alert-2" style="margin-bottom: 10px" type="success" show-icon>
     <template #title>
       使用自定义招呼语前 推荐禁用boss直聘自带招呼语
       <el-link href="https://www.zhipin.com/web/geek/notify-set?type=greetSet" target="_blank" type="warning">
         点我前往设置
       </el-link>
     </template>
-  </ElAlert>
+  </Alert>
   <ElForm
     inline
     label-position="left"
@@ -37,8 +38,8 @@ const { deliverLock } = useCommon()
   >
     <el-collapse accordion>
       <el-collapse-item title="筛选配置" name="1">
-        <el-alert title="复选框打钩才会启用，别忘记打钩启用哦" type="success" show-icon style="margin: 10px 0;" />
-        <el-alert title="排除和包含可点击切换，混合模式适用性过低不会考虑开发" type="success" show-icon style="margin: 10px 0;" />
+        <Alert id="filter-config-alert-enable" title="复选框打钩才会启用，别忘记打钩启用哦" type="success" show-icon style="margin: 10px 0;" />
+        <Alert id="filter-config-alert-mode" title="排除和包含可点击切换，混合模式适用性过低不会考虑开发" type="success" show-icon style="margin: 10px 0;" />
 
         <el-space class="config-input" wrap style="width: 100%">
           <form-item
@@ -83,6 +84,17 @@ const { deliverLock } = useCommon()
             <form-select
               v-model:value="formData.hrPosition.value"
               v-model:options="formData.hrPosition.options"
+            />
+          </form-item>
+          <form-item
+            v-bind="formInfoData.jobAddress"
+            v-model:enable="formData.jobAddress.enable"
+            :include-only="true"
+            :disabled="deliverLock"
+          >
+            <form-select
+              v-model:value="formData.jobAddress.value"
+              v-model:options="formData.jobAddress.options"
             />
           </form-item>
           <form-item

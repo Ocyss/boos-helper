@@ -1,4 +1,5 @@
 const globals = {
+  "Alert": true,
   "ChatAvatar": true,
   "ChatInput": true,
   "ChatMessage": true,
@@ -11,6 +12,7 @@ const globals = {
   "DirectiveBinding": true,
   "EffectScope": true,
   "EncryptJobId": true,
+  "ExtendedAlertProps": true,
   "ExtractDefaultPropTypes": true,
   "ExtractPropTypes": true,
   "ExtractPublicPropTypes": true,
