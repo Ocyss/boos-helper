@@ -32,3 +32,5 @@ logapi.zhipin.*.pem
 /local
 
 /.env*
+
+.wxt

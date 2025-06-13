@@ -1,8 +1,8 @@
 name: Main
 on:
-  push:
-    tags:
-      - '*'
+  # push:
+  #   tags:
+  #     - '*'
   workflow_dispatch:
   # schedule:
   #  - cron: "30 0 * * *"
