@@ -272,6 +272,9 @@ export const hrPosition: handleCFn = h =>
 export const jobAddress: handleCFn = h =>
   h.push(async (_, ctx) => {
     try {
+      if (formData.jobAddress.value.length === 0) {
+        return
+      }
       const content = ctx.listData.card?.address.trim()
       for (const x of formData.jobAddress.value) {
         if (!x) {
@@ -317,19 +320,21 @@ export const aiFiltering: handleCFn = (h) => {
           data: ctx.listData,
           boss: ctx.bossData,
           card: ctx.listData.card!,
-                    amap:            {
-            straightDistance:(ctx.amap?.distance?.straight.distance ?? 0)/1000,
-drivingDistance:(ctx.amap?.distance?.driving.distance ?? 0)/1000,
-drivingDuration:(ctx.amap?.distance?.driving.duration ?? 0)/60,
-walkingDistance:(ctx.amap?.distance?.walking.distance ?? 0)/1000,
-walkingDuration:(ctx.amap?.distance?.walking.duration ?? 0)/60,
+          amap: {
+            straightDistance: (ctx.amap?.distance?.straight.distance ?? 0) / 1000,
+            drivingDistance: (ctx.amap?.distance?.driving.distance ?? 0) / 1000,
+            drivingDuration: (ctx.amap?.distance?.driving.duration ?? 0) / 60,
+            walkingDistance: (ctx.amap?.distance?.walking.distance ?? 0) / 1000,
+            walkingDuration: (ctx.amap?.distance?.walking.duration ?? 0) / 60,
           },
         },
-                amap:formData.amap.enable? `直线距离:${(ctx.amap?.distance?.straight.distance ?? 0)/1000}km
-驾车距离:${(ctx.amap?.distance?.driving.distance ?? 0)/1000}km
-驾车时间:${(ctx.amap?.distance?.driving.duration ?? 0)/60}分钟
-步行距离:${(ctx.amap?.distance?.walking.distance ?? 0)/1000}km
-步行时间:${(ctx.amap?.distance?.walking.duration ?? 0)/60}分钟`:'',
+        amap: formData.amap.enable
+          ? `直线距离:${(ctx.amap?.distance?.straight.distance ?? 0) / 1000}km
+驾车距离:${(ctx.amap?.distance?.driving.distance ?? 0) / 1000}km
+驾车时间:${(ctx.amap?.distance?.driving.duration ?? 0) / 60}分钟
+步行距离:${(ctx.amap?.distance?.walking.distance ?? 0) / 1000}km
+步行时间:${(ctx.amap?.distance?.walking.duration ?? 0) / 60}分钟`
+          : '',
         json: true,
         // onStream: chatInput.handle,
         onPrompt: s => chatBossMessage(ctx, s),
@@ -389,13 +394,13 @@ export const customGreeting: handleCFn = (h) => {
         msg = template({
           data: ctx.listData,
           boss: ctx.bossData,
-          card: ctx.listData.card!,
+          card: ctx.listData.card,
           amap: {
-            straightDistance:(ctx.amap?.distance?.straight.distance ?? 0)/1000,
-drivingDistance:(ctx.amap?.distance?.driving.distance ?? 0)/1000,
-drivingDuration:(ctx.amap?.distance?.driving.duration ?? 0)/60,
-walkingDistance:(ctx.amap?.distance?.walking.distance ?? 0)/1000,
-walkingDuration:(ctx.amap?.distance?.walking.duration ?? 0)/60,
+            straightDistance: (ctx.amap?.distance?.straight.distance ?? 0) / 1000,
+            drivingDistance: (ctx.amap?.distance?.driving.distance ?? 0) / 1000,
+            drivingDuration: (ctx.amap?.distance?.driving.duration ?? 0) / 60,
+            walkingDistance: (ctx.amap?.distance?.walking.distance ?? 0) / 1000,
+            walkingDuration: (ctx.amap?.distance?.walking.duration ?? 0) / 60,
           },
         })
       }
@@ -458,7 +463,7 @@ export const aiGreeting: handleCFn = (h) => {
           data: ctx.listData,
           boss: ctx.bossData,
           card: ctx.listData.card!,
-          amap:{},
+          amap: {},
         },
         // onStream: chatInput.handle,
         onPrompt: s => chatBossMessage(ctx, s),

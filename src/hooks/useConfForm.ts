@@ -35,7 +35,7 @@ export const formInfoData: FormInfoData = {
   },
   jobAddress: {
     'label': '工作地址',
-    'data-help': '工作地址包含，即投递工作地址当中必须包含当前内容中的任意一项，否则排除',
+    'data-help': '只能为包含模式, 即投递工作地址当中必须包含当前内容中的任意一项，否则排除',
   },
   salaryRange: {
     'label': '薪资范围',
