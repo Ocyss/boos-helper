@@ -1,8 +1,20 @@
-> [!CAUTION] 免责声明
+> [!CAUTION]
 > 本项目仅供学习交流，禁止用于商业用途
 >
 > 使用该脚本有一定风险(如黑号,封号,权重降低等)，本项目不承担任何责任
 
+<<<<<<< HEAD
+=======
+# 重要提示
+
+本项目从0.3版本开始重构成浏览器扩展，油猴脚本不再更新，扩展等代码整理之后再开源
+
+| Chrome | Crx搜搜 | Edge | FireFox | Github |
+|----------|----------|----------|----------|----------|
+| [![Chrome Web Store](https://img.shields.io/chrome-web-store/v/ogkmgjbagackkdlcibcailacnncgonbn?label=Chrome插件商店)](https://chrome.google.com/webstore/detail/ogkmgjbagackkdlcibcailacnncgonbn) |[![Crx 搜搜](https://img.shields.io/badge/Crx搜索-v%3F.%3F.%3F-EF7C3D)](https://www.crxsoso.com/webstore/detail/ogkmgjbagackkdlcibcailacnncgonbn) | [![Edge Web Store](https://img.shields.io/badge/dynamic/json?url=https%3A%2F%2Fmicrosoftedge.microsoft.com%2Faddons%2Fgetproductdetailsbycrxid%2Fjcllnbjfeamhihjpfjlclhdnjmggbgal&query=version&prefix=v&label=Edge插件商店&color=EF7C3D)](https://microsoftedge.microsoft.com/addons/detail/jcllnbjfeamhihjpfjlclhdnjmggbgal) | [![Firefox](https://img.shields.io/amo/v/boss-helper?label=Mozilla插件商店)](https://addons.mozilla.org/zh-TW/firefox/addon/boss-helper/) | [![GitHub Release](https://img.shields.io/github/v/release/Ocyss/boos-helper)](https://github.com/Ocyss/boos-helper/releases/latest/) |
+
+> **国内**: 如果无法访问 `Chrome插件商店` , 请使用 `Crx搜搜` 或 `Edge插件商店` 安装
+>>>>>>> 6b0733a3894136d6a21d4f0a65841bba8451679d
 
 ## 项目介绍
 Boss直聘助手, 皆在减少投递简历的麻烦, 和提高投递简历的效率, 技术栈使用WXT + Vue3 + element-plus, 开源在 Github 欢迎前来Pr
@@ -54,6 +66,10 @@ greasyfork地址(0.2旧版本): <https://greasyfork.org/zh-CN/scripts/491340>
   - [x] 多账号管理
   - [ ] 聊天屏蔽已读消息
   - [ ] boss消息弹窗
+<<<<<<< HEAD
+=======
+
+>>>>>>> 6b0733a3894136d6a21d4f0a65841bba8451679d
 
 ## 参与贡献
 
