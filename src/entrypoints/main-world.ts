@@ -1,8 +1,9 @@
-import App from '@/components/App.vue'
-import { getRootVue } from '@/hooks/useVue'
+import App from '@/App.vue'
+import { getRootVue } from '@/composables/useVue'
 import { loader } from '@/utils'
 import { logger } from '@/utils/logger'
 import axios from 'axios'
+import { createPinia } from 'pinia'
 import { createApp } from 'vue'
 
 async function main(router: any) {
@@ -24,6 +25,7 @@ async function main(router: any) {
   if (!helper) {
     // eslint-disable-next-line ts/no-unsafe-argument
     const app = createApp(App)
+    app.use(createPinia())
     const appEl = document.createElement('div')
     appEl.id = 'boss-helper'
     document.body.append(appEl)

@@ -38,18 +38,7 @@ interface Window {
   Cookie: {
     get: (key: string) => string
   }
-  __q_parseGptJson: (json: any) => any
-  __q_getStorage: (key: string, defaultValue?: any) => Promise<any>
-  __q_setStorage: (key: string, value: any) => Promise<boolean>
-  __q_getUserResumeString: any
-  __q_sendMessage: any
-  __q_onMessage: any
-  __q_netNotification: any
-  __q_notify: any
-  __q_jobList: JobList
-  __q_chatSend?: (this: any) => Promise<void>
-  __q_openStore?: () => void
-  __q_netConf?: () => NetConf | undefined
+  [key: string]: any
 }
 
 declare const __APP_VERSION__: string

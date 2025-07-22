@@ -97,11 +97,12 @@ export async function requestBossData(
       method: 'POST',
       headers: { Zp_token: token },
     })
-    if (res.data.code !== 0 && res.data.message !== '非好友关系') {
+    if (res.data.code !== 0) {
+      if (res.data.message === '非好友关系') {
+        return await requestBossData(card, '非好友关系', retries - 1)
+      }
       throw new GreetError(`状态错误:${res.data.message}`)
     }
-    if (res.data.code !== 0)
-      return await requestBossData(card, '非好友关系', retries - 1)
     return res.data.zpData
   }
   catch (e: any) {
@@ -183,4 +184,11 @@ export function parseFiltering(content: string) {
   const message = `分数${rating}\n消极:${data?.negative?.reason}\n\n积极:${data?.positive?.reason}`
 
   return { res, message, rating, data }
+}
+
+export function errorHandle(e: any): string {
+  if (e instanceof Error) {
+    return e.message
+  }
+  return `${e}`
 }

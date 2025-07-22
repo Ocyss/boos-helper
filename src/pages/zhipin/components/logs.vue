@@ -2,7 +2,7 @@
 import type {
   TableV2Instance,
 } from 'element-plus'
-import { useLog } from '@/hooks/useLog'
+import { useLog } from '@/stores/log'
 import { ref } from 'vue'
 
 const tableRef = ref<TableV2Instance>()

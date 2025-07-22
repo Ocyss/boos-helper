@@ -1,20 +1,4 @@
 import type { FormData, FormInfoData } from '@/types/formData'
-import deepmerge from '@/utils/deepmerge'
-
-import { exportJson, importJson } from '@/utils/jsonImportExport'
-
-import { logger } from '@/utils/logger'
-import { getCookieInfo } from '@/utils/message/cookie'
-import { getStorage, setStorage } from '@/utils/message/storage'
-
-import { watchThrottled } from '@vueuse/core'
-import { ElMessage } from 'element-plus'
-import { reactive, ref, toRaw } from 'vue'
-import { changeUser, getUserId } from './useUser'
-
-export const formDataKey = 'local:web-geek-job-FormData'
-export const todayKey = 'local:web-geek-job-Today'
-export const statisticsKey = 'local:web-geek-job-Statistics'
 
 export const formInfoData: FormInfoData = {
   company: {
@@ -86,51 +70,51 @@ export const formInfoData: FormInfoData = {
     'data-help': '即使前面招呼语开了也不会发送，只会发送AI生成的招呼语，让gpt来打招呼真是太棒了，毕竟开场白很重要。',
     'example': [
       `我现在需要求职，所以请你来写求职招呼语来向boss或hr打招呼，你需要代入我的身份也就是一名求职者.
-## 我的简历:
-\`\`\`
-
-\`\`\`
-## 待处理的岗位信息:
-<岗位信息>
-岗位名:{{ card.jobName }}   薪资: {{ card.salaryDesc }}
-学历要求: {{ card.degreeName }}
-技能要求: {{ data.skills }}
-岗位标签:{{ card.jobLabels }}
-  <岗位描述>
-  {{ card.postDescription }}
-  <岗位描述/>
-</岗位信息>
-`,
+  ## 我的简历:
+  \`\`\`
+  
+  \`\`\`
+  ## 待处理的岗位信息:
+  <岗位信息>
+  岗位名:{{ card.jobName }}   薪资: {{ card.salaryDesc }}
+  学历要求: {{ card.degreeName }}
+  技能要求: {{ data.skills }}
+  岗位标签:{{ card.jobLabels }}
+    <岗位描述>
+    {{ card.postDescription }}
+    <岗位描述/>
+  </岗位信息>
+  `,
       [
         {
           role: 'system',
           content: `## 角色
-求职小能手
-
-## input：
-1 **求职者信息**
-\`\`\`
-1. ....
-2. ....
-3. ....
-\`\`\`
-
-## outputformat
-招呼语字符串，无书信格式和前缀，和聊天开场白一样的介绍求职者`,
+  求职小能手
+  
+  ## input：
+  1 **求职者信息**
+  \`\`\`
+  1. ....
+  2. ....
+  3. ....
+  \`\`\`
+  
+  ## outputformat
+  招呼语字符串，无书信格式和前缀，和聊天开场白一样的介绍求职者`,
         },
         {
           role: 'user',
           content: `### 待处理的岗位信息:\`\`\`
-<岗位信息>
-岗位名:{{ card.jobName }}   薪资: {{ card.salaryDesc }}
-学历要求: {{ card.degreeName }}
-技能要求: {{ data.skills }}
-岗位标签:{{ card.jobLabels }}
-  <岗位描述>
-  {{ card.postDescription }}
-  <岗位描述/>
-</岗位信息>
-\`\`\``,
+  <岗位信息>
+  岗位名:{{ card.jobName }}   薪资: {{ card.salaryDesc }}
+  学历要求: {{ card.degreeName }}
+  技能要求: {{ data.skills }}
+  岗位标签:{{ card.jobLabels }}
+    <岗位描述>
+    {{ card.postDescription }}
+    <岗位描述/>
+  </岗位信息>
+  \`\`\``,
         },
       ],
     ],
@@ -140,73 +124,73 @@ export const formInfoData: FormInfoData = {
     'data-help': '根据工作内容让gpt分析过滤，真是太稳健了，不放过任何一个垃圾',
     'example': [
       `我现在需要求职，让你根据我的需要对岗位进行评分，方便我筛选岗位。
-## 要求:
-- 加分: 双休,早九晚五,新技术,机会多,年轻人多 每个加分项 10分
-- 扣分: 需要上门,福利少,需要和客户交流,需要推销 每个扣分项 10分
-
-## 待处理的岗位信息:
-<岗位信息>
-岗位名:{{ card.jobName }}   薪资: {{ card.salaryDesc }}
-学历要求: {{ card.degreeName }}    工作经验要求: {{ card.experienceName }}
-福利列表: {{ data.welfareList }}
-技能要求: {{ data.skills }}
-岗位标签:{{ card.jobLabels }}
-  <岗位描述>
-  {{ card.postDescription }}
-  <岗位描述/>
-</岗位信息>
-
-## 输出
-
-总是输出以下Json格式
-
-interface aiFilteringItem {
-  reason: string; // 扣分或加分的理由
-  score: number ; // 分数变化 正整数 不需要+-正负符号
-}
-
-interface aiFiltering {
-  negative: aiFilteringItem[]; // 扣分项
-  positive: aiFilteringItem[] ; // 加分项
-}
-
-总分低于10分将过滤掉`,
+  ## 要求:
+  - 加分: 双休,早九晚五,新技术,机会多,年轻人多 每个加分项 10分
+  - 扣分: 需要上门,福利少,需要和客户交流,需要推销 每个扣分项 10分
+  
+  ## 待处理的岗位信息:
+  <岗位信息>
+  岗位名:{{ card.jobName }}   薪资: {{ card.salaryDesc }}
+  学历要求: {{ card.degreeName }}    工作经验要求: {{ card.experienceName }}
+  福利列表: {{ data.welfareList }}
+  技能要求: {{ data.skills }}
+  岗位标签:{{ card.jobLabels }}
+    <岗位描述>
+    {{ card.postDescription }}
+    <岗位描述/>
+  </岗位信息>
+  
+  ## 输出
+  
+  总是输出以下Json格式
+  
+  interface aiFilteringItem {
+    reason: string; // 扣分或加分的理由
+    score: number ; // 分数变化 正整数 不需要+-正负符号
+  }
+  
+  interface aiFiltering {
+    negative: aiFilteringItem[]; // 扣分项
+    positive: aiFilteringItem[] ; // 加分项
+  }
+  
+  总分低于10分将过滤掉`,
       [
         {
           role: 'system',
           content: `## 角色
-求职评委
-
-最终返回下面格式的JSON字符串,不要有任何其他字符
-
-interface aiFilteringItem {
-  reason: string; // 扣分或加分的理由
-  score: number ; // 分数变化 正整数 不需要+-正负符号
-}
-
-interface aiFiltering {
-  negative: aiFilteringItem[]; // 扣分项
-  positive: aiFilteringItem[] ; // 加分项
-}
-
-## 求职者需求
-- 加分: 双休,早九晚五,新技术,机会多,年轻人多 每个加分项 10分
-- 扣分: 需要上门,福利少,需要和客户交流,需要推销 每个扣分项 10分
-`,
+  求职评委
+  
+  最终返回下面格式的JSON字符串,不要有任何其他字符
+  
+  interface aiFilteringItem {
+    reason: string; // 扣分或加分的理由
+    score: number ; // 分数变化 正整数 不需要+-正负符号
+  }
+  
+  interface aiFiltering {
+    negative: aiFilteringItem[]; // 扣分项
+    positive: aiFilteringItem[] ; // 加分项
+  }
+  
+  ## 求职者需求
+  - 加分: 双休,早九晚五,新技术,机会多,年轻人多 每个加分项 10分
+  - 扣分: 需要上门,福利少,需要和客户交流,需要推销 每个扣分项 10分
+  `,
         },
         {
           role: 'user',
           content: `## 待处理的岗位信息:
-<岗位信息>
-岗位名:{{ card.jobName }}   薪资: {{ card.salaryDesc }}
-学历要求: {{ card.degreeName }}    工作经验要求: {{ card.experienceName }}
-福利列表: {{ data.welfareList }}
-技能要求: {{ data.skills }}
-岗位标签:{{ card.jobLabels }}
-  <岗位描述>
-  {{ card.postDescription }}
-  <岗位描述/>
-</岗位信息>`,
+  <岗位信息>
+  岗位名:{{ card.jobName }}   薪资: {{ card.salaryDesc }}
+  学历要求: {{ card.degreeName }}    工作经验要求: {{ card.experienceName }}
+  福利列表: {{ data.welfareList }}
+  技能要求: {{ data.skills }}
+  岗位标签:{{ card.jobLabels }}
+    <岗位描述>
+    {{ card.postDescription }}
+    <岗位描述/>
+  </岗位信息>`,
         },
       ],
     ],
@@ -373,124 +357,4 @@ export const defaultFormData: FormData = {
     messageSending: 5,
   },
   version: '20240401',
-}
-
-const formData: FormData = reactive(defaultFormData)
-const isLoaded = ref(false)
-
-const FROM_VERSION: [string, (from: Partial<FormData>) => Partial<FormData>][] = [
-  ['20240401', (from) => {
-    return from
-  }],
-]
-
-async function formDataHandler(from: Partial<FormData>) {
-  try {
-    for (let i = FROM_VERSION.length - 1; i >= 0; i--) {
-      const [version, fn] = FROM_VERSION[i]
-      if ((from?.version ?? '20240401') >= version) {
-        break
-      }
-      from = fn(from)
-      from.version = version
-    }
-    const uid = getUserId()
-    // eslint-disable-next-line eqeqeq
-    if (uid != null && from.userId != null && from.userId != uid) {
-      const data = await getCookieInfo()
-      if (uid in data) {
-        await changeUser(data[uid])
-        ElMessage.success('匹配到账号配置 恢复中, 3s后刷新页面')
-        setTimeout(() => window.location.reload(), 3000)
-        return
-      }
-      else {
-        ElMessage.success('登录新账号')
-        from.userId = uid
-      }
-    }
-    else if (uid != null && from.userId == null) {
-      from.userId = uid
-    }
-  }
-  catch (err) {
-    logger.error('用户配置初始化失败', err)
-    ElMessage.error(`用户配置初始化失败: ${String(err)}`)
-  }
-  return from
-}
-
-async function init() {
-  let from = await getStorage<Partial<FormData>>(formDataKey, {})
-  from = await formDataHandler(from) ?? from
-  const data = deepmerge<FormData>(defaultFormData, from)
-  Object.assign(formData, data)
-  isLoaded.value = true
-}
-
-void init()
-
-watchThrottled(
-  formData,
-  (v) => {
-    logger.debug('formData改变', toRaw(v))
-  },
-  { throttle: 2000 },
-)
-
-async function confSaving() {
-  const v = jsonClone(formData)
-  try {
-    await setStorage(formDataKey, v)
-    logger.debug('formData保存', v)
-    ElMessage.success('保存成功')
-  }
-  catch (error: any) {
-    ElMessage.error(`保存失败: ${error.message}`)
-  }
-}
-
-async function confReload() {
-  const v = deepmerge<FormData>(defaultFormData, await getStorage(formDataKey, {}))
-  deepmerge(formData, v, { clone: false })
-  logger.debug('formData已重置')
-  ElMessage.success('重置成功')
-}
-
-async function confExport() {
-  const data = deepmerge<FormData>(
-    defaultFormData,
-    await getStorage(formDataKey, {}),
-  )
-  exportJson(data, '打招呼配置')
-}
-
-async function confImport() {
-  let jsonData = await importJson<Partial<FormData>>()
-
-  jsonData.userId = undefined
-  jsonData = await formDataHandler(jsonData) ?? jsonData
-  // await setStorage(formDataKey, jsonData)
-  deepmerge(formData, jsonData, { clone: false })
-  ElMessage.success('导入成功, 切记要手动保存哦')
-}
-
-function confDelete() {
-  deepmerge(formData, defaultFormData, { clone: false })
-  logger.debug('formData已清空')
-  ElMessage.success('清空成功')
-}
-
-export function useConfFormData() {
-  return {
-    confSaving,
-    confReload,
-    confExport,
-    confImport,
-    confDelete,
-    formDataKey,
-    defaultFormData,
-    formData,
-    isLoaded,
-  }
 }

@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import type { formElm, llmInfoVal } from '@/hooks/useModel/type'
+import type { formElm, llmInfoVal } from '@/composables/useModel/type'
 import info from '@/components/icon/info.vue'
 import {
   ElInput,

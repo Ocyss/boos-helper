@@ -1,7 +1,8 @@
 import elmGetter from '@/utils/elmGetter'
 import { logger } from '@/utils/logger'
+import { createPinia } from 'pinia'
 import { createApp } from 'vue'
-import uiVue from './ui.vue'
+import uiVue from './components/ui.vue'
 import './index.scss'
 
 async function mountVue() {
@@ -11,6 +12,8 @@ async function mountVue() {
   }
   // eslint-disable-next-line ts/no-unsafe-argument
   const app = createApp(uiVue)
+  app.use(createPinia())
+
   const jobEl = document.createElement('div')
   jobEl.id = 'boss-helper-job'
 

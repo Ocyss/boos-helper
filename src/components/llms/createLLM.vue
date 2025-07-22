@@ -1,7 +1,7 @@
 <script lang="ts" setup>
-import type { modelData } from '@/hooks/useModel'
-import type { llm } from '@/hooks/useModel/type'
-import { llms, useModel } from '@/hooks/useModel'
+import type { modelData } from '@/composables/useModel'
+import type { llm } from '@/composables/useModel/type'
+import { llms, useModel } from '@/composables/useModel'
 import deepmerge, { jsonClone } from '@/utils/deepmerge'
 import { logger } from '@/utils/logger'
 import { reactiveComputed } from '@vueuse/core'
@@ -25,7 +25,7 @@ const show = defineModel<boolean>({ required: true })
 const createName = ref(props.model?.name || '')
 const createColor = ref(props.model?.color || color16())
 const testShow = ref(false)
-const { getGpt } = useModel()
+const { getModel } = useModel()
 
 const _llmsOptions = computed(() =>
   llms.map((v) => {
@@ -138,7 +138,7 @@ async function test() {
   data.data.mode = selectLLM.value
   logger.debug(data)
 
-  const gpt = getGpt(data, testIn.value) as llm<any>
+  const gpt = getModel(data, testIn.value) as llm<any>
   testOut.value = ''
   try {
     logger.group('LLMTest')

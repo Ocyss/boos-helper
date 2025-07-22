@@ -1,4 +1,4 @@
-import type { prompt } from '@/hooks/useModel/type'
+import type { prompt } from '@/composables/useModel/type'
 
 export interface Statistics {
   date: string

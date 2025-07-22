@@ -1,4 +1,4 @@
-import { useHookVueData, useHookVueFn } from '@/hooks/useVue'
+import { useHookVueData, useHookVueFn } from '@/composables/useVue'
 import { ref } from 'vue'
 
 const page = ref({ page: 1, pageSize: 30 })

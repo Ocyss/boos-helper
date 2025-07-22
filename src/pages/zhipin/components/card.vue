@@ -1,9 +1,10 @@
 <script lang="ts" setup>
-import { jobList } from '@/hooks/useJobList'
+import type { EncryptJobId } from '@/stores/jobs'
+import { jobList } from '@/stores/jobs'
 import { ref } from 'vue'
-import { useDeliver } from './hooks/useDeliver'
+import { useDeliver } from '../hooks/useDeliver'
 
-const { currentData } = useDeliver()
+const deliver = useDeliver()
 const jobSetRef = ref<Record<EncryptJobId, Element | ComponentPublicInstance | null>>({})
 const autoScroll = ref(true)
 const cards = ref<HTMLDivElement>()
@@ -19,10 +20,10 @@ function scroll(e: any) {
 }
 
 function scrollHandler() {
-  if (!currentData.value?.encryptJobId) {
+  if (!deliver.currentData?.encryptJobId) {
     return
   }
-  const d = jobSetRef.value[currentData.value?.encryptJobId]
+  const d = jobSetRef.value[deliver.currentData?.encryptJobId ?? '']
   if (!d) {
     return
   }
@@ -42,7 +43,7 @@ function scrollHandler() {
   }
 }
 
-watch(currentData, () => {
+watch(() => deliver.currentData, () => {
   if (autoScroll.value) {
     scrollHandler()
   }

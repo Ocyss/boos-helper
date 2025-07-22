@@ -3,8 +3,8 @@ import type { ElInput } from 'element-plus'
 import type {
   RecycleScrollerInstance,
 } from 'vue-virtual-scroller'
-import { useChat } from '@/hooks/useChat'
-import { userInfo } from '@/hooks/useUser'
+import { useChat } from '@/composables/useChat'
+import { useUser } from '@/stores/user'
 import { watchIgnorable } from '@vueuse/core'
 import { ref, watch } from 'vue'
 import {
@@ -14,7 +14,7 @@ import {
 import 'vue-virtual-scroller/dist/vue-virtual-scroller.css'
 
 const { chatMessages, chatInput } = useChat()
-
+const user = useUser()
 const messageScroller = ref<RecycleScrollerInstance>()
 const messageInput = ref<InstanceType<typeof ElInput>>()
 
@@ -105,7 +105,7 @@ function inputMsgUpdate(v: string) {
           :src="
             chatInput.avatar
               ? undefined
-              : userInfo?.tinyAvatar || userInfo?.largeAvatar
+              : user.info?.tinyAvatar || user.info?.largeAvatar
           "
           :style="{ '--el-avatar-bg-color': chatInput?.avatar?.color }"
         >

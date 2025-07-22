@@ -2,23 +2,22 @@
 import Alert from '@/components/Alert'
 import formItem from '@/components/form/formItem.vue'
 import formSelect from '@/components/form/formSelect.vue'
-import { useCommon } from '@/hooks/useCommon'
-import { formInfoData, useConfFormData } from '@/hooks/useConfForm'
+import { useCommon } from '@/composables/useCommon'
+import { formInfoData, useConf } from '@/stores/conf'
 import { amapGeocode } from '@/utils/amap'
 import { ElMessage } from 'element-plus'
 import aiVue from './ai.vue'
 
-const { formData, confDelete, confExport, confImport, confReload, confSaving }
-  = useConfFormData()
+const conf = useConf()
 
 const { deliverLock } = useCommon()
 const amapGeocodeLoading = ref(false)
 async function amapGeocodeHandler() {
   amapGeocodeLoading.value = true
   try {
-    const res = await amapGeocode(formData.amap.origins)
+    const res = await amapGeocode(conf.formData.amap.origins)
     if (res) {
-      formData.amap.origins = res.location
+      conf.formData.amap.origins = res.location
     }
     else {
       ElMessage.error('获取地址失败')
@@ -48,7 +47,7 @@ async function amapGeocodeHandler() {
       </el-link>
     </template>
   </Alert>
-  <ElForm inline label-position="left" label-width="auto" :model="formData" :disabled="deliverLock">
+  <ElForm inline label-position="left" label-width="auto" :model="conf.formData" :disabled="deliverLock">
     <el-collapse accordion>
       <el-collapse-item title="筛选配置" name="1">
         <Alert
@@ -62,31 +61,31 @@ async function amapGeocodeHandler() {
 
         <el-space class="config-input" wrap style="width: 100%">
           <form-item
-            v-bind="formInfoData.company" v-model:enable="formData.company.enable"
-            v-model:include="formData.company.include" :disabled="deliverLock"
+            v-bind="formInfoData.company" v-model:enable="conf.formData.company.enable"
+            v-model:include="conf.formData.company.include" :disabled="deliverLock"
           >
-            <formSelect v-model:value="formData.company.value" v-model:options="formData.company.options" />
+            <formSelect v-model:value="conf.formData.company.value" v-model:options="conf.formData.company.options" />
           </form-item>
           <form-item
-            v-bind="formInfoData.jobTitle" v-model:enable="formData.jobTitle.enable"
-            v-model:include="formData.jobTitle.include" :disabled="deliverLock"
+            v-bind="formInfoData.jobTitle" v-model:enable="conf.formData.jobTitle.enable"
+            v-model:include="conf.formData.jobTitle.include" :disabled="deliverLock"
           >
-            <form-select v-model:value="formData.jobTitle.value" v-model:options="formData.jobTitle.options" />
+            <form-select v-model:value="conf.formData.jobTitle.value" v-model:options="conf.formData.jobTitle.options" />
           </form-item>
           <form-item
-            v-bind="formInfoData.jobContent" v-model:enable="formData.jobContent.enable"
-            v-model:include="formData.jobContent.include" :disabled="deliverLock"
+            v-bind="formInfoData.jobContent" v-model:enable="conf.formData.jobContent.enable"
+            v-model:include="conf.formData.jobContent.include" :disabled="deliverLock"
           >
-            <form-select v-model:value="formData.jobContent.value" v-model:options="formData.jobContent.options" />
+            <form-select v-model:value="conf.formData.jobContent.value" v-model:options="conf.formData.jobContent.options" />
           </form-item>
           <form-item
-            v-bind="formInfoData.hrPosition" v-model:enable="formData.hrPosition.enable"
-            v-model:include="formData.hrPosition.include" :disabled="deliverLock"
+            v-bind="formInfoData.hrPosition" v-model:enable="conf.formData.hrPosition.enable"
+            v-model:include="conf.formData.hrPosition.include" :disabled="deliverLock"
           >
-            <form-select v-model:value="formData.hrPosition.value" v-model:options="formData.hrPosition.options" />
+            <form-select v-model:value="conf.formData.hrPosition.value" v-model:options="conf.formData.hrPosition.options" />
           </form-item>
           <form-item
-            v-bind="formInfoData.jobAddress" v-model:enable="formData.jobAddress.enable"
+            v-bind="formInfoData.jobAddress" v-model:enable="conf.formData.jobAddress.enable"
             :disabled="deliverLock"
           >
             <template #include>
@@ -97,26 +96,26 @@ async function amapGeocodeHandler() {
                 包含
               </ElLink>
             </template>
-            <form-select v-model:value="formData.jobAddress.value" v-model:options="formData.jobAddress.options" />
+            <form-select v-model:value="conf.formData.jobAddress.value" v-model:options="conf.formData.jobAddress.options" />
           </form-item>
-          <form-item v-bind="formInfoData.salaryRange" v-model:enable="formData.salaryRange.enable">
-            <ElInput v-model="formData.salaryRange.value" />
+          <form-item v-bind="formInfoData.salaryRange" v-model:enable="conf.formData.salaryRange.enable">
+            <ElInput v-model="conf.formData.salaryRange.value" />
           </form-item>
-          <form-item v-bind="formInfoData.companySizeRange" v-model:enable="formData.companySizeRange.enable">
-            <ElInput v-model.lazy="formData.companySizeRange.value" />
+          <form-item v-bind="formInfoData.companySizeRange" v-model:enable="conf.formData.companySizeRange.enable">
+            <ElInput v-model.lazy="conf.formData.companySizeRange.value" />
           </form-item>
 
-          <form-item v-bind="formInfoData.customGreeting" v-model:enable="formData.customGreeting.enable">
-            <ElInput v-model.lazy="formData.customGreeting.value" type="textarea" />
+          <form-item v-bind="formInfoData.customGreeting" v-model:enable="conf.formData.customGreeting.enable">
+            <ElInput v-model.lazy="conf.formData.customGreeting.value" type="textarea" />
           </form-item>
         </el-space>
         <el-space wrap>
-          <ElCheckbox v-bind="formInfoData.greetingVariable" v-model="formData.greetingVariable.value" border />
-          <ElCheckbox v-bind="formInfoData.activityFilter" v-model="formData.activityFilter.value" border />
-          <ElCheckbox v-bind="formInfoData.goldHunterFilter" v-model="formData.goldHunterFilter.value" border />
-          <ElCheckbox v-bind="formInfoData.friendStatus" v-model="formData.friendStatus.value" border />
-          <ElCheckbox v-bind="formInfoData.sameCompanyFilter" v-model="formData.sameCompanyFilter.value" border />
-          <ElCheckbox v-bind="formInfoData.sameHrFilter" v-model="formData.sameHrFilter.value" border />
+          <ElCheckbox v-bind="formInfoData.greetingVariable" v-model="conf.formData.greetingVariable.value" border />
+          <ElCheckbox v-bind="formInfoData.activityFilter" v-model="conf.formData.activityFilter.value" border />
+          <ElCheckbox v-bind="formInfoData.goldHunterFilter" v-model="conf.formData.goldHunterFilter.value" border />
+          <ElCheckbox v-bind="formInfoData.friendStatus" v-model="conf.formData.friendStatus.value" border />
+          <ElCheckbox v-bind="formInfoData.sameCompanyFilter" v-model="conf.formData.sameCompanyFilter.value" border />
+          <ElCheckbox v-bind="formInfoData.sameHrFilter" v-model="conf.formData.sameHrFilter.value" border />
         </el-space>
       </el-collapse-item>
       <el-collapse-item title="地址配置" name="4">
@@ -140,15 +139,15 @@ async function amapGeocodeHandler() {
             "
         />
         <ElCheckbox
-          v-bind="formInfoData.amap.enable" v-model="formData.amap.enable" border
+          v-bind="formInfoData.amap.enable" v-model="conf.formData.amap.enable" border
           style="margin-right: 10px;"
         />
         <ElFormItem v-bind="formInfoData.amap.key">
-          <ElInput v-model.lazy="formData.amap.key" />
+          <ElInput v-model.lazy="conf.formData.amap.key" />
         </ElFormItem>
         <br>
         <ElFormItem v-bind="formInfoData.amap.origins">
-          <ElInput v-model.lazy="formData.amap.origins" :disabled="amapGeocodeLoading">
+          <ElInput v-model.lazy="conf.formData.amap.origins" :disabled="amapGeocodeLoading">
             <template #append>
               <ElButton type="primary" :loading="amapGeocodeLoading" @click="amapGeocodeHandler()">
                 🤖
@@ -157,7 +156,7 @@ async function amapGeocodeHandler() {
           </ElInput>
         </ElFormItem>
         <ElFormItem v-bind="formInfoData.amap.straightDistance">
-          <ElInputNumber v-model.lazy="formData.amap.straightDistance" :precision="1" :max="1000" :min="0" :step="1">
+          <ElInputNumber v-model.lazy="conf.formData.amap.straightDistance" :precision="1" :max="1000" :min="0" :step="1">
             <template #suffix>
               <span>km</span>
             </template>
@@ -165,14 +164,14 @@ async function amapGeocodeHandler() {
         </ElFormItem>
         <br>
         <ElFormItem v-bind="formInfoData.amap.drivingDistance">
-          <ElInputNumber v-model.lazy="formData.amap.drivingDistance" :precision="1" :max="1000" :min="0" :step="1">
+          <ElInputNumber v-model.lazy="conf.formData.amap.drivingDistance" :precision="1" :max="1000" :min="0" :step="1">
             <template #suffix>
               <span>km</span>
             </template>
           </ElInputNumber>
         </ElFormItem>
         <ElFormItem v-bind="formInfoData.amap.drivingDuration">
-          <ElInputNumber v-model.lazy="formData.amap.drivingDuration" :precision="2" :max="1440" :min="0" :step="30">
+          <ElInputNumber v-model.lazy="conf.formData.amap.drivingDuration" :precision="2" :max="1440" :min="0" :step="30">
             <template #suffix>
               <span>分钟</span>
             </template>
@@ -180,14 +179,14 @@ async function amapGeocodeHandler() {
         </ElFormItem>
         <br>
         <ElFormItem v-bind="formInfoData.amap.walkingDistance">
-          <ElInputNumber v-model.lazy="formData.amap.walkingDistance" :precision="1" :max="1000" :min="0" :step="1">
+          <ElInputNumber v-model.lazy="conf.formData.amap.walkingDistance" :precision="1" :max="1000" :min="0" :step="1">
             <template #suffix>
               <span>km</span>
             </template>
           </ElInputNumber>
         </ElFormItem>
         <ElFormItem v-bind="formInfoData.amap.walkingDuration">
-          <ElInputNumber v-model.lazy="formData.amap.walkingDuration" :precision="2" :max="1440" :min="0" :step="30">
+          <ElInputNumber v-model.lazy="conf.formData.amap.walkingDuration" :precision="2" :max="1440" :min="0" :step="30">
             <template #suffix>
               <span>分钟</span>
             </template>
@@ -199,36 +198,36 @@ async function amapGeocodeHandler() {
       </el-collapse-item>
       <el-collapse-item title="延迟配置" name="3">
         <ElFormItem v-for="(item, key) in formInfoData.delay" :key :label="item.label" :data-help="item['data-help']">
-          <el-input-number v-model="formData.delay[key]" :min="1" :max="99999" :disabled="item.disable" />
+          <el-input-number v-model="conf.formData.delay[key]" :min="1" :max="99999" :disabled="item.disable" />
         </ElFormItem>
       </el-collapse-item>
     </el-collapse>
 
     <div style="margin-top: 20px; display: flex">
-      <ElCheckbox v-bind="formInfoData.notification" v-model="formData.notification.value" border />
+      <ElCheckbox v-bind="formInfoData.notification" v-model="conf.formData.notification.value" border />
 
       <ElFormItem :label="formInfoData.deliveryLimit.label" style="margin-left: 30px">
         <el-input-number
-          v-bind="formInfoData.deliveryLimit" v-model="formData.deliveryLimit.value" :min="1" :max="1000"
+          v-bind="formInfoData.deliveryLimit" v-model="conf.formData.deliveryLimit.value" :min="1" :max="1000"
           :step="10"
         />
       </ElFormItem>
     </div>
   </ElForm>
   <div style="margin-top: 15px">
-    <ElButton type="primary" data-help="保存配置，用于后续直接使用当前配置。" @click="confSaving">
+    <ElButton type="primary" data-help="保存配置，用于后续直接使用当前配置。" @click="conf.confSaving">
       保存配置
     </ElButton>
-    <ElButton type="primary" data-help="重新加载本地配置" @click="confReload">
+    <ElButton type="primary" data-help="重新加载本地配置" @click="conf.confReload">
       重载配置
     </ElButton>
-    <ElButton type="primary" data-help="互联网就是要分享" @click="confExport">
+    <ElButton type="primary" data-help="互联网就是要分享" @click="conf.confExport">
       导出配置
     </ElButton>
-    <ElButton type="primary" data-help="互联网就是要分享" @click="confImport">
+    <ElButton type="primary" data-help="互联网就是要分享" @click="conf.confImport">
       导入配置
     </ElButton>
-    <ElButton type="primary" data-help="清空配置,不会帮你保存,可以重载恢复" @click="confDelete">
+    <ElButton type="primary" data-help="清空配置,不会帮你保存,可以重载恢复" @click="conf.confDelete">
       删除配置
     </ElButton>
   </div>

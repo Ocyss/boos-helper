@@ -1,21 +1,17 @@
 <script lang="ts" setup>
+import type { NetConf } from '@/stores/signedKey'
 import type { Action } from 'element-plus'
 import logVue from '@/components/conf/log.vue'
 import storeVue from '@/components/conf/store.vue'
 import userVue from '@/components/conf/user.vue'
 import { store } from '@/components/icon/store'
-import { userInfoInit } from '@/hooks/useUser'
 import { logger } from '@/utils/logger'
 import { getStorage, setStorage } from '@/utils/message/storage'
 import {
-
   ElMessage,
   ElMessageBox,
 } from 'element-plus'
 import { onMounted, ref } from 'vue'
-
-logger.info('BossHelper挂载成功')
-ElMessage('BossHelper挂载成功!')
 
 const confBox = ref(false)
 
@@ -45,7 +41,7 @@ async function themeChange() {
   await setStorage('theme-dark', dark.value)
 }
 
-// console.log(monkeyWindow, window, unsafeWindow);
+// logger.log(monkeyWindow, window, unsafeWindow);
 
 const VITE_VERSION = __APP_VERSION__
 const storeShow = ref(false)
@@ -60,33 +56,36 @@ function updateNetConf() {
 }
 
 onMounted(async () => {
-  await userInfoInit()
+  logger.info('BossHelper挂载成功')
+  ElMessage('BossHelper挂载成功!')
+
   const protocol = 'boss-protocol'
-  const protocol_val = '2025/02/21'
+  const protocol_val = '2025/06/14'
   const protocol_date = await getStorage(protocol)
   if (protocol_date !== protocol_val) {
     ElMessageBox.alert(
-      `1. 遇到bug即时反馈，不会使用请加群，使用前先好好了解项目，阅读每一个标签和帮助
-2. 帮助复选框 能随时进入和退出帮助模式, 配置内容较多, 好好观看
-3. 配置最前面需要打钩启用，启用后需要保存配置
-4. 配置项 包含/排除 能点击切换模式
-5. 群已满，暂不创建，请勿私加开发者，我的时间也很宝贵, 请在github反馈，或者飞书问卷
+      `1. 使用前先好好了解项目，阅读每一个标签和帮助
+      2. 遇到bug即时反馈，不再维护交流群，遇到问题飞书表格或者GitHub反馈
+3. 帮助复选框 能随时进入和退出帮助模式, 配置内容较多, 好好观看
+4. 配置最前面需要打钩启用，启用后需要保存配置
+6. 配置项 包含/排除 能点击切换模式
+7. 投递在达到上限，或者页面无法滚动时会结束投递，反馈相关问题检查是否滚动到底了，无法刷出新岗位!
 
 本项目仅供学习交流，禁止用于商业用途
 使用该脚本有一定风险(如黑号,封号,权重降低等)，本项目不承担任何责任
 <img style="width: 200px; height: 200px;" src="https://qiu-config.oss-cn-beijing.aliyuncs.com/reward.png" style="object-fit: cover;"/>
 Github开源地址: <a href="https://github.com/ocyss/boos-helper" target="_blank">https://github.com/ocyss/boos-helper</a>
 greasyfork地址: <a href="https://greasyfork.org/zh-CN/scripts/491340" target="_blank">https://greasyfork.org/zh-CN/scripts/491340</a>
+反馈结果会在对应记录中评论回复， 一般3-7天回复
 飞书反馈问卷(匿名): <a href="https://gai06vrtbc0.feishu.cn/share/base/form/shrcnmEq2fxH9hM44hqEnoeaj8g" target="_blank">https://gai06vrtbc0.feishu.cn/share/base/form/shrcnmEq2fxH9hM44hqEnoeaj8g</a>
-飞书问卷结果: <a href="https://gai06vrtbc0.feishu.cn/share/base/view/shrcnrg8D0cbLQc89d7Jj7AZgMc" target="_blank">https://gai06vrtbc0.feishu.cn/share/base/view/shrcnrg8D0cbLQc89d7Jj7AZgMc</a>
-飞书交流群: <a href="https://applink.feishu.cn/client/chat/chatter/add_by_link?link_token=410v5499-7193-411f-8258-94ae0cac4fc0" target="_blank">https://applink.feishu.cn/client/chat/chatter/add_by_link?link_token=410v5499-7193-411f-8258-94ae0cac4fc0</a>`,
+飞书问卷结果: <a href="https://gai06vrtbc0.feishu.cn/share/base/view/shrcnrg8D0cbLQc89d7Jj7AZgMc" target="_blank">https://gai06vrtbc0.feishu.cn/share/base/view/shrcnrg8D0cbLQc89d7Jj7AZgMc</a>`,
       '注意事项',
       {
         autofocus: true,
         confirmButtonText: '了解并同意!',
         dangerouslyUseHTMLString: true,
         customStyle:
-          '--el-messagebox-width: unset; white-space: pre-wrap; width: unset;' as any,
+          '--el-messagebox-width: unset; white-space: pre-wrap; width: unset;max-width: unset;' as never,
         callback: (action: Action) => {
           if (action === 'confirm') {
             setStorage(protocol, protocol_val)

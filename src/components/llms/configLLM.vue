@@ -1,14 +1,14 @@
 <script lang="ts" setup>
-import type { modelData } from '@/hooks/useModel'
+import type { modelData } from '@/composables/useModel'
 import Alert from '@/components/Alert'
-import { llmsIcons, useModel } from '@/hooks/useModel'
+import { llmIcon, useModel } from '@/composables/useModel'
 import deepmerge from '@/utils/deepmerge'
 import { exportJson, importJson } from '@/utils/jsonImportExport'
 import { ElMessage } from 'element-plus'
 import { ref } from 'vue'
 
 const show = defineModel<boolean>({ required: true })
-const { modelData, save, init } = useModel()
+const { modelData, saveModel, initModel } = useModel()
 
 const createBoxShow = ref(false)
 
@@ -56,7 +56,7 @@ function create(d: modelData) {
 }
 
 function close() {
-  init()
+  initModel()
   show.value = false
 }
 
@@ -92,7 +92,7 @@ function importllm() {
               :size="30"
               :style="{ '--el-avatar-bg-color': scope.row.color }"
             >
-              <el-icon v-html="scope.row.vip != null ? llmsIcons.vip : llmsIcons[scope.row.data.mode]" />
+              <el-icon v-html="scope.row.vip != null ? llmIcon.vip : llmIcon[scope.row.data.mode]" />
             </el-avatar>
             <span style="margin-left: 8px">{{ scope.row.name }}</span>
           </div>
@@ -157,7 +157,7 @@ function importllm() {
         <el-button type="primary" @click="newllm">
           新建
         </el-button>
-        <el-button type="primary" @click="save">
+        <el-button type="primary" @click="saveModel">
           保存
         </el-button>
       </div>

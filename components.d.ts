@@ -7,7 +7,6 @@ export {}
 
 declare module 'vue' {
   export interface GlobalComponents {
-    App: typeof import('./src/components/App.vue')['default']
     Chat: typeof import('./src/components/chat/chat.vue')['default']
     ConfigLLM: typeof import('./src/components/llms/configLLM.vue')['default']
     CreateLLM: typeof import('./src/components/llms/createLLM.vue')['default']
@@ -65,7 +64,6 @@ declare module 'vue' {
     LForm: typeof import('./src/components/llms/lForm.vue')['default']
     LFormItem: typeof import('./src/components/llms/lFormItem.vue')['default']
     Log: typeof import('./src/components/conf/log.vue')['default']
-    Logger: typeof import('./src/components/logger.vue')['default']
     SelectLLM: typeof import('./src/components/llms/selectLLM.vue')['default']
     Settings: typeof import('./src/components/icon/settings.vue')['default']
     Store: typeof import('./src/components/conf/store.vue')['default']

@@ -1,12 +1,12 @@
 <script lang="ts" setup>
 import type { CookieInfo } from '@/utils/message/cookie'
-import { changeUser, createUser, deleteUser, getUserId, useCookieInfo } from '@/hooks/useUser'
+import { useUser } from '@/stores/user'
 import { logger } from '@/utils/logger'
 
 import { ElMessage, ElMessageBox } from 'element-plus'
 import { ref } from 'vue'
 
-const { data, tableData } = useCookieInfo()
+const user = useUser()
 
 const show = defineModel<boolean>({ required: true })
 
@@ -16,7 +16,7 @@ const loading = ref(false)
 async function handleCreate() {
   loading.value = true
   try {
-    const uid = getUserId()
+    const uid = user.getUserId()
     if (uid == null) {
       try {
         await ElMessageBox.confirm(
@@ -33,9 +33,9 @@ async function handleCreate() {
         return
       }
     }
-    const val = await createUser({})
+    const val = await user.createUser({})
     if (uid && val) {
-      data.value[uid] = val
+      user.cookieDatas[uid] = val
     }
     ElMessage.success('账号已保存，正在清空Cookie并刷新页面')
     setTimeout(() => window.location.reload(), 1500)
@@ -56,7 +56,7 @@ async function handleChange() {
       ElMessage.error('请先选择要切换的账号')
       return
     }
-    const uid = getUserId()
+    const uid = user.getUserId()
     if (uid == null) {
       try {
         await ElMessageBox.confirm(
@@ -73,7 +73,7 @@ async function handleChange() {
         return
       }
     }
-    await changeUser(currentRow.value)
+    await user.changeUser(currentRow.value)
     ElMessage.success('账号切换成功，即将刷新页面')
     setTimeout(() => window.location.reload(), 1500)
   }
@@ -116,7 +116,7 @@ function handleCurrentChange(val: CookieInfo | undefined) {
       style="margin: 6px 0"
     />
     <ElTable
-      :data="tableData"
+      :data="user.cookieTableData"
       style="width: 100%"
       highlight-current-row
       table-layout="auto"
@@ -165,7 +165,7 @@ function handleCurrentChange(val: CookieInfo | undefined) {
             link
             type="primary"
             size="small"
-            @click="() => deleteUser(scope.row)"
+            @click="() => user.deleteUser(scope.row)"
           >
             删除
           </ElButton>

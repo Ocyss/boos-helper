@@ -1,27 +1,30 @@
 <script lang="ts" setup>
-import { jobList } from '@/hooks/useJobList'
-import { useSignedKey } from '@/hooks/useSignedKey'
-import { netConf } from '@/utils/conf'
+import { useModel } from '@/composables/useModel'
+import { useConf } from '@/stores/conf'
+import { jobList } from '@/stores/jobs'
+import { useSignedKey } from '@/stores/signedKey'
+import { useUser } from '@/stores/user'
 import elmGetter from '@/utils/elmGetter'
 import { useMouse, useMouseInElement } from '@vueuse/core'
 import { ElMessage } from 'element-plus'
 import { computed, onMounted, ref } from 'vue'
+import { useDeliver } from '../hooks/useDeliver'
+import { usePager } from '../hooks/usePager'
 import aboutVue from './about.vue'
 import cardVue from './card.vue'
 import configVue from './config.vue'
-import { useDeliver } from './hooks/useDeliver'
-import { usePager } from './hooks/usePager'
 import logsVue from './logs.vue'
 import serviceVue from './service.vue'
 import statisticsVue from './statistics.vue'
 
-const { refreshSignedKeyInfo, initSignedKey } = useSignedKey()
-
+const user = useUser()
+const model = useModel()
+const signedKey = useSignedKey()
 const { initPager } = usePager()
 const { x, y } = useMouse({ type: 'client' })
-const { total, current } = useDeliver()
+const deliver = useDeliver()
 const { todayData } = useStatistics()
-const { formData } = useConfFormData()
+const conf = useConf()
 
 const helpVisible = ref(false)
 const searchRef = ref()
@@ -76,7 +79,10 @@ function findHelp(dom: HTMLElement | null) {
 }
 
 onMounted(async () => {
-  void initSignedKey()
+  void conf.confInit()
+  void user.initUser()
+  void model.initModel()
+  void signedKey.initSignedKey()
   try {
     await jobList.initJobList()
   }
@@ -134,7 +140,7 @@ onMounted(async () => {
   })
 
   const t = setInterval(() => {
-    void refreshSignedKeyInfo()
+    void signedKey.refreshSignedKeyInfo()
   }, 1000 * 60 * 3)
   onUnmounted(() => {
     clearInterval(t)
@@ -147,14 +153,12 @@ function tagOpen(url: string) {
 const VITE_VERSION = __APP_VERSION__
 
 const isDot = computed(() => {
-  return (netConf.value?.version ?? '0') > VITE_VERSION
+  return (signedKey.netConf?.version ?? '0') > VITE_VERSION
 })
 
 function openStore() {
   window.__q_openStore?.()
 }
-
-const { signedKey } = useSignedKey()
 </script>
 
 <template>
@@ -172,10 +176,10 @@ const { signedKey } = useSignedKey()
         </el-tag>
       </el-badge>
       <el-text v-if="todayData.total > 0" style="margin-right: 15px;">
-        今日: {{ todayData.success }}/{{ formData.deliveryLimit.value }}
+        今日: {{ todayData.success }}/{{ conf.formData.deliveryLimit.value }}
       </el-text>
-      <el-text v-if="total > 0">
-        当前页面: {{ current + 1 }}/{{ total }}
+      <el-text v-if="deliver.total > 0">
+        当前页面: {{ deliver.current + 1 }}/{{ deliver.total }}
       </el-text>
     </h2>
     <div
@@ -187,9 +191,9 @@ const { signedKey } = useSignedKey()
     "
       :style="boxStyles"
     />
-    <div v-if="netConf && netConf.notification" class="netAlerts">
+    <div v-if="signedKey.netConf && signedKey.netConf.notification" class="netAlerts">
       <template
-        v-for="item in netConf.notification.filter(
+        v-for="item in signedKey.netConf.notification.filter(
           (item) => item.type === 'alert',
         )"
         :key="item.key ?? item.data.title"
@@ -219,7 +223,7 @@ const { signedKey } = useSignedKey()
       <ElTabPane label="配置" data-help="好好看，好好学">
         <configVue />
       </ElTabPane>
-      <ElTabPane v-if="signedKey" label="AI" data-help="AI时代，脚本怎么能落伍!">
+      <ElTabPane v-if="signedKey.signedKey" label="AI" data-help="AI时代，脚本怎么能落伍!">
         <serviceVue />
       </ElTabPane>
       <ElTabPane label="日志" data-help="反正你也不看">
@@ -232,12 +236,12 @@ const { signedKey } = useSignedKey()
       >
         <aboutVue />
       </ElTabPane>
-      <ElTabPane v-if="netConf && netConf.feedback">
+      <ElTabPane v-if="signedKey.netConf && signedKey.netConf.feedback">
         <template #label>
           <el-link
             size="large"
             style="height: 100%"
-            @click.stop="tagOpen(netConf.feedback)"
+            @click.stop="tagOpen(signedKey.netConf.feedback)"
           >
             反馈
           </el-link>

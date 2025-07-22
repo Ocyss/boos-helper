@@ -1,15 +1,17 @@
 <script lang="ts" setup>
 import type { components } from '@/types/openapi'
 import type { FetchResponse } from 'openapi-fetch'
-import { useSignedKey } from '@/hooks/useSignedKey'
+import { useSignedKey } from '@/stores/signedKey'
+import { useUser } from '@/stores/user'
 import { useCountdown } from '@vueuse/core'
 import { useQRCode } from '@vueuse/integrations/useQRCode'
 import { ElMessage, ElMessageBox } from 'element-plus'
 import { events } from 'fetch-event-stream'
 import aiVue from './ai.vue'
 
-const { signedKey, signedKeyBak, signedKeyInfo, getSignedKeyInfo, signedKeyClient, netConf, signedKeyReqHandler, updateResume: _updateResume } = useSignedKey()
-const keyValue = ref(signedKey.value ?? signedKeyBak.value)
+const signedKey = useSignedKey()
+const user = useUser()
+const keyValue = ref(signedKey.signedKey ?? signedKey.signedKeyBak)
 const loading = ref(false)
 const buyDialogVisible = ref(false)
 const buyDialogLoading = ref(false)
@@ -21,7 +23,7 @@ const buyQrcode = useQRCode(buyQrcodeUrl, {
   margin: 2,
   errorCorrectionLevel: 'H',
 })
-const buyResult = ref<typeof signedKeyInfo['value']>()
+const buyResult = ref<typeof signedKey.signedKeyInfo>()
 const buyDialogStatus = ref<'key' | 'account' | 'balance' | 'balanceSelect'>('key')
 const balanceAmount = ref(10)
 const balanceAmountCustom = ref(0)
@@ -35,51 +37,51 @@ async function bindKey() {
       ElMessage.error('请输入密钥')
       return
     }
-    const data = await getSignedKeyInfo(keyValue.value)
+    const data = await signedKey.getSignedKeyInfo(keyValue.value)
     if (data != null && data.key != null && data.users.length > 0) {
-      const userID = getUserId()?.toString()
+      const userID = user.getUserId()?.toString()
       if (userID == null) {
         ElMessage.error('请先登录')
         return
       }
       if (data.users.some(item => item.user_id === userID)) {
-        signedKey.value = keyValue.value
-        signedKeyInfo.value = data
+        signedKey.signedKey = keyValue.value
+        signedKey.signedKeyInfo = data
         ElMessage.success('绑定成功')
       }
       else {
-        const resp = await signedKeyClient.POST('/v1/key/bind_account', {
+        const resp = await signedKey.client.POST('/v1/key/bind_account', {
           body: {
             data: {
               user_id: userID,
-              backup_user_id: userInfo.value?.encryptUserId,
+              backup_user_id: user.info?.encryptUserId,
             },
             signed_key: keyValue.value,
           },
         })
-        const errMsg = signedKeyReqHandler(resp)
+        const errMsg = signedKey.signedKeyReqHandler(resp)
         if (errMsg == null && resp.data != null) {
-          signedKey.value = resp.data.signed_key
+          signedKey.signedKey = resp.data.signed_key
           data.users.push(resp.data)
-          signedKeyInfo.value = data
+          signedKey.signedKeyInfo = data
           ElMessage.success('绑定成功')
         }
         else if (resp.response.status === 488) {
-          const resp = await signedKeyClient.POST('/v1/key/bind_account', {
+          const resp = await signedKey.client.POST('/v1/key/bind_account', {
             body: {
               data: {
                 user_id: userID,
-                backup_user_id: userInfo.value?.encryptUserId,
+                backup_user_id: user.info?.encryptUserId,
               },
               callback: 'force_unbind',
               signed_key: keyValue.value,
             },
           })
-          const errMsg = signedKeyReqHandler(resp)
+          const errMsg = signedKey.signedKeyReqHandler(resp)
           if (errMsg == null && resp.data != null) {
-            signedKey.value = resp.data.signed_key
+            signedKey.signedKey = resp.data.signed_key
             data.users.push(resp.data)
-            signedKeyInfo.value = data
+            signedKey.signedKeyInfo = data
             ElMessage.success('绑定成功')
           }
         }
@@ -101,14 +103,14 @@ async function buy(responseFn: (userId: string, backupUserId?: string) => Promis
   orderQuerySuccess.value = false
   try {
     buyDialogLoading.value = true
-    const userId = getUserId()?.toString()
-    const backupUserId = userInfo.value?.encryptUserId
+    const userId = user.getUserId()?.toString()
+    const backupUserId = user.info?.encryptUserId
     if (userId == null) {
       ElMessage.error('请先登录')
       return
     }
     const response = await responseFn(userId, backupUserId)
-    const errMsg = signedKeyReqHandler(response)
+    const errMsg = signedKey.signedKeyReqHandler(response)
     if (errMsg != null) {
       return response
     }
@@ -138,7 +140,7 @@ async function buy(responseFn: (userId: string, backupUserId?: string) => Promis
           }
           if (shouldAssignKey) {
             // signedKey.value = resp.key.signed_key
-            signedKeyInfo.value = jsonClone(info)
+            signedKey.signedKeyInfo = jsonClone(info)
           }
 
           buyResult.value = jsonClone(info)
@@ -159,12 +161,12 @@ async function queryOrder() {
     ElMessage.error('无订单号')
     return
   }
-  const res = await signedKeyClient.POST('/v1/key/query_order', {
+  const res = await signedKey.client.POST('/v1/key/query_order', {
     body: {
       order_id: orderID.value,
     },
   })
-  const errMsg = signedKeyReqHandler(res)
+  const errMsg = signedKey.signedKeyReqHandler(res)
   const resp = res.data
   if (errMsg != null || resp == null) {
     return
@@ -221,10 +223,10 @@ async function buyKey() {
   }
   try {
     buyDialogStatus.value = 'key'
-    buyOrderName.value = `购买密钥 ${netConf.value?.price_info?.signedKey ?? 15}元`
+    buyOrderName.value = `购买密钥 ${signedKey.netConf?.price_info?.signedKey ?? 15}元`
     const response = await buy(async (userId: string, backupUserId?: string) => {
       buySignal = new AbortController()
-      const res = await signedKeyClient.POST('/v1/key/purchase_key', {
+      const res = await signedKey.client.POST('/v1/key/purchase_key', {
         body: {
           data: {
             user_id: userId,
@@ -238,7 +240,7 @@ async function buyKey() {
     })
     if (response != null && response.response.status === 488) {
       try {
-        const errMsg = signedKeyReqHandler(response, false)
+        const errMsg = signedKey.signedKeyReqHandler(response, false)
         await ElMessageBox.confirm(
           errMsg ?? '当前用户已绑定密钥，是否强制解绑?',
           '购买失败',
@@ -253,7 +255,7 @@ async function buyKey() {
       }
       await buy(async (userId: string, backupUserId?: string) => {
         buySignal = new AbortController()
-        const res = await signedKeyClient.POST('/v1/key/purchase_key', {
+        const res = await signedKey.client.POST('/v1/key/purchase_key', {
           body: {
             data: {
               user_id: userId,
@@ -269,17 +271,17 @@ async function buyKey() {
     }
   }
   catch (e: any) {
-    console.error(e)
+    logger.error(e)
     ElMessage.error(`购买失败 ${e.message}`)
   }
 }
 
 async function buyAccount() {
   buyDialogStatus.value = 'account'
-  buyOrderName.value = `购买账号位 ${netConf.value?.price_info?.account ?? 5}元`
+  buyOrderName.value = `购买账号位 ${signedKey.netConf?.price_info?.account ?? 5}元`
   await buy(async () => {
     buySignal = new AbortController()
-    const res = await signedKeyClient.POST('/v1/key/purchase_account', {
+    const res = await signedKey.client.POST('/v1/key/purchase_account', {
       parseAs: 'stream',
       signal: buySignal.signal,
     })
@@ -293,7 +295,7 @@ async function buyBalance() {
   buyOrderName.value = `余额充值 ${amount}元`
   await buy(async () => {
     buySignal = new AbortController()
-    const res = await signedKeyClient.POST('/v1/key/recharge_key', {
+    const res = await signedKey.client.POST('/v1/key/recharge_key', {
       body: {
         amount,
       },
@@ -312,8 +314,8 @@ function openBalance() {
 }
 
 function unbindKey() {
-  keyValue.value = signedKey.value
-  signedKey.value = ''
+  keyValue.value = signedKey.signedKey
+  signedKey.signedKey = ''
 }
 
 function handleClose(done?: () => void) {
@@ -351,13 +353,13 @@ function setRemark(row: any) {
     cancelButtonText: '取消',
   })
     .then(async ({ value }) => {
-      const resp = await signedKeyClient.PUT('/v1/key/remark', {
+      const resp = await signedKey.client.PUT('/v1/key/remark', {
         body: {
           remark: value,
           id: row.id,
         },
       })
-      signedKeyReqHandler(resp)
+      signedKey.signedKeyReqHandler(resp)
       if (resp.error == null) {
         row.remark = value
         ElMessage.success('备注修改成功')
@@ -374,7 +376,7 @@ function copyKey() {
 async function updateResume() {
   try {
     loading.value = true
-    await _updateResume()
+    await signedKey.updateResume()
   }
   finally {
     loading.value = false
@@ -384,10 +386,10 @@ const showPreview = ref(false)
 const srcList = ref<string[]>([])
 
 async function contact() {
-  const resp = await signedKeyClient.GET('/v1/key/contact', {
+  const resp = await signedKey.client.GET('/v1/key/contact', {
     parseAs: 'blob',
   })
-  const errMsg = signedKeyReqHandler(resp)
+  const errMsg = signedKey.signedKeyReqHandler(resp)
   if (errMsg != null || resp.data == null) {
     return
   }
@@ -397,26 +399,26 @@ async function contact() {
 }
 
 const balance = computed(() => {
-  return Number(signedKeyInfo.value?.key?.balance ?? 0).toFixed(2)
+  return Number(signedKey.signedKeyInfo?.key?.balance ?? 0).toFixed(2)
 })
 
 const userAccount = computed(() => {
-  return `${signedKeyInfo.value?.users?.length ?? 0}/${signedKeyInfo.value?.key?.user_capacity ?? 0}`
+  return `${signedKey.signedKeyInfo?.users?.length ?? 0}/${signedKey.signedKeyInfo?.key?.user_capacity ?? 0}`
 })
 
-watch(signedKeyBak, () => {
-  keyValue.value = signedKeyBak.value
+watch(() => signedKey.signedKeyBak, (v) => {
+  keyValue.value = v
 })
 
 onMounted(() => {
-  if (signedKey.value != null) {
-    keyValue.value = signedKey.value
-    signedKeyInfo.value = jsonClone(signedKeyInfo.value)
+  if (signedKey.signedKey != null) {
+    keyValue.value = signedKey.signedKey
+    signedKey.signedKeyInfo = jsonClone(signedKey.signedKeyInfo)
   }
-  else if (signedKeyBak.value != null) {
-    keyValue.value = signedKeyBak.value
+  else if (signedKey.signedKeyBak != null) {
+    keyValue.value = signedKey.signedKeyBak
   }
-  logger.info('signedKey', { keyValue, signedKey, signedKeyBak })
+  logger.info('signedKey', { keyValue, signedKey: signedKey.signedKey, signedKeyBak: signedKey.signedKeyBak })
 })
 </script>
 
@@ -448,7 +450,7 @@ onMounted(() => {
             </el-button>
           </template>
           <h3>账号列表</h3>
-          <el-table :data="signedKeyInfo?.users">
+          <el-table :data="signedKey.signedKeyInfo?.users">
             <el-table-column width="150" property="user_id" label="用户ID" />
             <el-table-column width="100" property="remark" label="备注" />
             <el-table-column label="操作">
@@ -467,12 +469,12 @@ onMounted(() => {
         </el-popover>
       </div>
       <el-button-group style="margin-left: 10px">
-        <template v-if="!signedKey">
+        <template v-if="!signedKey.signedKey">
           <el-button type="primary" :loading="loading" @click="bindKey">
             绑定密钥
           </el-button>
           <el-button type="success" :loading="loading" @click="buyKey">
-            购买密钥 {{ netConf?.price_info?.signedKey ?? 15 }}元
+            购买密钥 {{ signedKey.netConf?.price_info?.signedKey ?? 15 }}元
           </el-button>
         </template>
         <template v-else>
@@ -483,7 +485,7 @@ onMounted(() => {
             余额充值
           </el-button>
           <el-button type="success" :loading="loading" @click="buyAccount">
-            账号位 {{ netConf?.price_info?.account ?? 5 }}元
+            账号位 {{ signedKey.netConf?.price_info?.account ?? 5 }}元
           </el-button>
           <el-button type="success" :loading="loading" @click="contact">
             联系作者

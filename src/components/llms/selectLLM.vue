@@ -1,13 +1,15 @@
 <script lang="tsx" setup>
-import type { MyJobListData } from '@/hooks/useJobList'
-import type { prompt } from '@/hooks/useModel/type'
+import type { prompt } from '@/composables/useModel/type'
+import type { MyJobListData } from '@/stores/jobs'
 import type { FormInfoAi } from '@/types/formData'
 import type { CheckboxValueType } from 'element-plus'
 import JobCard from '@/components/JobCard.vue'
-import { parseFiltering } from '@/hooks/useApplying/utils'
-import { formInfoData, useConfFormData } from '@/hooks/useConfForm'
-import { jobList } from '@/hooks/useJobList'
-import { getGpt, llmsIcons, useModel } from '@/hooks/useModel'
+import { parseFiltering } from '@/composables/useApplying/utils'
+import { llmIcon, useModel } from '@/composables/useModel'
+import { formInfoData, useConf } from '@/stores/conf'
+import { jobList } from '@/stores/jobs'
+import { useSignedKey } from '@/stores/signedKey'
+import { useUser } from '@/stores/user'
 import {
   ElMessage,
   ElMessageBox,
@@ -18,15 +20,15 @@ const props = defineProps<{
   data: 'aiGreeting' | 'aiFiltering' | 'aiReply'
 }>()
 
-const { signedKey } = useSignedKey()
-const { formData, confSaving } = useConfFormData()
-const { modelData } = useModel()
+const signedKey = useSignedKey()
+const conf = useConf()
+const model = useModel()
 
 const show = defineModel<boolean>({ required: true })
-const model = ref(formData[props.data].model)
-const singleMode = ref(formData[props.data].vip || signedKey.value != null ? 'vip' as const : !Array.isArray(formData[props.data].prompt))
+const currentModel = ref(conf.formData[props.data].model)
+const singleMode = ref(conf.formData[props.data].vip || signedKey.signedKey != null ? 'vip' as const : !Array.isArray(conf.formData[props.data].prompt))
 
-const score = ref(props.data === 'aiFiltering' ? (formData[props.data].score ?? 10) : 10)
+const score = ref(props.data === 'aiFiltering' ? (conf.formData[props.data].score ?? 10) : 10)
 
 const role = ['system', 'user', 'assistant'].map((item) => {
   return {
@@ -35,7 +37,7 @@ const role = ['system', 'user', 'assistant'].map((item) => {
   }
 })
 
-let _message = formData[props.data].prompt
+let _message = conf.formData[props.data].prompt
 
 if (Array.isArray(_message)) {
   _message = [..._message].map(item => ({ ...item }))
@@ -141,15 +143,15 @@ async function testJob() {
   }
   testJobLoading.value = true
   testJobStop.value = false
-  const md = modelData.value.find(
-    v => model.value === v.key,
+  const md = model.modelData.find(
+    v => currentModel.value === v.key,
   )
-  if (singleMode.value !== 'vip' && (!model.value || !md)) {
+  if (singleMode.value !== 'vip' && (!currentModel.value || !md)) {
     ElMessage.warning('请在上级弹窗右上角选择模型')
     return
   }
   try {
-    const gpt = getGpt(md!, message.value, singleMode.value === 'vip')
+    const gpt = model.getModel(md!, message.value, singleMode.value === 'vip')
     const handle = async (item: TestData) => {
       if (testJobStop.value) {
         return
@@ -176,7 +178,7 @@ async function testJob() {
         })
       }
       catch (err: any) {
-        console.error(err)
+        logger.error(err)
         ElMessage.error(err.message)
       }
       finally {
@@ -190,7 +192,7 @@ async function testJob() {
     }
   }
   catch (err: any) {
-    console.error(err)
+    logger.error(err)
     ElMessage.error(err.message)
   }
   finally {
@@ -201,26 +203,26 @@ async function testJob() {
 
 async function savePrompt() {
   if (singleMode.value !== 'vip') {
-    if (model.value == null) {
+    if (currentModel.value == null) {
       ElMessage.warning('请在右上角选择模型')
       return
     }
-    formData[props.data].model = model.value
+    conf.formData[props.data].model = currentModel.value
   }
   else {
-    formData[props.data].vip = true
+    conf.formData[props.data].vip = true
   }
-  formData[props.data].prompt = message.value
+  conf.formData[props.data].prompt = message.value
   if (props.data === 'aiFiltering') {
-    formData[props.data].score = score.value
+    conf.formData[props.data].score = score.value
   }
-  await confSaving()
+  await conf.confSaving()
   // ElMessage.success('保存成功')
   // show.value = false
 }
 
 async function copyOnlineResume() {
-  const resume = await getUserResumeString({})
+  const resume = await useUser().getUserResumeString({})
 
   await ElMessageBox({
     title: '在线简历',
@@ -284,21 +286,21 @@ async function copyOnlineResume() {
       </el-space>
       <ElSelectV2
         v-if="singleMode !== 'vip'"
-        v-model="model"
-        :options="modelData"
+        v-model="currentModel"
+        :options="model.modelData"
         :props="{ label: 'name', value: 'key' }"
         placeholder="选择模型"
         style="width: 35%"
       >
         <template #default="{ item }">
           <div style="display: flex;">
-            <span v-if="item.vip != null" style="align-items: center;display: inline-flex;margin-right: 6px;" v-html="llmsIcons.vip" />
+            <span v-if="item.vip != null" style="align-items: center;display: inline-flex;margin-right: 6px;" v-html="llmIcon.vip" />
             <span>{{ item.name }}</span>
           </div>
         </template>
         <template #label="{ label, value }">
           <div style="display: flex;">
-            <span v-if="value.startsWith('vip-')" style="align-items: center;display: inline-flex;margin-right: 6px;" v-html="llmsIcons.vip" />
+            <span v-if="value.startsWith('vip-')" style="align-items: center;display: inline-flex;margin-right: 6px;" v-html="llmIcon.vip" />
             <span>{{ label }}</span>
           </div>
         </template>
@@ -306,7 +308,7 @@ async function copyOnlineResume() {
     </div>
 
     <ElText v-if="singleMode !== 'vip'" style="margin: 20px 0" tag="div">
-      <Alert v-if="model?.startsWith('vip-')" id="vip-alert" title="注意" type="warning">
+      <Alert v-if="currentModel?.startsWith('vip-')" id="vip-alert" title="注意" type="warning">
         会员模型暂时不支持输出 思考过程, 比如deepseekR1，但是不影响模型能力
       </Alert>
       使用

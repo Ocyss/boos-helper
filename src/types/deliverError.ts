@@ -10,10 +10,9 @@ function createCustomError(
     state: 'warning' | 'danger'
     constructor(
       message: string,
-      // cause?: any
-      // options?: ErrorOptions
+      options?: ErrorOptions,
     ) {
-      super(message)
+      super(message, options)
       this.name = name
       this.state = state
       Object.setPrototypeOf(this, CustomError.prototype)

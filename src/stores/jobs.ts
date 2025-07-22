@@ -1,5 +1,5 @@
-import { requestCard } from '@/hooks/useApplying'
-import { useHookVueData } from '@/hooks/useVue'
+import { requestCard } from '@/composables/useApplying/utils'
+import { useHookVueData } from '@/composables/useVue'
 import { ref } from 'vue'
 
 export type EncryptJobId = bossZpJobItemData['encryptJobId']

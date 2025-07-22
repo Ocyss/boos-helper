@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import type { MyJobListData } from '@/stores/jobs'
+
 const props = defineProps<{
   job: MyJobListData
   hover?: boolean

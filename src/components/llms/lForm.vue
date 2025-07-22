@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import type { llms } from '@/hooks/useModel'
+import type { llms } from '@/composables/useModel'
 
 const props = defineProps<{
   data: (typeof llms)[number]

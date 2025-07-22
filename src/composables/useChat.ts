@@ -1,7 +1,7 @@
 import type { modelData } from './useModel'
 import { getCurDay, getCurTime } from '@/utils'
 import { reactive, ref, toRaw } from 'vue'
-import { llmsIcons } from './useModel'
+import { llmIcon } from './useModel'
 
 export type ChatMessages = ChatMessage[]
 
@@ -42,7 +42,7 @@ function chatInputInit(model: modelData) {
   chatInput.role = 'assistant'
   chatInput.name = model.name
   chatInput.avatar = {
-    icon: llmsIcons[model.data?.mode || ''],
+    icon: llmIcon[model.data?.mode || ''],
     color: model.color,
   }
   let end = false

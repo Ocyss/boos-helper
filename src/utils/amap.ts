@@ -1,4 +1,4 @@
-import { useConfFormData } from '@/hooks/useConfForm'
+import { useConf } from '@/stores/conf'
 import { request } from '@/utils/request'
 
 export interface AmapError {
@@ -49,7 +49,7 @@ export interface AmapDistance {
 }
 
 export async function amapGeocode(address: string): Promise<AmapGeocode['geocodes'][number] | undefined> {
-  const { formData } = useConfFormData()
+  const { formData } = useConf()
   const res = await request.get({
     url: `https://restapi.amap.com/v3/geocode/geo?address=${address}&output=JSON&Key=${formData.amap.key}`,
   }) as AmapGeocode | AmapError
@@ -60,7 +60,7 @@ export async function amapGeocode(address: string): Promise<AmapGeocode['geocode
 }
 
 export async function amapDistance(destination: string) {
-  const { formData } = useConfFormData()
+  const { formData } = useConf()
   const res0 = await request.get({
     url: `https://restapi.amap.com/v3/distance?origins=${formData.amap.origins}&destination=${destination}&type=0&output=JSON&Key=${formData.amap.key}`,
   }) as AmapDistance | AmapError

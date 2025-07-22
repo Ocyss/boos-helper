@@ -1,11 +1,11 @@
 <script lang="ts" setup>
 import type { FormDataAi } from '@/types/formData'
 import formSwitch from '@/components/form/formSwitch.vue'
-import { useCommon } from '@/hooks/useCommon'
-import { formInfoData, useConfFormData } from '@/hooks/useConfForm'
+import { useCommon } from '@/composables/useCommon'
+import { formInfoData, useConf } from '@/stores/conf'
 import { ref } from 'vue'
 
-const { formData, confSaving } = useConfFormData()
+const conf = useConf()
 const { deliverLock } = useCommon()
 // const useModelData = useModel()
 const aiBoxShow = ref(false)
@@ -15,7 +15,7 @@ const aiBox = ref<'aiGreeting' | 'aiFiltering' | 'aiReply' | 'record'>(
 )
 function change(v: Partial<FormDataAi>) {
   v.enable = !v.enable
-  confSaving()
+  conf.confSaving()
 }
 // 写的依托
 // const m = formData.record.model || []
@@ -27,7 +27,7 @@ function change(v: Partial<FormDataAi>) {
     <formSwitch
       :label="formInfoData.aiGreeting.label"
       :data-help="formInfoData.aiGreeting['data-help']"
-      :data="formData.aiGreeting"
+      :data="conf.formData.aiGreeting"
       :lock="deliverLock"
       @show="
         aiBox = 'aiGreeting';
@@ -38,7 +38,7 @@ function change(v: Partial<FormDataAi>) {
     <formSwitch
       :label="formInfoData.aiFiltering.label"
       :data-help="formInfoData.aiFiltering['data-help']"
-      :data="formData.aiFiltering"
+      :data="conf.formData.aiFiltering"
       :lock="deliverLock"
       @show="
         aiBox = 'aiFiltering';
@@ -49,7 +49,7 @@ function change(v: Partial<FormDataAi>) {
     <formSwitch
       :label="formInfoData.aiReply.label"
       :data-help="formInfoData.aiReply['data-help']"
-      :data="formData.aiReply"
+      :data="conf.formData.aiReply"
       disabled
       @show="
         aiBox = 'aiReply';
