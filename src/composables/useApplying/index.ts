@@ -1,8 +1,16 @@
+import type { JobStatus } from '@/stores/jobs'
+import type { PipelineCacheItem, ProcessorType } from '@/types/pipelineCache'
 import type { Handler, Pipeline, Step } from './type'
+import { PipelineCacheManager } from '@/composables/usePipelineCache'
 import { JobAddressError, UnknownError } from '@/types/deliverError'
+import { amapDistance, amapGeocode } from '@/utils/amap'
+import { logger } from '@/utils/logger'
 import { handles } from './handles'
 
 export * from './utils'
+
+// 全局缓存管理器实例
+let cacheManager: PipelineCacheManager | null = null
 
 function compilePipeline(pipeline: Pipeline, isNested = false): {
   before: Handler[]
@@ -103,4 +111,48 @@ export async function createHandle(): Promise<{
     ],
   ]
   return compilePipeline(pipeline)
+}
+
+/**
+ * 创建缓存实例
+ */
+function getCacheManager(): PipelineCacheManager {
+  if (!cacheManager) {
+    cacheManager = new PipelineCacheManager()
+  }
+  return cacheManager
+}
+
+/**
+ * 缓存Pipeline处理结果
+ */
+export async function cachePipelineResult(
+  encryptJobId: string,
+  jobName: string,
+  brandName: string,
+  status: JobStatus,
+  message: string,
+  processorType?: ProcessorType,
+): Promise<void> {
+  const cacheManager = getCacheManager()
+  await cacheManager.setCacheResult(encryptJobId, jobName, brandName, status, message, processorType)
+}
+
+/**
+ * 检查职位是否有有效缓存
+ */
+export function checkJobCache(encryptJobId: string): {
+  hasCache: boolean
+  cacheResult?: PipelineCacheItem
+} {
+  const cacheManager = getCacheManager()
+
+  if (cacheManager.isValidCache(encryptJobId)) {
+    const cached = cacheManager.getCachedResult(encryptJobId)
+    if (cached) {
+      return { hasCache: true, cacheResult: cached }
+    }
+  }
+
+  return { hasCache: false }
 }

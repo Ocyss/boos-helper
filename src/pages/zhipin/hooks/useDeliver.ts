@@ -1,6 +1,6 @@
 import type { MyJobListData } from '@/stores/jobs'
 import type { logData, logErr } from '@/stores/log'
-import { createHandle, sendPublishReq } from '@/composables/useApplying'
+import { cachePipelineResult, createHandle, sendPublishReq } from '@/composables/useApplying'
 import { useCommon } from '@/composables/useCommon'
 
 import { useStatistics } from '@/composables/useStatistics'
@@ -96,6 +96,20 @@ export const useDeliver = defineStore('zhipin/deliver', () => {
         ElMessage.error('未知报错')
       }
       finally {
+        // 缓存Pipeline处理结果
+        try {
+          await cachePipelineResult(
+            data.encryptJobId,
+            data.jobName || '',
+            data.brandName || '',
+            data.status.status,
+            data.status.msg || '处理完成',
+          )
+        }
+        catch (cacheError) {
+          logger.warn('缓存Pipeline结果失败', cacheError)
+        }
+
         statistics.todayData.total++
         await delay(conf.formData.delay.deliveryInterval)
       }
