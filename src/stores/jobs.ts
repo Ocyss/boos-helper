@@ -1,3 +1,4 @@
+import { checkJobCache } from '@/composables/useApplying'
 import { requestCard } from '@/composables/useApplying/utils'
 import { useHookVueData } from '@/composables/useVue'
 import { ref } from 'vue'
@@ -36,11 +37,14 @@ export class JobList {
         val = jobSet.get(item.encryptJobId)!
       }
       else {
+        // 检查缓存
+        const cacheCheck = checkJobCache(item.encryptJobId)
+
         val = {
           ...item,
           status: {
-            status: 'pending',
-            msg: '未开始',
+            status: cacheCheck.hasCache ? cacheCheck.cacheResult!.status : 'pending',
+            msg: cacheCheck.hasCache ? `${cacheCheck.cacheResult!.message} (缓存)` : '未开始',
             setStatus: (status: JobStatus, msg?: string) => {
               this._map[item.encryptJobId].status.status = status
               this._map[item.encryptJobId].status.msg = msg ?? ''
