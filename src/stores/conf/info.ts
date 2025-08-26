@@ -23,11 +23,11 @@ export const formInfoData: FormInfoData = {
   },
   salaryRange: {
     'label': '薪资范围',
-    'data-help': '投递工作的薪资范围, 交集匹配, 使用-连接范围, 单位: k。例如：【12-20】',
+    'data-help': '投递工作的薪资范围, 更多选项可看高级配置',
   },
   companySizeRange: {
     'label': '公司规模范围',
-    'data-help': '投递工作的公司规模, 子集匹配, 使用-连接范围。例如：【500-20000000】',
+    'data-help': '投递工作的公司规模, 推荐使用boss自带选项进行筛选。严格宽松定义在薪资高级配置中有写',
   },
   customGreeting: {
     'label': '自定义招呼语',
@@ -289,11 +289,16 @@ export const defaultFormData: FormData = {
     enable: false,
   },
   salaryRange: {
-    value: '8-13',
+    value: [8, 13, false],
+    advancedValue: {
+      H: [45, 75, false],
+      D: [360, 600, false],
+      M: [8000, 13000, false],
+    },
     enable: false,
   },
   companySizeRange: {
-    value: '',
+    value: [500, 20000, false],
     enable: false,
   },
   customGreeting: {

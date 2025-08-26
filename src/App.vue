@@ -64,10 +64,11 @@ onMounted(async () => {
   const protocol_date = await getStorage(protocol)
   if (protocol_date !== protocol_val) {
     ElMessageBox.alert(
-      `1. 使用前先好好了解项目，阅读每一个标签和帮助
-      2. 遇到bug即时反馈，不再维护交流群，遇到问题飞书表格或者GitHub反馈
-3. 帮助复选框 能随时进入和退出帮助模式, 配置内容较多, 好好观看
-4. 配置最前面需要打钩启用，启用后需要保存配置
+      `1. 使用前先好好了解项目，阅读每一个标签和帮助,
+2.暂时不维护文档，如果帮助还无法理解可以提交反馈, 优化文案
+3. 遇到bug即时反馈，不再维护交流群，遇到问题飞书表格或者GitHub反馈
+4. 帮助复选框 能随时进入和退出帮助模式, 配置内容较多, 好好观看
+5. 配置最前面需要打钩启用，启用后需要保存配置
 6. 配置项 包含/排除 能点击切换模式
 7. 投递在达到上限，或者页面无法滚动时会结束投递，反馈相关问题检查是否滚动到底了，无法刷出新岗位!
 
@@ -122,7 +123,7 @@ Github开源地址: <a href="https://github.com/ocyss/boos-helper" target="_blan
           >
             {{ v.name }}
           </ElDropdownItem>
-          <ElDropdownItem @click="themeChange">
+          <ElDropdownItem disabled @click="themeChange">
             暗黑模式（{{ dark ? "开" : "关" }}）
           </ElDropdownItem>
           <ElDropdownItem @click="storeShow = true">

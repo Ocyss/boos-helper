@@ -23,7 +23,15 @@ export const useConf = defineStore('conf', () => {
   const isLoaded = ref(false)
 
   const FROM_VERSION: [string, (from: Partial<FormData>) => Partial<FormData>][] = [
-    ['20240401', (from) => {
+    ['20250826', (from) => {
+      if (from.salaryRange && typeof from.salaryRange.value === 'string') {
+        const [min, max] = (from.salaryRange.value as string).split('-').map(Number)
+        from.salaryRange.value = [min, max, false]
+      }
+      if (from.companySizeRange && typeof from.companySizeRange.value === 'string') {
+        const [min, max] = (from.companySizeRange.value as string).split('-').map(Number)
+        from.companySizeRange.value = [min, max, false]
+      }
       return from
     }],
   ]

@@ -1,4 +1,4 @@
-<script lang="ts" setup>
+<script lang="tsx" setup>
 import Alert from '@/components/Alert'
 import formItem from '@/components/form/formItem.vue'
 import formSelect from '@/components/form/formSelect.vue'
@@ -31,6 +31,70 @@ async function amapGeocodeHandler() {
     amapGeocodeLoading.value = false
   }
 }
+
+const SalaryRangeComponent = defineComponent({
+  props: {
+    value: {
+      type: Object as PropType<[number, number, boolean]>,
+      required: true,
+    },
+    unit: {
+      type: String,
+      required: true,
+    },
+    show: {
+      type: Boolean,
+      required: true,
+    },
+    step: {
+      type: Number,
+    },
+    width: {
+      type: String,
+    },
+    controls: {
+      type: Boolean,
+      default: true,
+    },
+  },
+  setup(props) {
+    const handleToggle = () => {
+      // eslint-disable-next-line vue/no-mutating-props
+      props.value[2] = !props.value[2]
+    }
+    return () => (
+      <div style="display: flex;flex: 1;justify-content: space-between;align-items: center;">
+        <el-input-number
+          v-model={props.value[0]}
+          style={`width: ${props.width || '105px'};`}
+          controls={props.controls}
+          controls-position="right"
+          min={0}
+          step={props.step}
+        />
+        <span>-</span>
+        <el-input-number
+          v-model={props.value[1]}
+          style={`width: ${props.width || '105px'};`}
+          controls={props.controls}
+          controls-position="right"
+          min={0}
+          step={props.step}
+        />
+        <span>{props.unit}</span>
+        {props.show
+        && (
+          <el-button
+            onClick={handleToggle}
+            size="small"
+          >
+            {props.value[2] ? '严格' : '宽松'}
+          </el-button>
+        )}
+      </div>
+    )
+  },
+})
 </script>
 
 <template>
@@ -99,10 +163,23 @@ async function amapGeocodeHandler() {
             <form-select v-model:value="conf.formData.jobAddress.value" v-model:options="conf.formData.jobAddress.options" />
           </form-item>
           <form-item v-bind="formInfoData.salaryRange" v-model:enable="conf.formData.salaryRange.enable">
-            <ElInput v-model="conf.formData.salaryRange.value" />
+            <SalaryRangeComponent :value="conf.formData.salaryRange.value" width="80px" unit="K" :show="false" />
+            <el-popover placement="top" :width="400" trigger="click">
+              <template #reference>
+                <el-button style="margin-left: 5px">
+                  高级
+                </el-button>
+              </template>
+              <el-alert title="宽松匹配: 薪资范围有任何重叠即匹配, 如10-20K: 15-20K, 15-21k, 20-26k 都满足, 21-22k 不满足" type="info" show-icon :closable="false" />
+              <el-alert title="严格匹配: 目标薪资需完全在职位范围内, 如10-20K: 10-15K 和15-20K 满足, 15-21k 不满足" type="info" show-icon :closable="false" />
+              <SalaryRangeComponent :value="conf.formData.salaryRange.value" unit="K" :show="true" />
+              <SalaryRangeComponent :value="conf.formData.salaryRange.advancedValue.H" unit="元/时" :show="true" :step="5" />
+              <SalaryRangeComponent :value="conf.formData.salaryRange.advancedValue.D" unit="元/天" :show="true" :step="10" />
+              <SalaryRangeComponent :value="conf.formData.salaryRange.advancedValue.M" unit="元/月" :show="true" :step="200" />
+            </el-popover>
           </form-item>
           <form-item v-bind="formInfoData.companySizeRange" v-model:enable="conf.formData.companySizeRange.enable">
-            <ElInput v-model.lazy="conf.formData.companySizeRange.value" />
+            <SalaryRangeComponent :controls="false" :value="conf.formData.companySizeRange.value" width="90px" unit="人" :show="true" />
           </form-item>
 
           <form-item v-bind="formInfoData.customGreeting" v-model:enable="conf.formData.customGreeting.enable">

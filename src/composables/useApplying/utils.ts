@@ -1,3 +1,4 @@
+import type { FormDataRange } from '@/types/formData'
 import { GreetError, PublishError } from '@/types/deliverError'
 import axios from 'axios'
 import { ElMessage } from 'element-plus'
@@ -116,48 +117,38 @@ export async function requestBossData(
 // 匹配范围
 export function rangeMatch(
   rangeStr: string,
-  input?: string,
-  mode: 'intersection' | 'subset' = 'subset', // 交集、子集，默认: 子集
-  numberHandler: (start: number, end: number) => [number, number] = (start, end) => [start, end],
-): [boolean, string] {
-  if (!rangeStr) {
-    return [false, '无内容']
+  form: FormDataRange,
+): boolean {
+  if (!rangeStr)
+    return false
+  let [start, end, mode] = form // mode: true=严格(包含)，false=宽松(重叠)
+  if (start > end) {
+    [start, end] = [end, start]
   }
-  // 匹配定义范围的正则表达式
-  const reg = /(\d+)(?:-(\d+))?/
-  const match = rangeStr.match(reg)
-  let err = '预期之外'
-  if (match && match.length > 0) {
-    err = match[0]
-  }
-  if (match && input != null) {
-    const [start, end] = numberHandler(Number.parseInt(match[1]), Number.parseInt(match[2] || match[1]))
+  const re = /(\d+(?:\.\d+)?)(?:\s*-\s*(\d+(?:\.\d+)?))?/
+  const m = String(rangeStr).match(re)
+  if (!m)
+    return false
 
-    // 如果输入只有一个数字的情况
-    if (/^\d+$/.test(input)) {
-      const number = Number.parseInt(input)
+  let inputStart = Number.parseFloat(m[1])
+  let inputEnd = Number.parseFloat(m[2] != null ? m[2] : m[1])
+  if (!Number.isFinite(inputStart) || !Number.isFinite(inputEnd))
+    return false
 
-      return [number >= start && number <= end, err]
-    }
-
-    // 如果输入有两个数字的情况
-    const inputReg = /^(\d+)(?:-(\d+))?/
-    const inputMatch = input.match(inputReg)
-    if (inputMatch) {
-      const inputStart = Number.parseInt(inputMatch[1])
-      const inputEnd = Number.parseInt(inputMatch[2] || inputMatch[1])
-      return [
-        // start-end: 15-29 用户输入: inputStart-inputEnd 16-20
-        mode === 'subset'
-          ? (start >= inputStart && start <= inputEnd) || (end >= inputStart && end <= inputEnd) // 子集
-          : !(end < inputStart || inputEnd < start), // 交集
-        err,
-      ]
-    }
+  if (inputStart > inputEnd) {
+    [inputStart, inputEnd] = [inputEnd, inputStart]
   }
 
-  // 其他情况均视为不匹配
-  return [false, err]
+  if (mode) {
+    // 严格：职位范围(input) 完全覆盖 目标范围(form)
+    // inputStart <= s && inputEnd >= e
+    return (inputStart <= start) && (inputEnd >= end)
+  }
+  else {
+    // 宽松：任意重叠（闭区间）
+    // max(inputStart, s) <= min(inputEnd, e)
+    return Math.max(inputStart, start) <= Math.min(inputEnd, end)
+  }
 }
 
 export function parseFiltering(content: string) {

@@ -23,8 +23,8 @@ export interface FormData {
   jobContent: FormDataSelect
   hrPosition: FormDataSelect
   jobAddress: Omit<FormDataSelect, 'include'>
-  salaryRange: FormDataInput
-  companySizeRange: FormDataInput
+  salaryRange: FormSalaryRangeInput
+  companySizeRange: FormDataRangeInput
   customGreeting: FormDataInput
   deliveryLimit: FormDataInputNumber
   greetingVariable: FormDataCheckbox
@@ -86,6 +86,24 @@ export interface FormDataSelect {
 
 export interface FormDataInput {
   value: string
+  enable: boolean
+}
+
+export type FormDataRange = [number, number, boolean]
+
+export interface FormDataRangeInput {
+  value: FormDataRange
+  enable: boolean
+}
+
+export interface FormSalaryRangeInput {
+  // 宽松/严格 默认宽松false
+  value: FormDataRange // 8-13K
+  advancedValue: {
+    H: FormDataRange // 45-75元/时
+    D: FormDataRange // 360-600元/天
+    M: FormDataRange // 8000-13000元/月
+  }
   enable: boolean
 }
 

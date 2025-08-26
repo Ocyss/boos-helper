@@ -197,22 +197,22 @@ export function handles() {
     return async ({ data }, _ctx) => {
       try {
         const text = data.salaryDesc
-
-        const [v, err] = rangeMatch(
-          text,
-          conf.formData.salaryRange.value,
-          'intersection',
-          (start, end) => {
-            if (!/k/i.test(text)) {
-              return [start / 1000, end / 1000]
-            }
-            // 兼职特殊不处理
-            return [start, end]
-          },
-        )
+        let v = false
+        if (text.includes('元/时')) {
+          v = rangeMatch(text, conf.formData.salaryRange.advancedValue.H)
+        }
+        else if (text.includes('元/天')) {
+          v = rangeMatch(text, conf.formData.salaryRange.advancedValue.D)
+        }
+        else if (text.includes('元/月')) {
+          v = rangeMatch(text, conf.formData.salaryRange.advancedValue.M)
+        }
+        else {
+          v = rangeMatch(text, conf.formData.salaryRange.value)
+        }
         if (!v) {
           throw new SalaryError(
-            `不匹配的薪资范围 [${err}],预期: ${conf.formData.salaryRange.value}`,
+            `不匹配的薪资范围, 预期:`,
           )
         }
       }
@@ -230,11 +230,9 @@ export function handles() {
     return async ({ data }, _ctx) => {
       try {
         const text = data.brandScaleName
-
-        const [v, err] = rangeMatch(text, conf.formData.companySizeRange.value)
-        if (!v) {
+        if (!rangeMatch(text, conf.formData.companySizeRange.value)) {
           throw new CompanySizeError(
-            `不匹配的公司规模 [${err}], 预期: ${conf.formData.companySizeRange.value}`,
+            `不匹配的公司规模, 预期: `,
           )
         }
       }
@@ -361,7 +359,7 @@ export function handles() {
       void gpt.checkResume()
     }
     return async (_, ctx) => {
-    // const chatInput = chatInputInit(model)
+      // const chatInput = chatInputInit(model)
       try {
         const { content, prompt, reasoning_content } = await gpt.message({
           data: {
@@ -435,43 +433,45 @@ export function handles() {
       ElMessage.error('没有获取到uid,请刷新重试')
       throw new GreetError('没有获取到uid')
     }
-    return { after: async (args, ctx) => {
-      try {
-        if (ctx.bossData == null) {
-          const bossData = await requestBossData(ctx.listData.card!)
-          ctx.bossData = bossData
-        }
-        let msg = conf.formData.customGreeting.value
-        if (conf.formData.greetingVariable.value && ctx.listData.card) {
-          msg = template({
-            data: ctx.listData,
-            boss: ctx.bossData,
-            card: ctx.listData.card,
-            amap: {
-              straightDistance: (ctx.amap?.distance?.straight.distance ?? 0) / 1000,
-              drivingDistance: (ctx.amap?.distance?.driving.distance ?? 0) / 1000,
-              drivingDuration: (ctx.amap?.distance?.driving.duration ?? 0) / 60,
-              walkingDistance: (ctx.amap?.distance?.walking.distance ?? 0) / 1000,
-              walkingDuration: (ctx.amap?.distance?.walking.duration ?? 0) / 60,
-            },
+    return {
+      after: async (args, ctx) => {
+        try {
+          if (ctx.bossData == null) {
+            const bossData = await requestBossData(ctx.listData.card!)
+            ctx.bossData = bossData
+          }
+          let msg = conf.formData.customGreeting.value
+          if (conf.formData.greetingVariable.value && ctx.listData.card) {
+            msg = template({
+              data: ctx.listData,
+              boss: ctx.bossData,
+              card: ctx.listData.card,
+              amap: {
+                straightDistance: (ctx.amap?.distance?.straight.distance ?? 0) / 1000,
+                drivingDistance: (ctx.amap?.distance?.driving.distance ?? 0) / 1000,
+                drivingDuration: (ctx.amap?.distance?.driving.duration ?? 0) / 60,
+                walkingDistance: (ctx.amap?.distance?.walking.distance ?? 0) / 1000,
+                walkingDuration: (ctx.amap?.distance?.walking.duration ?? 0) / 60,
+              },
+            })
+          }
+
+          ctx.message = msg
+
+          const buf = new Message({
+            form_uid: uid.toString(),
+            to_uid: ctx.bossData.data.bossId.toString(),
+            to_name: ctx.bossData.data.encryptBossId, // encryptUserId
+            content: msg,
           })
+
+          buf.send()
         }
-
-        ctx.message = msg
-
-        const buf = new Message({
-          form_uid: uid.toString(),
-          to_uid: ctx.bossData.data.bossId.toString(),
-          to_name: ctx.bossData.data.encryptBossId, // encryptUserId
-          content: msg,
-        })
-
-        buf.send()
-      }
-      catch (e) {
-        throw new GreetError(errorHandle(e))
-      }
-    } }
+        catch (e) {
+          throw new GreetError(errorHandle(e))
+        }
+      },
+    }
   }
 
   function chatBossMessage(ctx: logData, msg: string) {
@@ -503,53 +503,55 @@ export function handles() {
       ElMessage.error('没有获取到uid,请刷新重试')
       throw new GreetError('没有获取到uid')
     }
-    return { after: async (args, ctx) => {
-    // const chatInput = chatInputInit(model)
-      try {
-        if (ctx.bossData == null) {
-          const bossData = await requestBossData(ctx.listData.card!)
-          ctx.bossData = bossData
+    return {
+      after: async (args, ctx) => {
+        // const chatInput = chatInputInit(model)
+        try {
+          if (ctx.bossData == null) {
+            const bossData = await requestBossData(ctx.listData.card!)
+            ctx.bossData = bossData
+          }
+          const { content, prompt, reasoning_content } = await gpt.message({
+            data: {
+              data: ctx.listData,
+              boss: ctx.bossData,
+              card: ctx.listData.card!,
+              amap: {},
+            },
+            // onStream: chatInput.handle,
+            onPrompt: s => chatBossMessage(ctx, s),
+          }, 'aiGreeting')
+          ctx.aiGreetingQ = prompt
+          if (content == null) {
+            return
+          }
+          ctx.message = content
+          ctx.aiGreetingA = content
+          ctx.aiGreetingR = reasoning_content
+          // chatInput.end(content)
+          const buf = new Message({
+            form_uid: uid.toString(),
+            to_uid: ctx.bossData.data.bossId.toString(),
+            to_name: ctx.bossData.data.encryptBossId, // encryptUserId
+            content,
+          })
+          buf.send()
         }
-        const { content, prompt, reasoning_content } = await gpt.message({
-          data: {
-            data: ctx.listData,
-            boss: ctx.bossData,
-            card: ctx.listData.card!,
-            amap: {},
-          },
-          // onStream: chatInput.handle,
-          onPrompt: s => chatBossMessage(ctx, s),
-        }, 'aiGreeting')
-        ctx.aiGreetingQ = prompt
-        if (content == null) {
-          return
+        catch (e) {
+          // chatInput.end('Err~')
+          throw new GreetError(errorHandle(e))
         }
-        ctx.message = content
-        ctx.aiGreetingA = content
-        ctx.aiGreetingR = reasoning_content
-        // chatInput.end(content)
-        const buf = new Message({
-          form_uid: uid.toString(),
-          to_uid: ctx.bossData.data.bossId.toString(),
-          to_name: ctx.bossData.data.encryptBossId, // encryptUserId
-          content,
-        })
-        buf.send()
-      }
-      catch (e) {
-      // chatInput.end('Err~')
-        throw new GreetError(errorHandle(e))
-      }
-    } }
+      },
+    }
   }
 
   const greeting: StepFactory = () => {
     if (conf.formData.aiGreeting.enable) {
-    // AI招呼语
+      // AI招呼语
       return aiGreeting()
     }
     else if (conf.formData.customGreeting.enable) {
-    // 自定义招呼语
+      // 自定义招呼语
       return customGreeting()
     }
   }
