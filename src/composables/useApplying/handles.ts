@@ -128,11 +128,11 @@ export function handles() {
     }
     return async ({ data }, _ctx) => {
       try {
-        const text = data.jobName
+        const text = data.jobName.toLowerCase()
         if (!text)
           throw new JobTitleError('岗位名为空')
         for (const x of conf.formData.jobTitle.value) {
-          if (text.includes(x)) {
+          if (text.includes(x.toLowerCase())) {
             if (conf.formData.jobTitle.include) {
               return
             }
@@ -251,13 +251,13 @@ export function handles() {
     }
     return async (_, ctx) => {
       try {
-        const content = ctx.listData.card?.postDescription
+        const content = ctx.listData.card?.postDescription.toLowerCase()
         for (const x of conf.formData.jobContent.value) {
           if (!x) {
             continue
           }
           const re = new RegExp(
-            `(?<!(不|无).{0,5})${x}(?!系统|软件|工具|服务)`,
+            `(?<!(不|无).{0,5})${x.toLowerCase()}(?!系统|软件|工具|服务)`,
           )
           if (content != null && re.test(content)) {
             if (conf.formData.jobContent.include) {
