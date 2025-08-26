@@ -73,14 +73,14 @@ export class Message {
         logger.debug('消息发送失败', this)
       })
     }
-    else if (window.__q_chatSend != null) {
-      // 当无渠道时，从网络加载临时补丁
-      window.__q_chatSend.call(this).then(() => {
-        logger.debug('消息发送成功', this)
-      }, () => {
-        logger.debug('消息发送失败', this)
-      })
-    }
+    // else if (window.__q_chatSend != null) { // 扩展限制，不能远程加载，暂不考虑实现
+    //   // 当无渠道时，从网络加载临时补丁
+    //   window.__q_chatSend.call(this).then(() => {
+    //     logger.debug('消息发送成功', this)
+    //   }, () => {
+    //     logger.debug('消息发送失败', this)
+    //   })
+    // }
     else {
       ElMessage.error('无可用发送渠道，请等待作者修复。可暂时关闭招呼语功能')
     }

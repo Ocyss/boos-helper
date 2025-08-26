@@ -14,6 +14,7 @@ message TechwolfSound {
   optional string url = 2;
   optional int32 duration = 3;
   optional int32 templateId = 4;
+  optional string extend = 5;
 }
 message TechwolfVideo {
   required int32 type = 1;
@@ -245,7 +246,7 @@ message TechwolfMessageRead {
   required int64 userId = 1;
   required int64 messageId = 2;
   required int64 readTime = 3;
-  optional bool sync = 4 [ default = false ];
+  optional bool sync = 4 [default = false];
   optional int32 userSource = 5;
 }
 message TechwolfChatProtocol {
@@ -349,6 +350,7 @@ message TechwolfSticker {
   optional TechwolfImage image = 3;
   optional string format = 4;
   optional string name = 5;
+  optional string encSid = 6;
 }
 message TechwolfChatShare {
   required int64 shareId = 1;
@@ -394,8 +396,12 @@ message TechwolfStarRate {
   optional TechwolfStar rateStar = 4;
   optional TechwolfButton submitButton = 5;
 }
-message TechwolfFrame { required string href = 1; }
-message TechwolfMultiImage { repeated TechwolfImageInfo images = 1; }
+message TechwolfFrame {
+  required string href = 1;
+}
+message TechwolfMultiImage {
+  repeated TechwolfImageInfo images = 1;
+}
 message TechwolfComDesc {
   required string picUrl = 1;
   required string name = 2;
