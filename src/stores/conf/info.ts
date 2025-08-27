@@ -291,9 +291,10 @@ export const defaultFormData: FormData = {
   salaryRange: {
     value: [8, 13, false],
     advancedValue: {
-      H: [45, 75, false],
-      D: [360, 600, false],
-      M: [8000, 13000, false],
+      // 默认全部关闭，避免用户未配置而投递错误岗位
+      H: [0, 1, false],
+      D: [0, 1, false],
+      M: [0, 1, false],
     },
     enable: false,
   },
