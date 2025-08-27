@@ -28,7 +28,7 @@ import { getStorage, setStorage } from '@/utils/message/storage'
 import { ElMessage } from 'element-plus'
 import { miTem } from 'mitem'
 import { SignedKeyLLM } from '../useModel/signedKey'
-import { errorHandle, parseFiltering, rangeMatch, requestBossData, sameCompanyKey, sameHrKey } from './utils'
+import { errorHandle, parseFiltering, rangeMatch, rangeMatchFormat, requestBossData, sameCompanyKey, sameHrKey } from './utils'
 
 export function handles() {
   const { chatMessages } = useChat()
@@ -194,26 +194,23 @@ export function handles() {
     if (!conf.formData.salaryRange.enable) {
       return
     }
+    const arr = [
+      ['元/时', conf.formData.salaryRange.advancedValue.H],
+      ['元/天', conf.formData.salaryRange.advancedValue.D],
+      ['元/月', conf.formData.salaryRange.advancedValue.M],
+      ['K', conf.formData.salaryRange.value],
+    ] as const
     return async ({ data }, _ctx) => {
       try {
         const text = data.salaryDesc
-        let v = false
-        if (text.includes('元/时')) {
-          v = rangeMatch(text, conf.formData.salaryRange.advancedValue.H)
-        }
-        else if (text.includes('元/天')) {
-          v = rangeMatch(text, conf.formData.salaryRange.advancedValue.D)
-        }
-        else if (text.includes('元/月')) {
-          v = rangeMatch(text, conf.formData.salaryRange.advancedValue.M)
-        }
-        else {
-          v = rangeMatch(text, conf.formData.salaryRange.value)
-        }
-        if (!v) {
-          throw new SalaryError(
-            `不匹配的薪资范围, 预期:`,
-          )
+        for (const key of arr) {
+          if (text.includes(key[0])) {
+            if (!rangeMatch(text, key[1])) {
+              throw new SalaryError(
+                `不匹配的薪资范围 ${text}, 预期: ${rangeMatchFormat(key[1], key[0])}`,
+              )
+            }
+          }
         }
       }
       catch (e) {
@@ -232,7 +229,7 @@ export function handles() {
         const text = data.brandScaleName
         if (!rangeMatch(text, conf.formData.companySizeRange.value)) {
           throw new CompanySizeError(
-            `不匹配的公司规模, 预期: `,
+            `不匹配的公司规模 ${text}, 预期: ${rangeMatchFormat(conf.formData.companySizeRange.value, '人')}`,
           )
         }
       }

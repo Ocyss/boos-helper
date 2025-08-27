@@ -299,7 +299,7 @@ export const defaultFormData: FormData = {
     enable: false,
   },
   companySizeRange: {
-    value: [500, 20000, false],
+    value: [500, 2000, true],
     enable: false,
   },
   customGreeting: {

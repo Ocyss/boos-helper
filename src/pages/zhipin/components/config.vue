@@ -32,6 +32,17 @@ async function amapGeocodeHandler() {
   }
 }
 
+function syncSalaryRange() {
+  conf.formData.salaryRange.advancedValue.M[0] = Math.round(conf.formData.salaryRange.value[0] * 1000)
+  conf.formData.salaryRange.advancedValue.M[1] = Math.round(conf.formData.salaryRange.value[1] * 1000)
+
+  conf.formData.salaryRange.advancedValue.D[0] = Math.round(conf.formData.salaryRange.advancedValue.M[0] / 21.75)
+  conf.formData.salaryRange.advancedValue.D[1] = Math.round(conf.formData.salaryRange.advancedValue.M[1] / 21.75)
+
+  conf.formData.salaryRange.advancedValue.H[0] = Math.round(conf.formData.salaryRange.advancedValue.D[0] / 8)
+  conf.formData.salaryRange.advancedValue.H[1] = Math.round(conf.formData.salaryRange.advancedValue.D[1] / 8)
+}
+
 const SalaryRangeComponent = defineComponent({
   props: {
     value: {
@@ -170,12 +181,18 @@ const SalaryRangeComponent = defineComponent({
                   高级
                 </el-button>
               </template>
-              <el-alert title="宽松匹配: 薪资范围有任何重叠即匹配, 如10-20K: 15-20K, 15-21k, 20-26k 都满足, 21-22k 不满足" type="info" show-icon :closable="false" />
-              <el-alert title="严格匹配: 目标薪资需完全在职位范围内, 如10-20K: 10-15K 和15-20K 满足, 15-21k 不满足" type="info" show-icon :closable="false" />
-              <SalaryRangeComponent :value="conf.formData.salaryRange.value" unit="K" :show="true" />
-              <SalaryRangeComponent :value="conf.formData.salaryRange.advancedValue.H" unit="元/时" :show="true" :step="5" />
-              <SalaryRangeComponent :value="conf.formData.salaryRange.advancedValue.D" unit="元/天" :show="true" :step="10" />
-              <SalaryRangeComponent :value="conf.formData.salaryRange.advancedValue.M" unit="元/月" :show="true" :step="200" />
+              <div style="display: flex;flex-direction: column;gap: 10px;">
+                <el-alert title="宽松匹配: 薪资范围有任何重叠即匹配, 如10-20K: 15-20K, 15-21k, 20-26k 都满足, 21-22k 不满足" type="info" show-icon :closable="false" />
+                <el-alert title="严格匹配: 目标薪资需完全在职位范围内, 如10-20K: 10-15K 和15-20K 满足, 15-21k 不满足" type="info" show-icon :closable="false" />
+                <SalaryRangeComponent :value="conf.formData.salaryRange.value" unit="K" :show="true" />
+                <el-alert title="计算值进行同步，算法固定. 日薪: /21.75, 时薪: /21.75/8" type="info" show-icon :closable="false" />
+                <el-button @click="syncSalaryRange">
+                  同步
+                </el-button>
+                <SalaryRangeComponent :value="conf.formData.salaryRange.advancedValue.H" unit="元/时" :show="true" :step="5" />
+                <SalaryRangeComponent :value="conf.formData.salaryRange.advancedValue.D" unit="元/天" :show="true" :step="10" />
+                <SalaryRangeComponent :value="conf.formData.salaryRange.advancedValue.M" unit="元/月" :show="true" :step="200" />
+              </div>
             </el-popover>
           </form-item>
           <form-item v-bind="formInfoData.companySizeRange" v-model:enable="conf.formData.companySizeRange.enable">

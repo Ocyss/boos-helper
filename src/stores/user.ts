@@ -39,13 +39,13 @@ export const UserResumeStringOptions = {
   基本信息: false
     ? false as const
     : {
-      姓名: false,
-      年龄: true,
-      性别: true,
-      学历: true,
-      求职状态: true,
-      工作年限: true,
-    },
+        姓名: false,
+        年龄: true,
+        性别: true,
+        学历: true,
+        求职状态: true,
+        工作年限: true,
+      },
   期望职位: true,
   个人优势: true,
   工作经历: true,
@@ -55,15 +55,13 @@ export const UserResumeStringOptions = {
   志愿者经历: true,
 }
 
-
 const info = ref<UserInfo>()
 const cookieDatas = ref<Record<string, CookieInfo>>({})
 const cookieTableData = computed(() => Object.values(cookieDatas.value))
 
 const resume = ref<bossZpResumeData>()
 
-
-export const useUser = () => {
+export function useUser() {
   function getUserId(): number | string | null {
     return info.value?.userId
       ?? window?._PAGE?.uid
@@ -105,34 +103,33 @@ export const useUser = () => {
     }
   }
 
-  async function saveUser({ uid }:{uid: string | number | null}) {
+  async function saveUser({ uid }: { uid: string | number | null }) {
     if (uid == null) {
       uid = getUserId()
     }
 
     const { formData } = useConf()
 
-      if (uid == null) {
-        throw new Error('找不到uid')
-      }
-      uid = String(uid)
+    if (uid == null) {
+      throw new Error('找不到uid')
+    }
+    uid = String(uid)
 
-      const val: CookieInfo = {
-        uid,
-        user: info.value?.showName ?? info.value?.name ?? '未知用户',
-        avatar: info.value?.tinyAvatar ?? info.value?.largeAvatar ?? '',
-        remark: '',
-        gender: info.value?.gender === 0 ? 'man' : 'woman',
-        flag: info.value?.studentFlag ? 'student' : 'staff',
-        date: new Date().toLocaleString(),
-        form: jsonClone(formData),
-        statistics: await useStatistics().getStatistics(),
-      }
-      logger.debug('开始创建账户', info.value, val)
-      await saveCookie(val)
-      return val
-    
-  }  
+    const val: CookieInfo = {
+      uid,
+      user: info.value?.showName ?? info.value?.name ?? '未知用户',
+      avatar: info.value?.tinyAvatar ?? info.value?.largeAvatar ?? '',
+      remark: '',
+      gender: info.value?.gender === 0 ? 'man' : 'woman',
+      flag: info.value?.studentFlag ? 'student' : 'staff',
+      date: new Date().toLocaleString(),
+      form: jsonClone(formData),
+      statistics: await useStatistics().getStatistics(),
+    }
+    logger.debug('开始创建账户', info.value, val)
+    await saveCookie(val)
+    return val
+  }
 
   async function clearUser() {
     await clearCookie()
@@ -148,8 +145,8 @@ export const useUser = () => {
     const uid = useUser().getUserId()
     if (uid != null) {
     // 保存当前账号状态
-    await saveUser({ uid })
-  }
+      await saveUser({ uid })
+    }
 
     // 恢复目标账号的配置
     if (targetAccount.form) {
@@ -238,15 +235,15 @@ ${data.workExpList?.map(item => `
 
 相关技能: ${item?.emphasis?.map(e => `\`${e}\``).join(' ')}
 ${item?.workContent
-          ? `<工作内容>
+  ? `<工作内容>
 ${item.workContent}
 </工作内容>`
-          : ''}
+  : ''}
 ${item?.workPerformance
-          ? `<工作业绩>
+  ? `<工作业绩>
 ${item.workPerformance}
 </工作业绩>`
-          : ''}
+  : ''}
 `).join('\n')}`
     }
     if (options.项目经历 && data.projectExpList && data.projectExpList.length > 0) {
@@ -305,7 +302,7 @@ ${data.volunteerExpList?.map(item => `- ${item?.name} ${item?.serviceLength}
     resume.value = data.zpData
     return data.zpData
   }
-  return { info, resume, getUserResumeString, getUserResumeData, getUserId, initUser, saveUser,clearUser, changeUser, deleteUser, cookieDatas, cookieTableData, initCookie }
+  return { info, resume, getUserResumeString, getUserResumeData, getUserId, initUser, saveUser, clearUser, changeUser, deleteUser, cookieDatas, cookieTableData, initCookie }
 }
 
 window.__q_useUser = useUser

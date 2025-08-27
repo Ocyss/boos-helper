@@ -114,6 +114,13 @@ export async function requestBossData(
   }
 }
 
+export function rangeMatchFormat(
+  v: FormDataRange,
+  unit: string,
+): string {
+  return `${v[0]} - ${v[1]} ${unit} ${v[2] ? '严格' : '宽松'}`
+}
+
 // 匹配范围
 export function rangeMatch(
   rangeStr: string,
@@ -138,15 +145,15 @@ export function rangeMatch(
   if (inputStart > inputEnd) {
     [inputStart, inputEnd] = [inputEnd, inputStart]
   }
-
+  // console.log({
+  //     inputStart,inputEnd,start,end
+  // })
   if (mode) {
     // 严格：职位范围(input) 完全覆盖 目标范围(form)
-    // inputStart <= s && inputEnd >= e
-    return (inputStart <= start) && (inputEnd >= end)
+    return (start <= inputStart) && (inputEnd <= end)
   }
   else {
     // 宽松：任意重叠（闭区间）
-    // max(inputStart, s) <= min(inputEnd, e)
     return Math.max(inputStart, start) <= Math.min(inputEnd, end)
   }
 }
