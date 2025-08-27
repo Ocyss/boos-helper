@@ -81,6 +81,7 @@ function findHelp(dom: HTMLElement | null) {
 onMounted(async () => {
   void conf.confInit()
   void user.initUser()
+  void user.initCookie()
   void model.initModel()
   void signedKey.initSignedKey()
   try {

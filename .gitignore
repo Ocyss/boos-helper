@@ -34,3 +34,5 @@ logapi.zhipin.*.pem
 /.env*
 
 .wxt
+
+/temp

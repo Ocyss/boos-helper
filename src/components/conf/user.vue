@@ -33,11 +33,12 @@ async function handleCreate() {
         return
       }
     }
-    const val = await user.createUser({})
+    const val = await user.saveUser({uid})
     if (uid && val) {
-      user.cookieDatas[uid] = val
+      user.cookieDatas.value[uid] = val
     }
     ElMessage.success('账号已保存，正在清空Cookie并刷新页面')
+    await user.clearUser()
     setTimeout(() => window.location.reload(), 1500)
   }
   catch (err) {
@@ -116,7 +117,7 @@ function handleCurrentChange(val: CookieInfo | undefined) {
       style="margin: 6px 0"
     />
     <ElTable
-      :data="user.cookieTableData"
+      :data="user.cookieTableData.value"
       style="width: 100%"
       highlight-current-row
       table-layout="auto"

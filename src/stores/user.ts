@@ -39,13 +39,13 @@ export const UserResumeStringOptions = {
   基本信息: false
     ? false as const
     : {
-        姓名: false,
-        年龄: true,
-        性别: true,
-        学历: true,
-        求职状态: true,
-        工作年限: true,
-      },
+      姓名: false,
+      年龄: true,
+      性别: true,
+      学历: true,
+      求职状态: true,
+      工作年限: true,
+    },
   期望职位: true,
   个人优势: true,
   工作经历: true,
@@ -55,17 +55,19 @@ export const UserResumeStringOptions = {
   志愿者经历: true,
 }
 
-export const useUser = defineStore('user', () => {
-  const info = ref<UserInfo>()
-  const cookieDatas = ref<Record<string, CookieInfo>>({})
-  const cookieTableData = computed(() => Object.values(cookieDatas.value))
 
-  const resume = ref<bossZpResumeData>()
+const info = ref<UserInfo>()
+const cookieDatas = ref<Record<string, CookieInfo>>({})
+const cookieTableData = computed(() => Object.values(cookieDatas.value))
 
+const resume = ref<bossZpResumeData>()
+
+
+export const useUser = () => {
   function getUserId(): number | string | null {
     return info.value?.userId
-  ?? window?._PAGE?.uid
-  ?? window?._PAGE?.userId
+      ?? window?._PAGE?.uid
+      ?? window?._PAGE?.userId
   }
 
   async function initUser() {
@@ -103,16 +105,13 @@ export const useUser = defineStore('user', () => {
     }
   }
 
-  async function createUser({ change = false, uid = null as string | number | null, clearCk = true }) {
+  async function saveUser({ uid }:{uid: string | number | null}) {
     if (uid == null) {
       uid = getUserId()
     }
-    logger.debug('开始创建账户')
+
     const { formData } = useConf()
 
-    // 如果不切换账号或者
-    // 切换账号但是有uid则创建
-    if (!change || uid != null) {
       if (uid == null) {
         throw new Error('找不到uid')
       }
@@ -129,12 +128,14 @@ export const useUser = defineStore('user', () => {
         form: jsonClone(formData),
         statistics: await useStatistics().getStatistics(),
       }
+      logger.debug('开始创建账户', info.value, val)
       await saveCookie(val)
       return val
-    }
-    if (clearCk) {
-      await clearCookie()
-    }
+    
+  }  
+
+  async function clearUser() {
+    await clearCookie()
   }
 
   async function changeUser(currentRow?: CookieInfo) {
@@ -144,9 +145,11 @@ export const useUser = defineStore('user', () => {
     }
 
     const targetAccount = jsonClone(currentRow)
-
+    const uid = useUser().getUserId()
+    if (uid != null) {
     // 保存当前账号状态
-    await createUser({ change: true })
+    await saveUser({ uid })
+  }
 
     // 恢复目标账号的配置
     if (targetAccount.form) {
@@ -164,6 +167,7 @@ export const useUser = defineStore('user', () => {
   async function deleteUser(d: CookieInfo) {
     try {
       await deleteCookie(d.uid)
+      delete cookieDatas.value[d.uid]
       ElMessage.success('账号删除成功')
     }
     catch (error) {
@@ -234,15 +238,15 @@ ${data.workExpList?.map(item => `
 
 相关技能: ${item?.emphasis?.map(e => `\`${e}\``).join(' ')}
 ${item?.workContent
-  ? `<工作内容>
+          ? `<工作内容>
 ${item.workContent}
 </工作内容>`
-  : ''}
+          : ''}
 ${item?.workPerformance
-  ? `<工作业绩>
+          ? `<工作业绩>
 ${item.workPerformance}
 </工作业绩>`
-  : ''}
+          : ''}
 `).join('\n')}`
     }
     if (options.项目经历 && data.projectExpList && data.projectExpList.length > 0) {
@@ -301,7 +305,7 @@ ${data.volunteerExpList?.map(item => `- ${item?.name} ${item?.serviceLength}
     resume.value = data.zpData
     return data.zpData
   }
-  return { info, resume, getUserResumeString, getUserResumeData, getUserId, initUser, createUser, changeUser, deleteUser, cookieDatas, cookieTableData, initCookie }
-})
+  return { info, resume, getUserResumeString, getUserResumeData, getUserId, initUser, saveUser,clearUser, changeUser, deleteUser, cookieDatas, cookieTableData, initCookie }
+}
 
 window.__q_useUser = useUser

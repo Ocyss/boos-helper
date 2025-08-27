@@ -24,6 +24,7 @@ export default defineBackground({
       const userConf = await storage.getItem<UserConf>(userKey, { fallback: {} })
       if (uid in userConf) {
         const cookies = await browser.cookies.getAll({ url: 'https://zhipin.com' })
+        console.log(`待删除cookies ${cookies.length} 个`)
         await Promise.all(cookies.map(async (cookie) => {
           await browser.cookies.remove({
             url: 'https://zhipin.com',
@@ -35,6 +36,7 @@ export default defineBackground({
 
         console.log('切换账号 targetUser', targetUser)
 
+        console.log(`待设置cookies ${targetUser.cookies.length} 个`)
         await Promise.all(targetUser.cookies.map(async (ck) => {
           await browser.cookies.set({
             url: 'https://zhipin.com',
@@ -71,6 +73,7 @@ export default defineBackground({
 
     onBrowserMessage('cookie:clear', async () => {
       const cookies = await browser.cookies.getAll({ url: 'https://zhipin.com' })
+      console.log(`待删除cookies ${cookies.length} 个`)
       await Promise.all(cookies.map(async (cookie) => {
         await browser.cookies.remove({
           url: 'https://zhipin.com',
