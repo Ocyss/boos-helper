@@ -88,6 +88,7 @@ export function signedKeyReqHandler(data: any, message = true): string | undefin
     return errMsg
   }
 }
+
 export type Client = ReturnType<typeof createClient<paths>>
 const baseUrl = (true || import.meta.env.PROD || import.meta.env.TEST || import.meta.env.WXT_TEST) ? 'https://boss-helper.ocyss.icu' : 'http://localhost:8002'
 

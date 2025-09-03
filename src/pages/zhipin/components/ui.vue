@@ -142,7 +142,7 @@ onMounted(async () => {
 
   const t = setInterval(() => {
     void signedKey.refreshSignedKeyInfo()
-  }, 1000 * 60 * 3)
+  }, 1000 * 60 * 20)
   onUnmounted(() => {
     clearInterval(t)
   })
