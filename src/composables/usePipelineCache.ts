@@ -108,10 +108,10 @@ export class PipelineCacheManager {
     item.lastAccessed = Date.now()
     item.hitCount++
 
-    logger.debug('当前职位缓存命中次数', {
-      currentName: `${item.brandName} - ${item.jobName}`,
-      count: item.hitCount,
-    })
+    // logger.debug('当前职位缓存命中次数', {
+    //   currentName: `${item.brandName} - ${item.jobName}`,
+    //   count: item.hitCount,
+    // })
 
     void this.saveCache()
     return item
@@ -128,6 +128,10 @@ export class PipelineCacheManager {
     message: string,
     processorType?: ProcessorType,
   ): Promise<void> {
+    if (status === 'error') {
+      // 不缓存错误
+      return
+    }
     try {
       const now = Date.now()
       const inferredProcessorType = processorType || this.inferProcessorType(message)
@@ -149,11 +153,11 @@ export class PipelineCacheManager {
 
       this.cache.value.data[encryptJobId] = jsonClone(cacheItem)
 
-      logger.debug('缓存结果已保存', {
-        encryptJobId,
-        jobName,
-        processorType: inferredProcessorType,
-      })
+      // logger.debug('缓存结果已保存', {
+      //   encryptJobId,
+      //   jobName,
+      //   processorType: inferredProcessorType,
+      // })
 
       await this.evictLRUIfNeeded()
       await this.saveCache()

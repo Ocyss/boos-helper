@@ -22,6 +22,11 @@ export async function requestCard(params: { securityId: string, lid: string }) {
 }
 
 export async function requestDetail(params: { securityId: string, lid: string }) {
+  const token = window?.Cookie.get('bst')
+  if (!token) {
+    ElMessage.error('没有获取到token,请刷新重试')
+    throw new PublishError('没有获取到token')
+  }
   return axios.get<{
     code: number
     message: string
@@ -31,6 +36,7 @@ export async function requestDetail(params: { securityId: string, lid: string })
       ...params,
       _: Date.now(),
     },
+    headers: { Zp_token: token },
     timeout: 5000,
   })
 }

@@ -17,11 +17,17 @@ export type MyJobListData = bossZpJobItemData & {
 
 export class JobList {
   private _vue_jobList = ref<bossZpJobItemData[]>([])
+  private _vue_jobDetail = ref<bossZpDetailData>()
 
   _list = ref<Array<MyJobListData>>([])
   _map = reactive<Record<EncryptJobId, MyJobListData>>({})
 
-  initJobList = useHookVueData('#wrap .page-job-wrapper,.job-recommend-main,.page-jobs-main', 'jobList', this._vue_jobList, (v) => {
+  private hookJobDetail = useHookVueData('#wrap .page-job-wrapper,.job-recommend-main,.page-jobs-main', 'jobDetail', this._vue_jobDetail)
+  private hookClickJobCardAction = useHookVueFn('#wrap .page-job-wrapper,.job-recommend-main,.page-jobs-main', 'clickJobCardAction')
+  private clickJobCardAction = async (_: bossZpJobItemData) => {
+  }
+
+  private hookJobList = useHookVueData('#wrap .page-job-wrapper,.job-recommend-main,.page-jobs-main', 'jobList', this._vue_jobList, (v) => {
     logger.info('初始化岗位列表', v)
 
     const jobSet = this._list.value.reduce((acc, item) => {
@@ -52,10 +58,29 @@ export class JobList {
           },
           getCard: async () => {
             // TODO： 将 bossZpCardData 转换为 bossZpDetailData
-            const data = (await requestDetail({
-              lid: item.lid,
-              securityId: item.securityId,
-            })).data.zpData
+            await this.clickJobCardAction(item)
+            const data = await new Promise<bossZpDetailData>((resolve, reject) => {
+              setTimeout(() => {
+                reject(new Error('bossZpDetailData获取超时'))
+              }, 1000 * 60)
+              const interval = setInterval(() => {
+                if (this._vue_jobDetail.value && this._vue_jobDetail.value.lid === item.lid) {
+                  resolve(this._vue_jobDetail.value)
+                  clearInterval(interval)
+                }
+              }, 100)
+            })
+            // const data = await requestDetail({
+            //   lid: item.lid,
+            //   securityId: item.securityId,
+            // }).then(async (r) => {
+            //   if (r.data.code !== 0) {
+            //     logger.error('获取职位详情失败', r)
+            //     await new Promise(resolve => setTimeout(resolve, 10000000))
+            //     return null
+            //   }
+            //   return r.data.zpData
+            // })
             const card: bossZpDetailData & bossZpCardData = {
               ...data,
               jobName: data.jobInfo.jobName,
@@ -94,6 +119,12 @@ export class JobList {
       return val
     })
   })
+
+  async initJobList() {
+    await this.hookJobDetail()
+    this.clickJobCardAction = await this.hookClickJobCardAction()
+    await this.hookJobList()
+  }
 
   get(encryptJobId: EncryptJobId): MyJobListData | undefined {
     return this._map[encryptJobId]
