@@ -8,12 +8,12 @@ import { ElMessage } from 'element-plus'
 import { ref } from 'vue'
 
 const show = defineModel<boolean>({ required: true })
-const { modelData, saveModel, initModel } = useModel()
+const modelStore = useModel()
 
 const createBoxShow = ref(false)
 
 function del(d: modelData) {
-  modelData.value = modelData.value.filter(v => d.key !== v.key)
+  modelStore.modelData = modelStore.modelData.filter(v => d.key !== v.key)
   ElMessage.success('删除成功')
 }
 
@@ -21,7 +21,7 @@ function copy(d: modelData) {
   d = jsonClone(d)
   d.key = new Date().getTime().toString()
   d.name = `${d.name} 副本`
-  modelData.value.push(d)
+  modelStore.modelData.push(d)
   ElMessage.success('复制成功')
 }
 
@@ -39,34 +39,34 @@ function newllm() {
 
 function create(d: modelData) {
   if (d.key) {
-    const old = modelData.value.find(v => v.key === d.key)
+    const old = modelStore.modelData.find(v => v.key === d.key)
     if (old) {
       deepmerge(old, d, { clone: false })
     }
     else {
       d.key = new Date().getTime().toString()
-      modelData.value.push(d)
+      modelStore.modelData.push(d)
     }
   }
   else {
     d.key = new Date().getTime().toString()
-    modelData.value.push(d)
+    modelStore.modelData.push(d)
   }
   createBoxShow.value = false
 }
 
 function close() {
-  initModel()
+  modelStore.initModel()
   show.value = false
 }
 
 function exportllm() {
-  exportJson(jsonClone(modelData.value), 'Ai模型配置')
+  exportJson(jsonClone(modelStore.modelData), 'Ai模型配置')
 }
 
 function importllm() {
   importJson<modelData[]>().then((data) => {
-    modelData.value = data
+    modelStore.modelData = data
     ElMessage.success('导入成功, 请手动保存')
   })
 }
@@ -84,7 +84,7 @@ function importllm() {
     <Alert id="llm-config-alert" title="注意" type="warning">
       会员模型暂时不支持输出 思考过程, 比如deepseekR1，但是不影响模型能力
     </Alert>
-    <el-table :data="modelData" style="width: 100%" table-layout="auto">
+    <el-table :data="modelStore.modelData" style="width: 100%" table-layout="auto">
       <el-table-column label="模型">
         <template #default="scope">
           <div style="align-items: center; display: flex">
@@ -157,7 +157,7 @@ function importllm() {
         <el-button type="primary" @click="newllm">
           新建
         </el-button>
-        <el-button type="primary" @click="saveModel">
+        <el-button type="primary" @click="modelStore.saveModel">
           保存
         </el-button>
       </div>
