@@ -113,7 +113,10 @@ interface bossZpJobItemData {
   /** 是否直接通过ATS发布，例如：false */
   atsDirectPost: boolean
   /** GPS位置，例如：null */
-  gps: any
+  gps: {
+    longitude: number
+    latitude: number
+  }
   /** 最后修改时间（时间戳），例如：1710067550000 */
   lastModifyTime: number
   /** 加密后的品牌ID，例如：'6d13c740...' */
@@ -139,6 +142,7 @@ interface bossZpJobItemData {
 /**
  * 职位卡片信息,在模板中通常使用 card 获取
  * 如 {{ card.activeTimeDesc }} 获取活跃时间描述
+ * @deprecated 此接口已弃用，请使用 bossZpDetailData 替代
  */
 interface bossZpCardData {
   /** 职位名称，例如："电脑技术员" */
@@ -415,3 +419,181 @@ type bossZpResumeData = DeepPartial<{
   }
   virtualPartTimeCombineExpect: any
 }>
+
+/**
+ * Boss直聘职位详情数据
+ * 包含职位详细信息、招聘者信息、公司信息等完整数据
+ */
+interface bossZpDetailData {
+  /** 页面类型，例如：0 */
+  pageType: number
+  /** 是否自己访问，例如：false */
+  selfAccess: boolean
+  /** 安全标识符，用于请求验证，例如：'abc123def456...' */
+  securityId: string
+  /** 会话ID，例如：null */
+  sessionId: any
+  /** 日志ID，用于追踪，例如：'abc123.search.35' */
+  lid: string
+  /** 职位详细信息 */
+  jobInfo: {
+    /** 加密后的职位ID，例如：'abc123def456...' */
+    encryptId: string
+    /** 加密后的用户ID，例如：'xyz789uvw012...' */
+    encryptUserId: string
+    /** 职位是否无效，例如：false */
+    invalidStatus: boolean
+    /** 职位名称，例如：'前端开发工程师' */
+    jobName: string
+    /** 职位编码，例如：100123 */
+    position: number
+    /** 职位名称，例如：'前端工程师' */
+    positionName: string
+    /** 城市编码，例如：101280600 */
+    location: number
+    /** 城市名称，例如：'北京' */
+    locationName: string
+    /** 城市URL，例如：'/c101010100/' */
+    locationUrl: string
+    /** 工作经验要求，例如：'3-5年' */
+    experienceName: string
+    /** 学历要求，例如：'本科' */
+    degreeName: string
+    /** 工作类型，例如：0 */
+    jobType: number
+    /** 是否代理职位，例如：0 */
+    proxyJob: number
+    /** 代理类型，例如：0 */
+    proxyType: number
+    /** 薪资描述，例如：'15-25K' */
+    salaryDesc: string
+    /** 薪资类型描述，例如：null */
+    payTypeDesc: any
+    /** 职位描述，包含岗位职责和任职要求，例如：'负责前端页面开发，熟悉Vue/React框架...' */
+    postDescription: string
+    /** 加密后的地址ID，例如：'def456ghi789...' */
+    encryptAddressId: string
+    /** 工作地址，例如：'北京市朝阳区xxx大厦' */
+    address: string
+    /** 经度，例如：116.397128 */
+    longitude: number
+    /** 纬度，例如：39.916527 */
+    latitude: number
+    /** 静态地图URL（移动端） */
+    staticMapUrl: string
+    /** 静态地图URL（PC端） */
+    pcStaticMapUrl: string
+    /** 百度静态地图URL（移动端） */
+    baiduStaticMapUrl: string
+    /** 百度静态地图URL（PC端） */
+    baiduPcStaticMapUrl: string
+    /** 海外地址列表，例如：[] */
+    overseasAddressList: Array<any>
+    /** 海外信息，例如：null */
+    overseasInfo: any
+    /** 显示的技能标签，例如：['Vue', 'React', 'JavaScript', 'TypeScript', '前端开发经验'] */
+    showSkills: Array<string>
+    /** 是否匿名发布，例如：0 */
+    anonymous: number
+    /** 职位状态描述，例如：'最新' */
+    jobStatusDesc: string
+  }
+  /** 招聘者信息 */
+  bossInfo: {
+    /** 招聘者姓名，例如：'张经理' */
+    name: string
+    /** 招聘者职位，例如：'技术总监' */
+    title: string
+    /** 招聘者头像URL（小图），例如：'https://img.bosszhipin.com/boss/avatar/avatar_1.png' */
+    tiny: string
+    /** 招聘者头像URL（大图），例如：'https://img.bosszhipin.com/boss/avatar/avatar_1.png' */
+    large: string
+    /** 活跃时间描述，例如：'今日活跃' */
+    activeTimeDesc: string
+    /** 招聘者是否在线，例如：false */
+    bossOnline: boolean
+    /** 公司名称，例如：'北京科技有限公司' */
+    brandName: string
+    /** 招聘者来源，例如：0 */
+    bossSource: number
+    /** 是否认证，例如：true */
+    certificated: boolean
+    /** 标签图标URL，例如：null */
+    tagIconUrl: any
+    /** 头像贴纸URL，例如：null */
+    avatarStickerUrl: any
+  }
+  /** 公司品牌信息 */
+  brandComInfo: {
+    /** 加密后的品牌ID，例如：'ghi789jkl012...' */
+    encryptBrandId: string
+    /** 公司名称，例如：'北京科技有限公司' */
+    brandName: string
+    /** 公司Logo URL，例如：'https://img.bosszhipin.com/beijin/icon/logo.png' */
+    logo: string
+    /** 公司阶段编码，例如：0 */
+    stage: number
+    /** 公司阶段名称，例如：'' */
+    stageName: string
+    /** 公司规模编码，例如：301 */
+    scale: number
+    /** 公司规模描述，例如：'50-150人' */
+    scaleName: string
+    /** 行业编码，例如：100020 */
+    industry: number
+    /** 行业名称，例如：'互联网' */
+    industryName: string
+    /** 公司介绍，例如：'' */
+    introduce: string
+    /** 公司标签，例如：[] */
+    labels: Array<any>
+    /** 活跃时间戳，例如：1640995200000 */
+    activeTime: number
+    /** 是否显示品牌信息，例如：true */
+    visibleBrandInfo: boolean
+    /** 是否关注品牌，例如：false */
+    focusBrand: boolean
+    /** 客户品牌名称，例如：'北京科技有限公司' */
+    customerBrandName: string
+    /** 客户品牌阶段名称，例如：'' */
+    customerBrandStageName: string
+  }
+  /** 一键投递简历信息 */
+  oneKeyResumeInfo: {
+    /** 邀请类型，例如：0 */
+    inviteType: number
+    /** 是否已发送，例如：false */
+    alreadySend: boolean
+    /** 是否可以发送简历，例如：false */
+    canSendResume: boolean
+    /** 是否可以发送电话，例如：false */
+    canSendPhone: boolean
+    /** 是否可以发送微信，例如：false */
+    canSendWechat: boolean
+  }
+  /** 关系信息 */
+  relationInfo: {
+    /** 是否对职位感兴趣，例如：false */
+    interestJob: boolean
+    /** 是否已加为好友，例如：false */
+    beFriend: boolean
+  }
+  /** 残障信息，例如：null */
+  handicappedInfo: any
+  /** 附录信息 */
+  appendixInfo: {
+    /** 是否可以反馈，例如：false */
+    canFeedback: boolean
+    /** 聊天气泡，例如：null */
+    chatBubble: any
+  }
+  /** ATS在线申请信息 */
+  atsOnlineApplyInfo: {
+    /** 邀请类型，例如：0 */
+    inviteType: number
+    /** 是否已申请，例如：false */
+    alreadyApply: boolean
+  }
+  /** 认证材料列表，例如：[] */
+  certMaterials: Array<any>
+}

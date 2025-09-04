@@ -31,6 +31,20 @@ async function showDescriptionHandler() {
     await props.job.getCard()
   }
 }
+
+function getActiveTimeType(activeTime?: number): 'success' | 'warning' | 'danger' {
+  if (!activeTime)
+    return 'danger'
+
+  const now = Date.now()
+  const diffDays = (now - activeTime) / (1000 * 60 * 60 * 24)
+
+  if (diffDays <= 2)
+    return 'success'
+  if (diffDays <= 7)
+    return 'warning'
+  return 'danger'
+}
 </script>
 
 <template>
@@ -81,6 +95,16 @@ async function showDescriptionHandler() {
         {{ job.welfareList.join(",") }}
       </div>
     </div>
+
+    <div v-if="job.card?.brandComInfo?.activeTime" class="active-time-tag">
+      <ElTag
+        :type="getActiveTimeType(job.card.brandComInfo.activeTime)"
+        effect="plain"
+      >
+        活跃时间：{{ new Date(job.card?.brandComInfo.activeTime).toLocaleString() }}
+      </ElTag>
+    </div>
+
     <div class="author-row">
       <img
         alt=""
@@ -177,6 +201,11 @@ async function showDescriptionHandler() {
     -webkit-margin-before: auto;
     margin-block-start: auto;
     padding: 5px 0;
+  }
+  .active-time-tag {
+    padding: 0.5rem 0;
+    display: flex;
+    justify-content: flex-start;
   }
   .card-content {
     cursor: pointer;

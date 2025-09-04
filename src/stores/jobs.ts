@@ -1,12 +1,12 @@
 import { checkJobCache } from '@/composables/useApplying'
-import { requestCard } from '@/composables/useApplying/utils'
+import { requestDetail } from '@/composables/useApplying/utils'
 import { useHookVueData } from '@/composables/useVue'
 import { ref } from 'vue'
 
 export type EncryptJobId = bossZpJobItemData['encryptJobId']
 export type JobStatus = 'pending' | 'wait' | 'running' | 'success' | 'error' | 'warn'
 export type MyJobListData = bossZpJobItemData & {
-  card?: bossZpCardData
+  card?: bossZpDetailData & bossZpCardData
   status: {
     status: JobStatus
     msg: string
@@ -51,12 +51,42 @@ export class JobList {
             },
           },
           getCard: async () => {
-            const cardResp = await requestCard({
+            // TODO： 将 bossZpCardData 转换为 bossZpDetailData
+            const data = (await requestDetail({
               lid: item.lid,
               securityId: item.securityId,
-            })
-            this._map[item.encryptJobId].card = cardResp.data.zpData.jobCard
-            return cardResp.data.zpData.jobCard
+            })).data.zpData
+            const card: bossZpDetailData & bossZpCardData = {
+              ...data,
+              jobName: data.jobInfo.jobName,
+              postDescription: data.jobInfo.postDescription,
+              encryptJobId: data.jobInfo.encryptId,
+              atsDirectPost: false,
+              atsProxyJob: data.jobInfo.proxyJob === 1,
+              salaryDesc: data.jobInfo.salaryDesc,
+              cityName: data.jobInfo.locationName,
+              experienceName: data.jobInfo.experienceName,
+              degreeName: data.jobInfo.degreeName,
+              jobLabels: data.jobInfo.showSkills || [],
+              address: data.jobInfo.address,
+              lid: data.lid,
+              sessionId: data.sessionId || '',
+              securityId: data.securityId,
+              encryptUserId: data.jobInfo.encryptUserId,
+              bossName: data.bossInfo.name,
+              bossTitle: data.bossInfo.title,
+              bossAvatar: data.bossInfo.tiny,
+              online: data.bossInfo.bossOnline,
+              certificated: data.bossInfo.certificated,
+              activeTimeDesc: data.bossInfo.activeTimeDesc,
+              brandName: data.brandComInfo.brandName,
+              canAddFriend: true,
+              friendStatus: 0,
+              isInterested: data.relationInfo.interestJob ? 1 : 0,
+              login: true,
+            }
+            this._map[item.encryptJobId].card = card
+            return card
           },
         }
       }

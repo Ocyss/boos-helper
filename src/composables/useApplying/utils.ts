@@ -21,6 +21,20 @@ export async function requestCard(params: { securityId: string, lid: string }) {
   })
 }
 
+export async function requestDetail(params: { securityId: string, lid: string }) {
+  return axios.get<{
+    code: number
+    message: string
+    zpData: bossZpDetailData
+  }>('https://www.zhipin.com/wapi/zpgeek/job/detail.json', {
+    params: {
+      ...params,
+      _: Date.now(),
+    },
+    timeout: 5000,
+  })
+}
+
 export async function sendPublishReq(
   data: bossZpJobItemData,
   errorMsg?: string,
